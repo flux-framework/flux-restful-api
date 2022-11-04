@@ -1,5 +1,7 @@
 # Flux RESTFul API
 
+![img/flux-restful.png](img/flux-restful.png)
+
 This is a small Flux Python API (using FastAPI) that can be containerized
 alongside Flux, and provide an easy means to interact with Flux via the API.
 My goals are:
@@ -79,6 +81,9 @@ List jobs owned by the flux executor (the current user).
 
 Get a job with a specific identifer.
 
+### POST `/jobs/{uid}/cancel`
+
+Cancel a job based on identifier.
 
 ### POST `/jobs/submit`
 
@@ -110,7 +115,6 @@ Note that you should do this outside of the container!
 - Basic authentication
 - API endpoint to kill job server
 - pre-commit and workflows to run it
-- Cute logo with sleeping Flux?
 - contributors action!
 - We can put additional assets for the server in [data](data), not sure what those are yet!
 
