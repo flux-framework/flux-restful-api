@@ -13,14 +13,12 @@ def main():
     cli = FluxRestfulClient() 
     
     # Submit the job to flux
-    print('😴 Submitting job sleep 60')
-    res = cli.submit(command=['sleep', 60])
+    print('Submitting 3 jobs to sleep!')
+    for time in [10, 20, 30]:
+        cli.submit(command=['sleep', time])
+    res = cli.jobs()
     if res:
         print(json.dumps(res, indent=4))
-    print('🍓 Getting job info...')
-    res = cli.jobs(res['id'])
-    if res:
-        print(json.dumps(res, indent=4))
-  
+
 if __name__ == "__main__":
     main()

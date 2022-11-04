@@ -2,6 +2,7 @@ import requests
 import logging 
 import json
 import os
+import base64
 from copy import deepcopy
 
 logger = logging.getLogger(__name__)
@@ -11,8 +12,10 @@ class FluxRestfulClient:
         self.host = host  or "http://127.0.0.1:5000"
         self.user = user or os.environ.get('FLUX_USER')
         self.token = token or os.environ.get('FLUX_TOKEN')
-        self.session = requests.Session()
         self.headers = {}
+        if self.user and self.token:
+            self.set_basic_auth(self.user, self.token)
+        self.session = requests.Session()
 
     def set_header(self, name, value):
         self.headers.update({name: value})
@@ -42,7 +45,8 @@ class FluxRestfulClient:
         # Always reset headers for new request.
         self.reset()
 
-        headers = headers or {}
+        headers = headers or self.headers
+        print(self.headers)
         url = "%s/%s" % (self.host, endpoint)
 
         # Make the request and return to calling function, unless requires auth
@@ -106,16 +110,31 @@ class FluxRestfulClient:
         self.headers.update({"Authorization": "Bearer %s" % token})
         return True
 
+    def list_nodes(self):
+        """
+        List nodes available.
+        """
+        return self.do_request("nodes", "GET").json()
+
+    def cancel(self, jobid):
+        """
+        Request for a job to be cancelled based on identifier.
+        """
+        return self.do_request(f"jobs/{jobid}/cancel", "POST").json()
+
+    def stop_service(self):
+        """
+        Stop the server running.
+        """
+        return self.do_request(f"service/stop", "POST").json()
+
     def jobs(self, jobid=None):
         """
         Given the id for a result, download to file
         """
-        print('JOBS LIST')
-        import IPython 
-        IPython.embed()
-        endpoint = "jobs/"
+        endpoint = "jobs"
         if jobid:
-            endpoint += str(jobid) + "/"
+            endpoint += "/" + str(jobid)
         result = self.do_request(endpoint, "GET")
         if result.status_code == 404:
             print("There is no job for that identifier.")
@@ -126,11 +145,10 @@ class FluxRestfulClient:
         """
         Given the id for a result, download to file
         """
-        endpoint = "jobs/submit"
         if isinstance(command, list):
             command = " ".join([str(x) for x in command])
         data = {"command": command}
-        result = self.do_request(endpoint, "GET", data=data)
+        result = self.do_request("jobs/submit", "POST", data=data)
         if result.status_code == 404:
             print("There is no job for that identifier.")
             return

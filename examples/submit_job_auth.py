@@ -4,6 +4,13 @@ import os
 import sys 
 import json
 
+# This is the same example as the submit_job.py, but with authentication 
+# added. You should start the server with the following environment
+# variables exported:
+# FLUX_USER=fluxuser
+# FLUX_TOKEN=12345
+# FLUX_REQUIRE_AUTH=true
+
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
 
