@@ -1,6 +1,6 @@
 # Flux RESTFul API
 
-![img/flux-restful.png](img/flux-restful.png)
+![img/flux-restful-small.png](img/flux-restful-small.png)
 
 This is a small Flux Python API (using FastAPI) that can be containerized
 alongside Flux, and provide an easy means to interact with Flux via the API.
