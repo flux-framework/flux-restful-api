@@ -2,12 +2,11 @@ import logging
 import os
 import sys
 
-from fastapi import FastAPI, Request, Depends 
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.core.config import settings
 from app.core.logging import init_loggers
 from app.routers import api, views
 
@@ -47,7 +46,7 @@ async def load_app_data(request: Request, call_next):
     # Use a common flux executor
     try:
         app.handle = flux.Flux()
-    except:
+    except Exception:
         sys.exit(
             "Cannot find flux instance! Ensure you have run flux start or similar."
         )

@@ -1,14 +1,14 @@
+import json
 import os
 import shlex
-import json
 
 import flux.job
-from fastapi import APIRouter, Depends, HTTPException, Request
+import flux.resource
+from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from flux.job import JobspecV1
-import flux.resource
 
 from app.core.config import settings
 from app.library.auth import alert_auth, check_auth

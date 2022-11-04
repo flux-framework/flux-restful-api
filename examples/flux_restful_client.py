@@ -1,17 +1,20 @@
-import requests 
-import logging 
-import json
-import os
 import base64
+import json
+import logging
+import os
+import re
 from copy import deepcopy
+
+import requests
 
 logger = logging.getLogger(__name__)
 
+
 class FluxRestfulClient:
     def __init__(self, host=None, user=None, token=None):
-        self.host = host  or "http://127.0.0.1:5000"
-        self.user = user or os.environ.get('FLUX_USER')
-        self.token = token or os.environ.get('FLUX_TOKEN')
+        self.host = host or "http://127.0.0.1:5000"
+        self.user = user or os.environ.get("FLUX_USER")
+        self.token = token or os.environ.get("FLUX_TOKEN")
         self.headers = {}
         if self.user and self.token:
             self.set_basic_auth(self.user, self.token)
@@ -57,7 +60,7 @@ class FluxRestfulClient:
             return response
 
         # Otherwise, authenticate the request and retry
-        if self.authenticate_request(response):            
+        if self.authenticate_request(response):
             return self.session.request(method, url, json=data, headers=self.headers)
         return response
 
@@ -126,7 +129,7 @@ class FluxRestfulClient:
         """
         Stop the server running.
         """
-        return self.do_request(f"service/stop", "POST").json()
+        return self.do_request("service/stop", "POST").json()
 
     def jobs(self, jobid=None):
         """
@@ -156,6 +159,7 @@ class FluxRestfulClient:
 
 
 # Helper functions
+
 
 def get_basic_auth(username, password):
     auth_str = "%s:%s" % (username, password)
