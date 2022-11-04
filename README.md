@@ -35,7 +35,7 @@ this, continue to [Local](#Local) below.
 
 ### Docker
 
-You can use the [demo container](https://github.com/flux-framework/flux-restful-api/pkgs/container/flux-restful-api), 
+You can use the [demo container](https://github.com/flux-framework/flux-restful-api/pkgs/container/flux-restful-api),
 either as provided or build on your own, to
 run the server and interact with it. To optionally build the container:
 
