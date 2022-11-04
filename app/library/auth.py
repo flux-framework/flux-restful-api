@@ -1,9 +1,10 @@
-from fastapi import HTTPException, Depends, status
-from app.core.config import settings
-
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-import secrets
 import logging
+import secrets
+
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -23,16 +24,19 @@ def alert_auth():
     print(
         "🍓    Flux user: %s" % ("*" * len(settings.flux_user))
         if settings.flux_user
-        else "unset"
+        else "🍓    Flux user: unset"
     )
     print(
         "🍓   Flux token: %s" % ("*" * len(settings.flux_token))
         if settings.flux_token
-        else "unset"
+        else "🍓   Flux token: unset"
     )
 
 
 def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
+    """
+    Check base64 encoded auth (this is HTTP Basic auth.)
+    """
     if not settings.flux_user or not settings.flux_token:
         return not_authenticated("Missing FLUX_USER and/or FLUX_TOKEN")
     current_username_bytes = credentials.username.encode("utf8")
