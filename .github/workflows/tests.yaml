@@ -1,4 +1,4 @@
-name: Test Flux RESTFul FastAPI
+name: Test flux-restful-api
 
 on:
   pull_request: []
