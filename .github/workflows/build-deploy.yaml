@@ -1,5 +1,4 @@
-name: Build Deploy Containers
-
+name: Build flux-restful-api
 on:
 
   # Publish packages on release
