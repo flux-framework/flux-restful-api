@@ -257,6 +257,13 @@ And then run pre-commit manually, or install:
 ```bash
 $ pre-commit run --all-files
 ```
+
+You can also install it to run "pre commit":
+
+```bash
+pre-commit install
+```
+
 Note that you should do this outside of the container!
 
 
@@ -286,6 +293,7 @@ tool to generate a contributors graphic below.
 ## TODO
 
 - Interface view with nice job table
+- convert readme to pretty docs? Improve logo!
 - We can put additional assets for the server in [data](data), not sure what those are yet!
 
 #### Release
