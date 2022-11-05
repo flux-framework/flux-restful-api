@@ -11,9 +11,9 @@ jobs:
       ports:
        - 5000
     steps:
+    - uses: actions/checkout@v3
     - name: Install Dependencies (in case changes)
       run: pip install -r requirements.txt
-    - uses: actions/checkout@v3
     - name: Run tests
       run: |
         # These need to be run in separate instances
