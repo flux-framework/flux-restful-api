@@ -1,0 +1,21 @@
+name: Test Flux RESTFul FastAPI
+
+on:
+  pull_request: []
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flux-framework/flux-restful-api:latest
+      ports:
+       - 5000
+    steps:
+    - name: Install Dependencies (in case changes)
+      run: pip install -r requirements.txt
+    - uses: actions/checkout@v3
+    - name: Run tests
+      run: |
+        # These need to be run in separate instances
+        flux start pytest -xs tests/test_api.py
+        flux start pytest -xs tests/test_api_auth.py

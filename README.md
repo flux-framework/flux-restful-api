@@ -43,12 +43,13 @@ run the server and interact with it. To optionally build the container:
 $ docker build -t ghcr.io/flux-framework/flux-restful-api .
 ```
 
-To build ensuring there is authentication:
+To build ensuring there is authentication (this will use user and token defaults)
 
 ```bash
-$ docker build --build-arg user=fluxuser --build-arg token=12345 --build-arg use_auth=true -t ghcr.io/flux-framework/flux-restful-api .
+$ docker build --build-arg use_auth=true -t ghcr.io/flux-framework/flux-restful-api .
 ```
 
+Or define extra builds args `--build-arg user=fluxuser --build-arg token=12345` to customize the username and token!
 Build arguments supported are:
 
 | Name | Description | Default |
