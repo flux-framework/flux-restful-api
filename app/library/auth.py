@@ -20,7 +20,7 @@ def not_authenticated(detail="Incorrect user or token."):
 
 
 def alert_auth():
-    print("🍓 Require auth: %s" % settings.flux_require_auth)
+    print("🍓 Require auth: %s" % settings.require_auth)
     print(
         "🍓    Flux user: %s" % ("*" * len(settings.flux_user))
         if settings.flux_user
