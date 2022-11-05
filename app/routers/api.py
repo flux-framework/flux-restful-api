@@ -17,7 +17,7 @@ from app.library.auth import alert_auth, check_auth
 alert_auth()
 router = APIRouter(
     tags=["jobs"],
-    dependencies=[Depends(check_auth)] if settings.flux_require_auth else [],
+    dependencies=[Depends(check_auth)] if settings.require_auth else [],
     responses={404: {"description": "Not found"}},
 )
 templates = Jinja2Templates(directory="templates/")

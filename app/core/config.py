@@ -9,9 +9,7 @@ class Settings(BaseSettings):
     # These map to envars, e.g., FLUX_USER
     flux_user: str = os.environ.get("FLUX_USER")
     flux_token: str = os.environ.get("FLUX_TOKEN")
-    flux_require_auth: bool = (
-        False if os.environ.get("FLUX_REQUIRE_AUTH") is None else True
-    )
+    require_auth: bool = False if os.environ.get("FLUX_REQUIRE_AUTH") is None else True
 
 
 settings = Settings()
