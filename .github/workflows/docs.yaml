@@ -31,17 +31,16 @@ jobs:
 
     - name: Generate Docs
       run: |
-        ln -s $(which python3) /usr/bin/python
-        python --version
+        python3 --version
         root=$PWD
         ls
         cd /tmp
         git clone -b add/docs https://github.com/flux-framework/flux-restful-api
         cd flux-restful-api
-        python -m pip install -r requirements.txt
-        python -m pip install -r .github/dev-requirements.txt
+        python3 -m pip install -r requirements.txt
+        python3 -m pip install -r .github/dev-requirements.txt
         cd docs
-        python -m pip install -r requirements.txt
+        python3 -m pip install -r requirements.txt
         make html
         mv $root/.git _build/html/.git
         rm -rf $root
