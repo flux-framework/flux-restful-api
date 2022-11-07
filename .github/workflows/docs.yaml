@@ -1,0 +1,58 @@
+name: Update Docs
+
+on:
+  pull_request: []
+  push:
+    branches: [main]
+
+jobs:
+
+  # This allows us to wait for the container to build after merge
+  sleep:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Sleepytime!
+      run: sleep 0
+
+  generate-docs:
+    needs: [sleep]
+    runs-on: ubuntu-latest
+    services:
+      api:
+        image: gchr.io/flux-framework/flux-restful-api:latest
+        ports:
+          - 5000:5000
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+
+    - name: Create environment
+      run: python -m venv env
+
+    - name: Generate Docs
+      run: |
+        source env/bin/activate
+        python --version
+        root=$PWD
+        ls
+        cd /tmp
+        git clone -b add/docs https://github.com/flux-framework/flux-restful-api
+        cd flux-restful-api
+        pip install -e .
+        cd docs
+        pip install -r requirements.txt
+        make html
+        mv $root/.git _build/html/.git
+        rm -rf $root
+        mv _build/html $root
+        cd $root
+        touch .nojekyll
+        ls
+
+#    - name: Deploy 🚀
+#      uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 # v4.4.1
+#      with:
+#        branch: gh-pages
+#        folder: .
