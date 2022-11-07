@@ -1,7 +1,6 @@
 name: Docs flux-restful-api
 
 on:
-  pull_request: []
   push:
     branches: [main]
 
@@ -11,9 +10,11 @@ jobs:
   sleep:
     runs-on: ubuntu-latest
     container: ghcr.io/flux-framework/flux-restful-api:latest
+
+    # It takes about 2 minutes to build, so give it 3!
     steps:
     - name: Sleepytime!
-      run: sleep 0
+      run: sleep 180
 
   generate-docs:
     needs: [sleep]
@@ -37,7 +38,7 @@ jobs:
         root=$PWD
         ls
         cd /tmp
-        git clone -b add/docs https://github.com/flux-framework/flux-restful-api
+        git clone https://github.com/flux-framework/flux-restful-api
         cd flux-restful-api
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r .github/dev-requirements.txt
@@ -51,8 +52,8 @@ jobs:
         touch .nojekyll
         ls
 
-#    - name: Deploy 🚀
-#      uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 # v4.4.1
-#      with:
-#        branch: gh-pages
-#        folder: .
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 # v4.4.1
+      with:
+        branch: gh-pages
+        folder: .
