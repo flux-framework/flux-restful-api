@@ -1,7 +1,0 @@
-[tool.black]
-profile = "black"
-exclude = ["^env/"]
-
-[tool.isort]
-profile = "black" # needed for black/isort compatibility
-skip = []
