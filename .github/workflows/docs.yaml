@@ -10,6 +10,7 @@ jobs:
   # This allows us to wait for the container to build after merge
   sleep:
     runs-on: ubuntu-latest
+    container: ghcr.io/flux-framework/flux-restful-api:latest
     steps:
     - name: Sleepytime!
       run: sleep 0
