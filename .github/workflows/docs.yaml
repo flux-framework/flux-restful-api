@@ -29,22 +29,20 @@ jobs:
       with:
         ref: gh-pages
 
-    - name: Create environment
-      run: python -m venv env
-
     - name: Generate Docs
       run: |
         source env/bin/activate
+        ln -s $(which python3) /usr/bin/python
         python --version
         root=$PWD
         ls
         cd /tmp
         git clone -b add/docs https://github.com/flux-framework/flux-restful-api
         cd flux-restful-api
-        pip install -r requirements.txt
-        pip install -r .github/dev-requirements.txt
+        python -m pip install -r requirements.txt
+        python -m pip install -r .github/dev-requirements.txt
         cd docs
-        pip install -r requirements.txt
+        python -m pip install -r requirements.txt
         make html
         mv $root/.git _build/html/.git
         rm -rf $root
