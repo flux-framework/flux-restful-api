@@ -19,11 +19,13 @@ app = FastAPI()
 
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.dirname(here)
+static_root = os.path.join(root, "static")
+data_root = os.path.join(root, "data")
+template_root = os.path.join(root, "templates")
 
-templates = Jinja2Templates(directory="templates")
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/data", StaticFiles(directory="data"), name="data")
+templates = Jinja2Templates(directory=template_root)
+app.mount("/static", StaticFiles(directory=static_root), name="static")
+app.mount("/data", StaticFiles(directory=data_root), name="data")
 
 app.include_router(views.router)
 app.include_router(api.router)
