@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       api:
-        image: gchr.io/flux-framework/flux-restful-api:latest
+        image: ghcr.io/flux-framework/flux-restful-api:latest
         ports:
           - 5000:5000
 
