@@ -31,6 +31,8 @@ jobs:
 
     - name: Generate Docs
       run: |
+        # Ensure we can find flux
+        export PYTHONPATH=/usr/lib/flux/python3.8
         python3 --version
         root=$PWD
         ls
