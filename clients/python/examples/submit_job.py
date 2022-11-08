@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
 
 import json
-import os
-import sys
 
-here = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, here)
-
-from flux_restful_client import FluxRestfulClient  # noqa
+from flux_restful_client.main import get_client
 
 
 def main():
-    cli = FluxRestfulClient()
+    cli = get_client()
 
     # Submit the job to flux
     print("😴 Submitting job sleep 60")

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import json
-import os
-import sys
+
+from flux_restful_client.main import get_client
 
 # This is the same example as the submit_job.py, but with authentication
 # added. You should start the server with the following environment
@@ -11,14 +11,9 @@ import sys
 # FLUX_TOKEN=12345
 # FLUX_REQUIRE_AUTH=true
 
-here = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, here)
-
-from flux_restful_client import FluxRestfulClient  # noqa
-
 
 def main():
-    cli = FluxRestfulClient()
+    cli = get_client
 
     # Submit the job to flux
     print("😴 Submitting job sleep 60")

@@ -59,33 +59,6 @@ $ docker run --name flux-restful -d --rm -it -p 5000:5000 ghcr.io/flux-framework
 $ docker stop flux-restful
 ```
 
-Either way, you can open your host to [http://127.0.0.1:5000](http://127.0.0.1:5000)
-to see the very simple interface! This currently has API documentation ([openapi](https://fastapi.tiangolo.com/advanced/extending-openapi/))
-and we will soon add a table of jobs.
-
-![img/portal.png](img/portal.png)
-
-Once you have the server running, you can test out the example scripts!
-You'll minimally need requests installed:
-
-```bash
-$ pip install requests
-```
-
-Note there is more documentation about this in the user guide.
-You should export the same flux user and password token if you added authentication:
-
-```bash
-$ export FLUX_USER=fluxuser
-$ export FLUX_TOKEN=12345
-```
-```bash
-$ python
-```
-
-
-See the [examples](examples) folder for more functionality.
-
 ### Local
 
 You can use this setup locally (if you have flux and Python available) or within the Dev Container
@@ -93,7 +66,7 @@ in a VSCode environment.
 
 #### 1. Install
 
-Install dependencies:
+After cloning the repository, install dependencies:
 
 ```bash
 $ python -m venv env
@@ -141,45 +114,18 @@ export FLUX_TOKEN=123456
 export FLUX_USER_AUTH=true
 ```
 
-#### 4. Interactions
+### Interactions
 
-After starting, you can open your browser to [http://127.0.0.1:5000](http://127.0.0.1:5000)
-to view the app interface. API endpoints are shown below, and see [examples](examples)
-for a full client and example scripts to interact with your server. E.g., here
-is an example:
+Regardless of how you install, you can open your host to [http://127.0.0.1:5000](http://127.0.0.1:5000)
+to see the very simple interface! This currently has API documentation ([openapi](https://fastapi.tiangolo.com/advanced/extending-openapi/))
+and we will soon add a table of jobs.
 
-```console
-$ python3 examples/submit_job.py
-```
+![img/portal.png](img/portal.png)
 
-To use authentication, you can either export your user and token to the environment, as before
-(and they will be found by the client):
+Once you have the server running, you can use an example client to interact
+with the server. See our [User Guide](https://flux-framework.org/flux-restful-api/getting_started/user-guide.html) for these instructions.
 
-```bash
-export FLUX_USER=$USER
-export FLUX_TOKEN=123456
-```
-or if you cannot do this, the client can accept the username and password token at creation or
-after it:
 
-```python
-# Make sure the directory with the client is in sys.path
-from flux_restful_client import FluxRestfulClient
-
-# create with username and token
-cli = FluxRestfulClient(user="fluxuser", token="12345")
-
-# Add or update after creation
-cli.set_basic_auth(user="fluxuser", token="12345")
-```
-In addition, you can set the hostname (which defaults to localhost on port 5000):
-
-```python
-# create with username and token
-cli = FluxRestfulClient('http://127.0.0.1:5000')
-```
-
-See the [examples](examples) folder for a mix of example (one with submit with auth)!
 
 ## Code Linting
 
@@ -229,7 +175,7 @@ Finally, we recommend you use the same development environment also to build and
 documentation. The reason is because we import the app to derive docstrings,
 and this will require having Flux.
 
-**NOTE** to build the documentation you will need an unathenticated flux endpoint
+**NOTE** to build the documentation you will need an unauthenticated flux endpoint
 running. E.g., in another terminal:
 
 ```bash

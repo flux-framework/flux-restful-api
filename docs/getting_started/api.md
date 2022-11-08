@@ -26,10 +26,25 @@ Request for a job cancellation based on identifier.
 
 ### POST `/jobs/submit`
 
-Submit a new job, required metadata in the post is:
+Submit a new job
 
- - command: a string of the command to run (required)
- - runtime: maximum runtime allowed (defaults to 0, unlimited, optional)
+#### Payload
+
+**Required** parameters in the post are:
+
+ - command (string or list): a string of the command to run (required)
+ - runtime (int): maximum runtime allowed (defaults to 0, unlimited, optional)
+
+**Optional** parameters include:
+
+- workdir (str): a working directory for the job. Defaults to "None" which is unset.
+- envars (dict): A set of key, value pairs (dict) of environment variables to add
+- num_tasks (int): Number of tasks (defaults to 1)
+- cores_per_task (int): Number of cores per task (default to 1)
+- gpus_per_task (int): Number of gpus per task (defaults to None)
+- num_nodes (int): Number of nodes (defaults to None)
+- exclusive (bool): is the job exclusive? (defaults to False)
+
 
 ## Nodes
 

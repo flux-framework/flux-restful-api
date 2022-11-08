@@ -68,7 +68,14 @@ async def cancel_job(jobid):
     """
     from app.main import app
 
-    flux.job.cancel(app.handle, jobid)
+    try:
+        flux.job.cancel(app.handle, jobid)
+    # This is usually FileNotFoundError
+    except Exception as e:
+        return JSONResponse(
+            content={"Message": "Job cannot be cancelled: %s." % e}, status_code=400
+        )
+
     return JSONResponse(
         content={"Message": "Job is requested to cancel."}, status_code=200
     )
@@ -78,6 +85,10 @@ async def cancel_job(jobid):
 async def submit_job(request: Request):
     """
     Submit a job to our running cluster.
+
+    The logic for parsing a submission is only required here, so we
+    include everything in this function instead of having separate
+    functions.
     """
     from app.main import app
 
@@ -88,19 +99,49 @@ async def submit_job(request: Request):
         )
 
     # Generate the flux job
-    command = shlex.split(payload["command"])
-    fluxjob = JobspecV1.from_command(command=command)
+    command = payload["command"]
+    if isinstance(command, str):
+        command = shlex.split(command)
+
+    # Optional defaults
+    kwargs = {"command": command}
+    for optional in [
+        "num_tasks",
+        "cores_per_task",
+        "gpus_per_task",
+        "num_nodes",
+        "exclusive",
+    ]:
+        if optional in payload and payload[optional]:
+            kwargs[optional] = payload[optional]
+    fluxjob = JobspecV1.from_command(**kwargs)
+
+    # Does the user want a working directory?
+    workdir = payload.get("workdir")
+    if workdir is not None:
+        fluxjob.workdir = workdir
 
     # A duration of zero (the default) means unlimited
     fluxjob.duration = payload.get("runtime", 0) or 0
 
-    # Ensure the cwd is the snakemake working directory
-    # TODO user should be able to provide envars in payload
-    fluxjob.environment = dict(os.environ)
-    flux_future = flux.job.submit_async(app.handle, fluxjob)
+    # Additional envars in the payload?
+    environment = dict(os.environ)
+    extra_envars = payload.get("envars", {})
+    environment.update(extra_envars)
+    fluxjob.environment = environment
+
+    # Submit the job and return the ID, but allow for error
+    try:
+        flux_future = flux.job.submit_async(app.handle, fluxjob)
+    except Exception as e:
+        result = jsonable_encoder(
+            {"Message": "There was an issue submitting that job.", "Error": str(e)}
+        )
+        return JSONResponse(content=result, status_code=400)
+
     jobid = flux_future.get_id()
 
-    # TODO we should write jobid and other metadata to database?
+    # TODO we should write jobid and other metadata to a database?
     result = jsonable_encoder({"Message": "Job submit.", "id": jobid})
     return JSONResponse(content=result, status_code=200)
 

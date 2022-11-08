@@ -15,9 +15,9 @@ With Flux RESTful we can:
 3. option to kill or stop the server (intended for Flux Operator)
 4. allow for start with a user name and token (for basic auth)
 
-
 This project is new and we look forward to [hearing your feedback](https://github.com/flux-framework/flux-restful-api).
-See our ⭐️ [Documentation](https://flux-framework.github.io/flux-restful-api) ⭐️ to get started!
+See our ⭐️ [Documentation](https://flux-framework.github.io/flux-restful-api) ⭐️ to get started,
+and take a look at the [clients](clients) we provide to interact with the server.
 
 ![img/flux-restful.png](img/flux-restful.png)
 

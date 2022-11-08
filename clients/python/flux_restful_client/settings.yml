@@ -1,0 +1,16 @@
+# The flux-restful-client settings file allows for finer control
+# over settings. For most people, you shouldn't need to change these defaults
+
+# config editor
+config_editor: vim
+
+# Default host and port (e.g., API baseurl)
+host: "http://127.0.0.1:5000"
+
+# Default working directory to use in the container
+workdir: null
+
+# Default flux user and token
+# This is recommended to get from the environment and not write to file
+flux_user: null
+flux_token: null
