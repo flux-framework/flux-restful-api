@@ -83,7 +83,7 @@ optional arguments:
   --exclusive           The --exclusive flag.
 ```
 
-The only requirment is the command, which you can add to the end of the submit request.
+The only requirement is the command, which you can add to the end of the submit request.
 Here is submitting a basic job to sleep.
 
 ```bash
