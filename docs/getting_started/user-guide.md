@@ -284,3 +284,7 @@ cli = get_client('http://127.0.0.1:5000')
 ```
 
 See the [examples](https://github.com/flux-framework/flux-restful-api/tree/main/client/python/examples) folder for a mix of example (one with submit with auth)!
+
+## Go
+
+Coming soon!
