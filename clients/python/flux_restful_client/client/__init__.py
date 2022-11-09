@@ -18,6 +18,11 @@ def add_submit_arguments(command):
         if name == "command":
             continue
         typ = attrs.get("type")
+
+        # This is currently just envars, we will add separately as append args.
+        if not typ and "oneOf" in attrs:
+            continue
+
         default_type = str
         action = None
 
@@ -85,9 +90,9 @@ def get_parser():
         "-c",
         dest="config_params",
         help=""""customize a config value on the fly to ADD/SET/REMOVE for a command
-action-updater -c set:key:value <command> <args>
-action-updater -c add:listkey:value <command> <args>
-action-updater -c rm:listkey:value""",
+flux-restful-cli -c set:key:value <command> <args>
+flux-restful-cli -c add:listkey:value <command> <args>
+flux-restful-cli -c rm:listkey:value""",
         action="append",
     )
 
@@ -108,6 +113,14 @@ action-updater -c rm:listkey:value""",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     add_submit_arguments(submit)
+    submit.add_argument(
+        "--env",
+        dest="envars",
+        help=""""key=value pairs to provide to the job in the environment (add as many as you need)
+flux-restful-cli --env PIPELINE_VAR=one ...
+flux-restful-cli --env SUPERHERO=batman --env SUPERHERO_NAME=manbat ...""",
+        action="append",
+    )
 
     # Local shell with client loaded
     shell = subparsers.add_parser(

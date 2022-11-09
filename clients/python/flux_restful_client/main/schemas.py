@@ -9,26 +9,43 @@ keyvals = {
 
 # A job submission schema
 submit_properties = {
-    "workdir": {"type": ["string", "null"]},
+    "workdir": {
+        "type": ["string", "null"],
+        "description": "working directory for the job to run",
+    },
     "command": {
         "oneOf": [
             {
                 "type": "string",
             },
             {"type": "array", "items": {"type": ["string", "number"]}},
-        ]
+        ],
+        "description": "full command for job to run as a string or list.",
     },
     "envars": {
+        "description": "key value pairs to export to the environment.",
         "oneOf": [
             {"type": "null"},
             keyvals,
-        ]
+        ],
     },
-    "num_tasks": {"type": "number"},
-    "cores_per_task": {"type": ["number", "null"]},
-    "gpus_per_task": {"type": ["number", "null"]},
-    "num_nodes": {"type": ["number", "null"]},
-    "exclusive": {"type": ["boolean", "null"]},
+    "num_tasks": {"type": "number", "description": "number of tasks for the job."},
+    "cores_per_task": {
+        "type": ["number", "null"],
+        "description": "number of cores per task for the job.",
+    },
+    "gpus_per_task": {
+        "type": ["number", "null"],
+        "description": "number of gpus per task for the job.",
+    },
+    "num_nodes": {
+        "type": ["number", "null"],
+        "description": "number of nodes for the job.",
+    },
+    "exclusive": {
+        "type": ["boolean", "null"],
+        "description": "ask for exclusive nodes for the job.",
+    },
 }
 
 job_submit_schema = {
