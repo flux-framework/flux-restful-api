@@ -103,7 +103,7 @@ Let's list the nodes in our cluster!
     Listing nodes
     {
         "nodes": [
-            "305a7e33e5e9"
+            "80e5b9973186"
         ]
     }
 
@@ -173,22 +173,17 @@ And finally, let's get job info.
     🍓 Getting job info...
     {
         "job": {
-            "id": 1275940831232,
+            "id": 866090221568,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1667956735.968448,
-            "t_depend": 1667956735.968448,
-            "t_run": 1667956735.9835992,
-            "state": 16,
+            "t_submit": 1667956791.8467693,
+            "t_depend": 1667956791.8467693,
+            "state": 8,
             "name": "sleep",
             "ntasks": 1,
             "ncores": 1,
-            "duration": 0.0,
-            "nnodes": 1,
-            "ranks": "0",
-            "nodelist": "305a7e33e5e9",
-            "expiration": 4821556735.0
+            "duration": 0.0
         }
     }
 
@@ -223,16 +218,16 @@ Submit the job to flux
     {
         "jobs": [
             {
-                "id": 1277266231296
+                "id": 867197517824
             },
             {
-                "id": 1277886988288
+                "id": 867667279872
             },
             {
-                "id": 1276695805952
+                "id": 866694201344
             },
             {
-                "id": 1275940831232
+                "id": 866090221568
             }
         ]
     }
@@ -267,7 +262,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 1278591631360
+        "id": 868237705216
     }
     Requesting job cancel..
     {
@@ -303,7 +298,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.567 seconds)
+   **Total running time of the script:** ( 0 minutes  0.398 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:
