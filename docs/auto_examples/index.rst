@@ -18,6 +18,7 @@ This gallery consists of introductory examples and general examples
 of using the Flux RESTFul API in Python.
 
 
+
 .. raw:: html
 
     <div class="sphx-glr-thumbnails">
