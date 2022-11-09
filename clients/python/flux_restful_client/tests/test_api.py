@@ -1,3 +1,5 @@
+import time
+
 from flux_restful_client.main import get_client
 
 
@@ -47,8 +49,7 @@ def test_cancel_job():
     assert "requested to cancel" in response["Message"]
 
     # Give time to cancel
-    # This will be re-enabled with new container build
-    # time.sleep(3)
-    # response = client.cancel(jobid)
-    # assert "Message" in response
-    # assert "cannot be cancelled" in response["Message"]
+    time.sleep(3)
+    response = client.cancel(jobid)
+    assert "Message" in response
+    assert "cannot be cancelled" in response["Message"]
