@@ -19,7 +19,7 @@ jobs:
     - name: Run tests without auth
       run: |
         cd clients/python
-        pip install -e .
+        pip install -e .[all]
         pytest -xs flux_restful_client/tests/test_api.py
 
   test-auth:
@@ -38,7 +38,7 @@ jobs:
     - name: Run tests with auth
       run: |
         cd clients/python
-        pip install -e .
+        pip install -e .[all]
         export FLUX_USER=fluxuser
         export FLUX_TOKEN=12345
         pytest -xs flux_restful_client/tests/test_api.py
