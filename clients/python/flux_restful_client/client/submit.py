@@ -26,5 +26,17 @@ def main(args, parser, extra, subparser):
         if hasattr(args, arg) and getattr(args, arg, None) is not None:
             kwargs[arg] = getattr(args, arg)
 
+    # Parse environment variables
+    envars = {}
+    for pair in args.envars or []:
+        if "=" not in pair:
+            logger.warning(f"Envar {pair} is missing '=', skipping")
+            continue
+        key, value = pair.split("=", 1)
+        envars[key.strip()] = value.strip()
+
+    # Don't bother adding if they are empty!
+    if envars:
+        kwargs["envars"] = envars
     res = cli.submit(**kwargs)
     print(json.dumps(res, indent=4))
