@@ -25,7 +25,7 @@ This small tutorial walks through the basics of using an API.
 The most basic thing to do is submit a job to the API,
 list, get statuses, cancel. We can use our example client for this.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-31
+.. GENERATED FROM PYTHON SOURCE LINES 10-27
 
 .. code-block:: default
 
@@ -33,22 +33,18 @@ list, get statuses, cancel. We can use our example client for this.
     import json
     import os
     import sys
+
     import matplotlib.pyplot as plt
+    from flux_restful_client.main import get_client
 
     # This is expected to be rendered from docs root
     here = os.path.dirname(os.path.abspath(os.getcwd()))
-    root = os.path.dirname(here)
 
     # This is here for the nice thumbnail :)
     image = plt.imread(os.path.join(here, "images", "logo.png"))
     fig = plt.imshow(image)
-    plt.axis('off')
+    plt.axis("off")
     plt.show()
-
-    # This directory has the Python client
-    sys.path.insert(0, os.path.join(root, "examples"))
-
-    from flux_restful_client import FluxRestfulClient  # noqa
 
 
 
@@ -62,18 +58,18 @@ list, get statuses, cancel. We can use our example client for this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-35
+.. GENERATED FROM PYTHON SOURCE LINES 28-31
 
 Here we instantiate a client. If you need authentication, this can optionally take
 a user and token, or also derive from the FLUX_USER and FLUX_TOKEN in the
 environment.
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-38
+.. GENERATED FROM PYTHON SOURCE LINES 31-34
 
 .. code-block:: default
 
 
-    cli = FluxRestfulClient()
+    cli = get_client()
 
 
 
@@ -82,16 +78,16 @@ environment.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-40
+.. GENERATED FROM PYTHON SOURCE LINES 35-36
 
 Let's list the nodes in our cluster!
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-46
+.. GENERATED FROM PYTHON SOURCE LINES 36-42
 
 .. code-block:: default
 
     print("Listing nodes")
-    res = cli.list_nodes();
+    res = cli.list_nodes()
     if res:
         print(json.dumps(res, indent=4))
 
@@ -105,32 +101,31 @@ Let's list the nodes in our cluster!
  .. code-block:: none
 
     Listing nodes
-    {}
     {
         "nodes": [
-            "a6856cb188a9"
+            "3a2a7a9428e6"
         ]
     }
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-48
+.. GENERATED FROM PYTHON SOURCE LINES 43-44
 
 Now let's submit a job to Flux.
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-57
+.. GENERATED FROM PYTHON SOURCE LINES 44-53
 
 .. code-block:: default
 
 
     print("😴 Submitting job sleep 60")
-    res = cli.submit(command=["sleep", 60]);
+    res = cli.submit(command=["sleep", 60])
 
     # This is an indication something went wrong - detail has an error.
     if res and "detail" in res:
-        print(res['detail']);
-        sys.exit();
+        print(res["detail"])
+        sys.exit()
 
 
 
@@ -141,12 +136,11 @@ Now let's submit a job to Flux.
  .. code-block:: none
 
     😴 Submitting job sleep 60
-    {}
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-64
+.. GENERATED FROM PYTHON SOURCE LINES 54-60
 
 To require auth, the server should be startup with these variables
 in the environment (and the first two found by the client here)
@@ -155,16 +149,16 @@ FLUX_USER=fluxuser
 FLUX_TOKEN=12345
 FLUX_REQUIRE_AUTH=true
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-67
+.. GENERATED FROM PYTHON SOURCE LINES 62-63
 
 And finally, let's get job info.
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-72
+.. GENERATED FROM PYTHON SOURCE LINES 63-68
 
 .. code-block:: default
 
     print("🍓 Getting job info...")
-    res = cli.jobs(res["id"]);
+    res = cli.jobs(res["id"])
     if res:
         print(json.dumps(res, indent=4))
 
@@ -177,16 +171,15 @@ And finally, let's get job info.
  .. code-block:: none
 
     🍓 Getting job info...
-    {}
     {
         "job": {
-            "id": 24466415419392,
+            "id": 13428886339584,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1667781617.2412803,
-            "t_depend": 1667781617.2412803,
-            "t_run": 1667781617.2555447,
+            "t_submit": 1667955436.1993887,
+            "t_depend": 1667955436.1993887,
+            "t_run": 1667955436.2116482,
             "state": 16,
             "name": "sleep",
             "ntasks": 1,
@@ -194,27 +187,27 @@ And finally, let's get job info.
             "duration": 0.0,
             "nnodes": 1,
             "ranks": "0",
-            "nodelist": "a6856cb188a9",
-            "expiration": 4821381617.0
+            "nodelist": "3a2a7a9428e6",
+            "expiration": 4821555436.0
         }
     }
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-75
+.. GENERATED FROM PYTHON SOURCE LINES 69-71
 
 Now let's submit three jobs in unison so we can list them back!
 Submit the job to flux
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-82
+.. GENERATED FROM PYTHON SOURCE LINES 71-78
 
 .. code-block:: default
 
     print("Submitting 3 jobs to sleep!")
     for time in [10, 20, 30]:
-        cli.submit(command=["sleep", time]);
-    res = cli.jobs();
+        cli.submit(command=["sleep", time])
+    res = cli.jobs()
     if res:
         print(json.dumps(res, indent=4))
 
@@ -227,98 +220,34 @@ Submit the job to flux
  .. code-block:: none
 
     Submitting 3 jobs to sleep!
-    {}
-    {}
-    {}
-    {}
     {
         "jobs": [
             {
-                "id": 24468630011904
+                "id": 13430681501696
             },
             {
-                "id": 24467992477696
+                "id": 13430010413056
             },
             {
-                "id": 24467136839680
+                "id": 13429473542144
             },
             {
-                "id": 24466415419392
+                "id": 13428886339584
             },
             {
-                "id": 19772888580096
+                "id": 24310185984
             },
             {
-                "id": 19774398529536
+                "id": 25987907584
             },
             {
-                "id": 19773911990272
+                "id": 25467813888
             },
             {
-                "id": 19773425451008
+                "id": 24914165760
             },
             {
-                "id": 19775019286528
-            },
-            {
-                "id": 12969610051584
-            },
-            {
-                "id": 12971103223808
-            },
-            {
-                "id": 12970599907328
-            },
-            {
-                "id": 12970130145280
-            },
-            {
-                "id": 12971740758016
-            },
-            {
-                "id": 11126901309440
-            },
-            {
-                "id": 11128327372800
-            },
-            {
-                "id": 11127857610752
-            },
-            {
-                "id": 11127421403136
-            },
-            {
-                "id": 11128998461440
-            },
-            {
-                "id": 5668031430656
-            },
-            {
-                "id": 5669742706688
-            },
-            {
-                "id": 5669205835776
-            },
-            {
-                "id": 5668652187648
-            },
-            {
-                "id": 5670447349760
-            },
-            {
-                "id": 3678102618112
-            },
-            {
-                "id": 3679629344768
-            },
-            {
-                "id": 3679109251072
-            },
-            {
-                "id": 3678639489024
-            },
-            {
-                "id": 3680250101760
+                "id": 26625441792
             }
         ]
     }
@@ -326,20 +255,20 @@ Submit the job to flux
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-84
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 Finally, let's submit and cancel a job
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-92
+.. GENERATED FROM PYTHON SOURCE LINES 80-88
 
 .. code-block:: default
 
     print("Submitting job sleep 60 intending to cancel..")
-    res = cli.submit(command=["sleep", 60]);
+    res = cli.submit(command=["sleep", 60])
     if res:
         print(json.dumps(res, indent=4))
         print("Requesting job cancel..")
-        res = cli.cancel(res["id"]);
+        res = cli.cancel(res["id"])
         print(json.dumps(res, indent=4))
 
 
@@ -351,13 +280,11 @@ Finally, let's submit and cancel a job
  .. code-block:: none
 
     Submitting job sleep 60 intending to cancel..
-    {}
     {
         "Message": "Job submit.",
-        "id": 24469485649920
+        "id": 13431470030848
     }
     Requesting job cancel..
-    {}
     {
         "Message": "Job is requested to cancel."
     }
@@ -365,16 +292,17 @@ Finally, let's submit and cancel a job
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-94
+.. GENERATED FROM PYTHON SOURCE LINES 89-90
 
 And this would be how you stop your cluster service
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-95
+.. GENERATED FROM PYTHON SOURCE LINES 90-92
 
 .. code-block:: default
 
     print("Stopping the service...")
     # res = cli.stop_service()
+
 
 
 
@@ -390,7 +318,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.577 seconds)
+   **Total running time of the script:** ( 0 minutes  0.508 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:

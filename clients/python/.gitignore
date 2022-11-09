@@ -1,0 +1,13 @@
+bin/
+lib/
+flux_restful_client.egg-info/
+env
+.env
+build
+release
+dist/
+__pycache__
+*.simg
+*.sif
+*.img
+/.eggs

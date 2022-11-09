@@ -13,10 +13,10 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
+from flux_restful_client.main import get_client
 
 # This is expected to be rendered from docs root
 here = os.path.dirname(os.path.abspath(os.getcwd()))
-root = os.path.dirname(here)
 
 # This is here for the nice thumbnail :)
 image = plt.imread(os.path.join(here, "images", "logo.png"))
@@ -24,17 +24,12 @@ fig = plt.imshow(image)
 plt.axis("off")
 plt.show()
 
-# This directory has the Python client
-sys.path.insert(0, os.path.join(root, "examples"))
-
-from flux_restful_client import FluxRestfulClient  # noqa
-
 #%%
 # Here we instantiate a client. If you need authentication, this can optionally take
 # a user and token, or also derive from the FLUX_USER and FLUX_TOKEN in the
 # environment.
 
-cli = FluxRestfulClient()
+cli = get_client()
 
 #%%
 # Let's list the nodes in our cluster!

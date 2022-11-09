@@ -1,3 +1,4 @@
+import base64
 import os
 import sys
 
@@ -5,12 +6,8 @@ from fastapi.testclient import TestClient
 
 here = os.path.abspath(os.path.dirname(__file__))
 root = os.path.dirname(here)
-examples = os.path.join(root, "examples")
 
-sys.path.insert(0, examples)
 sys.path.insert(0, root)
-
-from flux_restful_client import get_basic_auth  # noqa
 
 # Define authentication in environment for server
 flux_user = "fluxuser"
@@ -23,6 +20,11 @@ os.environ["FLUX_REQUIRE_AUTH"] = "true"
 from app.main import app  # noqa
 
 client = TestClient(app)
+
+
+def get_basic_auth(username, password):
+    auth_str = "%s:%s" % (username, password)
+    return base64.b64encode(auth_str.encode("utf-8")).decode("utf-8")
 
 
 def get_headers():
