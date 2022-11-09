@@ -108,6 +108,9 @@
   'GRAD' 0,
   'opsz' 48
 }
+.sphx-glr-script-out .highlight pre {
+  background-color: #def0ff !important;
+}
   </style>
   <link href="../_static/images/logo.png" rel="apple-touch-icon"/>
  </head>
@@ -361,6 +364,15 @@
                         </span>
                        </code>
                       </a>
+                      <nav class="md-nav">
+                       <ul class="md-nav__list">
+                        <li class="md-nav__item">
+                         <a class="md-nav__link" href="#payload">
+                          Payload
+                         </a>
+                        </li>
+                       </ul>
+                      </nav>
                      </li>
                     </ul>
                    </nav>
@@ -507,6 +519,15 @@
                    </span>
                   </code>
                  </a>
+                 <nav class="md-nav">
+                  <ul class="md-nav__list">
+                   <li class="md-nav__item">
+                    <a class="md-nav__link" href="#payload">
+                     Payload
+                    </a>
+                   </li>
+                  </ul>
+                 </nav>
                 </li>
                </ul>
               </nav>
@@ -651,20 +672,77 @@ and thus exit the job and bring down the mini-cluster.
            </a>
           </h3>
           <p>
-           Submit a new job, required metadata in the post is:
+           Submit a new job
           </p>
-          <ul class="simple">
-           <li>
-            <p>
-             command: a string of the command to run (required)
-            </p>
-           </li>
-           <li>
-            <p>
-             runtime: maximum runtime allowed (defaults to 0, unlimited, optional)
-            </p>
-           </li>
-          </ul>
+          <section id="payload">
+           <h4 id="payload">
+            Payload
+            <a class="headerlink" href="#payload" title="Permalink to this heading">
+             ¶
+            </a>
+           </h4>
+           <p>
+            <strong>
+             Required
+            </strong>
+            parameters in the post are:
+           </p>
+           <ul class="simple">
+            <li>
+             <p>
+              command (string or list): a string of the command to run (required)
+             </p>
+            </li>
+            <li>
+             <p>
+              runtime (int): maximum runtime allowed (defaults to 0, unlimited, optional)
+             </p>
+            </li>
+           </ul>
+           <p>
+            <strong>
+             Optional
+            </strong>
+            parameters include:
+           </p>
+           <ul class="simple">
+            <li>
+             <p>
+              workdir (str): a working directory for the job. Defaults to “None” which is unset.
+             </p>
+            </li>
+            <li>
+             <p>
+              envars (dict): A set of key, value pairs (dict) of environment variables to add
+             </p>
+            </li>
+            <li>
+             <p>
+              num_tasks (int): Number of tasks (defaults to 1)
+             </p>
+            </li>
+            <li>
+             <p>
+              cores_per_task (int): Number of cores per task (default to 1)
+             </p>
+            </li>
+            <li>
+             <p>
+              gpus_per_task (int): Number of gpus per task (defaults to None)
+             </p>
+            </li>
+            <li>
+             <p>
+              num_nodes (int): Number of nodes (defaults to None)
+             </p>
+            </li>
+            <li>
+             <p>
+              exclusive (bool): is the job exclusive? (defaults to False)
+             </p>
+            </li>
+           </ul>
+          </section>
          </section>
         </section>
         <section id="nodes">
@@ -737,7 +815,7 @@ and thus exit the job and bring down the mini-cluster.
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 07, 2022.
+              Nov 09, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

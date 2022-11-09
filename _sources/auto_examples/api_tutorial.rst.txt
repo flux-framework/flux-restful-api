@@ -25,7 +25,7 @@ This small tutorial walks through the basics of using an API.
 The most basic thing to do is submit a job to the API,
 list, get statuses, cancel. We can use our example client for this.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-32
+.. GENERATED FROM PYTHON SOURCE LINES 10-27
 
 .. code-block:: default
 
@@ -35,21 +35,16 @@ list, get statuses, cancel. We can use our example client for this.
     import sys
 
     import matplotlib.pyplot as plt
+    from flux_restful_client.main import get_client
 
     # This is expected to be rendered from docs root
     here = os.path.dirname(os.path.abspath(os.getcwd()))
-    root = os.path.dirname(here)
 
     # This is here for the nice thumbnail :)
     image = plt.imread(os.path.join(here, "images", "logo.png"))
     fig = plt.imshow(image)
     plt.axis("off")
     plt.show()
-
-    # This directory has the Python client
-    sys.path.insert(0, os.path.join(root, "examples"))
-
-    from flux_restful_client import FluxRestfulClient  # noqa
 
 
 
@@ -63,18 +58,18 @@ list, get statuses, cancel. We can use our example client for this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-36
+.. GENERATED FROM PYTHON SOURCE LINES 28-31
 
 Here we instantiate a client. If you need authentication, this can optionally take
 a user and token, or also derive from the FLUX_USER and FLUX_TOKEN in the
 environment.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-39
+.. GENERATED FROM PYTHON SOURCE LINES 31-34
 
 .. code-block:: default
 
 
-    cli = FluxRestfulClient()
+    cli = get_client()
 
 
 
@@ -83,11 +78,11 @@ environment.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-41
+.. GENERATED FROM PYTHON SOURCE LINES 35-36
 
 Let's list the nodes in our cluster!
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-47
+.. GENERATED FROM PYTHON SOURCE LINES 36-42
 
 .. code-block:: default
 
@@ -106,21 +101,20 @@ Let's list the nodes in our cluster!
  .. code-block:: none
 
     Listing nodes
-    {}
     {
         "nodes": [
-            "b27d01c1fd8c"
+            "19e93c91bb89"
         ]
     }
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-49
+.. GENERATED FROM PYTHON SOURCE LINES 43-44
 
 Now let's submit a job to Flux.
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-58
+.. GENERATED FROM PYTHON SOURCE LINES 44-53
 
 .. code-block:: default
 
@@ -142,12 +136,11 @@ Now let's submit a job to Flux.
  .. code-block:: none
 
     😴 Submitting job sleep 60
-    {}
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-65
+.. GENERATED FROM PYTHON SOURCE LINES 54-60
 
 To require auth, the server should be startup with these variables
 in the environment (and the first two found by the client here)
@@ -156,11 +149,11 @@ FLUX_USER=fluxuser
 FLUX_TOKEN=12345
 FLUX_REQUIRE_AUTH=true
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-68
+.. GENERATED FROM PYTHON SOURCE LINES 62-63
 
 And finally, let's get job info.
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-73
+.. GENERATED FROM PYTHON SOURCE LINES 63-68
 
 .. code-block:: default
 
@@ -178,16 +171,15 @@ And finally, let's get job info.
  .. code-block:: none
 
     🍓 Getting job info...
-    {}
     {
         "job": {
-            "id": 813376208896,
+            "id": 1157846007808,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1667784569.2485256,
-            "t_depend": 1667784569.2485256,
-            "t_run": 1667784569.2629416,
+            "t_submit": 1667956181.6926441,
+            "t_depend": 1667956181.6926441,
+            "t_run": 1667956181.7095733,
             "state": 16,
             "name": "sleep",
             "ntasks": 1,
@@ -195,20 +187,20 @@ And finally, let's get job info.
             "duration": 0.0,
             "nnodes": 1,
             "ranks": "0",
-            "nodelist": "b27d01c1fd8c",
-            "expiration": 4821384569.0
+            "nodelist": "19e93c91bb89",
+            "expiration": 4821556181.0
         }
     }
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-76
+.. GENERATED FROM PYTHON SOURCE LINES 69-71
 
 Now let's submit three jobs in unison so we can list them back!
 Submit the job to flux
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-83
+.. GENERATED FROM PYTHON SOURCE LINES 71-78
 
 .. code-block:: default
 
@@ -228,23 +220,19 @@ Submit the job to flux
  .. code-block:: none
 
     Submitting 3 jobs to sleep!
-    {}
-    {}
-    {}
-    {}
     {
         "jobs": [
             {
-                "id": 814449950720
+                "id": 1159070744576
             },
             {
-                "id": 814919712768
+                "id": 1159607615488
             },
             {
-                "id": 813980188672
+                "id": 1158533873664
             },
             {
-                "id": 813376208896
+                "id": 1157846007808
             }
         ]
     }
@@ -252,11 +240,11 @@ Submit the job to flux
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-85
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 Finally, let's submit and cancel a job
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-93
+.. GENERATED FROM PYTHON SOURCE LINES 80-88
 
 .. code-block:: default
 
@@ -277,13 +265,11 @@ Finally, let's submit and cancel a job
  .. code-block:: none
 
     Submitting job sleep 60 intending to cancel..
-    {}
     {
         "Message": "Job submit.",
-        "id": 815456583680
+        "id": 1160228372480
     }
     Requesting job cancel..
-    {}
     {
         "Message": "Job is requested to cancel."
     }
@@ -291,11 +277,11 @@ Finally, let's submit and cancel a job
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-95
+.. GENERATED FROM PYTHON SOURCE LINES 89-90
 
 And this would be how you stop your cluster service
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+.. GENERATED FROM PYTHON SOURCE LINES 90-92
 
 .. code-block:: default
 
@@ -317,7 +303,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.380 seconds)
+   **Total running time of the script:** ( 0 minutes  0.496 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:

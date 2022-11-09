@@ -108,6 +108,9 @@
   'GRAD' 0,
   'opsz' 48
 }
+.sphx-glr-script-out .highlight pre {
+  background-color: #def0ff !important;
+}
   </style>
   <link href="../_static/images/logo.png" rel="apple-touch-icon"/>
  </head>
@@ -361,21 +364,16 @@ list, get statuses, cancel. We can use our example client for this.
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">flux_restful_client.main</span> <span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="c1"># This is expected to be rendered from docs root</span>
 <span class="n">here</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span>
-<span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">here</span><span class="p">)</span>
 
 <span class="c1"># This is here for the nice thumbnail :)</span>
 <span class="n">image</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">here</span><span class="p">,</span> <span class="s2">"images"</span><span class="p">,</span> <span class="s2">"logo.png"</span><span class="p">))</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-<span class="c1"># This directory has the Python client</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">"examples"</span><span class="p">))</span>
-
-<span class="kn">from</span> <span class="nn">flux_restful_client</span> <span class="kn">import</span> <span class="n">FluxRestfulClient</span>  <span class="c1"># noqa</span>
 </pre>
          </div>
         </div>
@@ -387,7 +385,7 @@ environment.
         </p>
         <div class="highlight-default notranslate">
          <div class="highlight">
-          <pre><span></span><span class="n">cli</span> <span class="o">=</span> <span class="n">FluxRestfulClient</span><span class="p">()</span>
+          <pre><span></span><span class="n">cli</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 </pre>
          </div>
         </div>
@@ -406,10 +404,9 @@ environment.
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>Listing nodes
-{}
 {
     "nodes": [
-        "b27d01c1fd8c"
+        "19e93c91bb89"
     ]
 }
 </pre>
@@ -433,7 +430,6 @@ environment.
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>😴 Submitting job sleep 60
-{}
 </pre>
          </div>
         </div>
@@ -460,16 +456,15 @@ FLUX_REQUIRE_AUTH=true
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>🍓 Getting job info...
-{}
 {
     "job": {
-        "id": 813376208896,
+        "id": 1157846007808,
         "userid": 0,
         "urgency": 16,
         "priority": 16,
-        "t_submit": 1667784569.2485256,
-        "t_depend": 1667784569.2485256,
-        "t_run": 1667784569.2629416,
+        "t_submit": 1667956181.6926441,
+        "t_depend": 1667956181.6926441,
+        "t_run": 1667956181.7095733,
         "state": 16,
         "name": "sleep",
         "ntasks": 1,
@@ -477,8 +472,8 @@ FLUX_REQUIRE_AUTH=true
         "duration": 0.0,
         "nnodes": 1,
         "ranks": "0",
-        "nodelist": "b27d01c1fd8c",
-        "expiration": 4821384569.0
+        "nodelist": "19e93c91bb89",
+        "expiration": 4821556181.0
     }
 }
 </pre>
@@ -502,23 +497,19 @@ Submit the job to flux
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>Submitting 3 jobs to sleep!
-{}
-{}
-{}
-{}
 {
     "jobs": [
         {
-            "id": 814449950720
+            "id": 1159070744576
         },
         {
-            "id": 814919712768
+            "id": 1159607615488
         },
         {
-            "id": 813980188672
+            "id": 1158533873664
         },
         {
-            "id": 813376208896
+            "id": 1157846007808
         }
     ]
 }
@@ -543,13 +534,11 @@ Submit the job to flux
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>Submitting job sleep 60 intending to cancel..
-{}
 {
     "Message": "Job submit.",
-    "id": 815456583680
+    "id": 1160228372480
 }
 Requesting job cancel..
-{}
 {
     "Message": "Job is requested to cancel."
 }
@@ -576,7 +565,7 @@ Requesting job cancel..
          <strong>
           Total running time of the script:
          </strong>
-         ( 0 minutes  0.380 seconds)
+         ( 0 minutes  0.496 seconds)
         </p>
         <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-api-tutorial-py">
          <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -674,7 +663,7 @@ Requesting job cancel..
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 07, 2022.
+              Nov 09, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
