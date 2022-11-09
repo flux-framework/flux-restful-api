@@ -29,7 +29,6 @@ class SettingsBase:
         """
         Create a new settings object not requiring a settings file.
         """
-        # Set an updated time, in case it's written back to file
         self._settings = {}
         self.settings_file = None
         self.user_settings = None
@@ -84,7 +83,7 @@ class SettingsBase:
             editor = self._find_editor(self.config_editor)
         if not editor:
             logger.exit(
-                "No editors found! Update with flux-restul-cli config set config_editor:<name>"
+                "No editors found! Update with flux-restful-cli config set config_editor:<name>"
             )
 
         utils.run_command([editor, settings_file], stream=True)

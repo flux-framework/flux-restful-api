@@ -141,7 +141,7 @@ async def submit_job(request: Request):
 
     jobid = flux_future.get_id()
 
-    # TODO we should write jobid and other metadata to a database?
+    # TODO should we write jobid and other metadata to a database?
     result = jsonable_encoder({"Message": "Job submit.", "id": jobid})
     return JSONResponse(content=result, status_code=200)
 

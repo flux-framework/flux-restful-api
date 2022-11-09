@@ -183,6 +183,7 @@ class FluxRestfulClient:
             "num_nodes",
             "exclusive",
             "workdir",
+            "envars",
         ]:
 
             # Assume if it's provided, period, the user wants to set it!

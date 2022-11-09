@@ -4,15 +4,10 @@ flux_restful_client.egg-info/
 env
 .env
 build
-docs/_build
 release
-_site
 dist/
-OLD
 __pycache__
 *.simg
 *.sif
 *.img
 /.eggs
-/modules
-/views

@@ -87,7 +87,7 @@ Let's list the nodes in our cluster!
 .. code-block:: default
 
     print("Listing nodes")
-    res = cli.list_nodes();
+    res = cli.list_nodes()
     if res:
         print(json.dumps(res, indent=4))
 
@@ -120,7 +120,7 @@ Now let's submit a job to Flux.
 
 
     print("😴 Submitting job sleep 60")
-    res = cli.submit(command=["sleep", 60]);
+    res = cli.submit(command=["sleep", 60])
 
     # This is an indication something went wrong - detail has an error.
     if res and "detail" in res:
@@ -158,7 +158,7 @@ And finally, let's get job info.
 .. code-block:: default
 
     print("🍓 Getting job info...")
-    res = cli.jobs(res["id"]);
+    res = cli.jobs(res["id"])
     if res:
         print(json.dumps(res, indent=4))
 
@@ -173,13 +173,13 @@ And finally, let's get job info.
     🍓 Getting job info...
     {
         "job": {
-            "id": 24310185984,
+            "id": 13428886339584,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1667954637.224754,
-            "t_depend": 1667954637.224754,
-            "t_run": 1667954637.237555,
+            "t_submit": 1667955436.1993887,
+            "t_depend": 1667955436.1993887,
+            "t_run": 1667955436.2116482,
             "state": 16,
             "name": "sleep",
             "ntasks": 1,
@@ -188,7 +188,7 @@ And finally, let's get job info.
             "nnodes": 1,
             "ranks": "0",
             "nodelist": "3a2a7a9428e6",
-            "expiration": 4821554637.0
+            "expiration": 4821555436.0
         }
     }
 
@@ -223,6 +223,21 @@ Submit the job to flux
     {
         "jobs": [
             {
+                "id": 13430681501696
+            },
+            {
+                "id": 13430010413056
+            },
+            {
+                "id": 13429473542144
+            },
+            {
+                "id": 13428886339584
+            },
+            {
+                "id": 24310185984
+            },
+            {
                 "id": 25987907584
             },
             {
@@ -232,7 +247,7 @@ Submit the job to flux
                 "id": 24914165760
             },
             {
-                "id": 24310185984
+                "id": 26625441792
             }
         ]
     }
@@ -267,7 +282,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 26625441792
+        "id": 13431470030848
     }
     Requesting job cancel..
     {
@@ -303,7 +318,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.435 seconds)
+   **Total running time of the script:** ( 0 minutes  0.508 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:

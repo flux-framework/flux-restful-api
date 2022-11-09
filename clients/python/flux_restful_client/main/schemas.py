@@ -18,6 +18,12 @@ submit_properties = {
             {"type": "array", "items": {"type": ["string", "number"]}},
         ]
     },
+    "envars": {
+        "oneOf": [
+            {"type": "null"},
+            keyvals,
+        ]
+    },
     "num_tasks": {"type": "number"},
     "cores_per_task": {"type": ["number", "null"]},
     "gpus_per_task": {"type": ["number", "null"]},

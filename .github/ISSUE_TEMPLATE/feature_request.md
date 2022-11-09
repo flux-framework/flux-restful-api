@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Request a feature for action-updater
+about: Request a feature
 
 ---
 

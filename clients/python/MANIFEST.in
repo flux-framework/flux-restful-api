@@ -11,4 +11,3 @@ global-exclude *.img
 global-exclude *.simg
 global-exclude *.sif
 global-exclude __pycache__
-prune docs*
