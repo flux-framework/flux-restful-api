@@ -103,7 +103,7 @@ Let's list the nodes in our cluster!
     Listing nodes
     {
         "nodes": [
-            "80e5b9973186"
+            "eb2696be629a"
         ]
     }
 
@@ -173,12 +173,12 @@ And finally, let's get job info.
     🍓 Getting job info...
     {
         "job": {
-            "id": 866090221568,
+            "id": 1020256059392,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1667956791.8467693,
-            "t_depend": 1667956791.8467693,
+            "t_submit": 1668018458.7403858,
+            "t_depend": 1668018458.7403858,
             "state": 8,
             "name": "sleep",
             "ntasks": 1,
@@ -218,16 +218,16 @@ Submit the job to flux
     {
         "jobs": [
             {
-                "id": 867197517824
+                "id": 1021430464512
             },
             {
-                "id": 867667279872
+                "id": 1021917003776
             },
             {
-                "id": 866694201344
+                "id": 1020910370816
             },
             {
-                "id": 866090221568
+                "id": 1020256059392
             }
         ]
     }
@@ -262,7 +262,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 868237705216
+        "id": 1022504206336
     }
     Requesting job cancel..
     {
@@ -298,7 +298,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.398 seconds)
+   **Total running time of the script:** ( 0 minutes  0.440 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:

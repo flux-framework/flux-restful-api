@@ -71,16 +71,19 @@ submit a job via the flux restful client
 
 optional arguments:
   -h, --help            show this help message and exit
-  --workdir WORKDIR     The --workdir flag.
+  --workdir WORKDIR     working directory for the job to run
   --num_tasks NUM_TASKS
-                        The --num_tasks flag.
+                        number of tasks for the job.
   --cores_per_task CORES_PER_TASK
-                        The --cores_per_task flag.
+                        number of cores per task for the job.
   --gpus_per_task GPUS_PER_TASK
-                        The --gpus_per_task flag.
+                        number of gpus per task for the job.
   --num_nodes NUM_NODES
-                        The --num_nodes flag.
-  --exclusive           The --exclusive flag.
+                        number of nodes for the job.
+  --exclusive           ask for exclusive nodes for the job.
+  --env ENVARS          "key=value pairs to provide to the job in the environment (add as many as you need)
+                        flux-restful-cli --env PIPELINE_VAR=one ...
+                        flux-restful-cli --env SUPERHERO=batman --env SUPERHERO_NAME=manbat ...
 ```
 
 The only requirement is the command, which you can add to the end of the submit request.

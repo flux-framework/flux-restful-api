@@ -676,16 +676,19 @@ a script. Here are examples:
 
 <span class="go">optional arguments:</span>
 <span class="go">  -h, --help            show this help message and exit</span>
-<span class="go">  --workdir WORKDIR     The --workdir flag.</span>
+<span class="go">  --workdir WORKDIR     working directory for the job to run</span>
 <span class="go">  --num_tasks NUM_TASKS</span>
-<span class="go">                        The --num_tasks flag.</span>
+<span class="go">                        number of tasks for the job.</span>
 <span class="go">  --cores_per_task CORES_PER_TASK</span>
-<span class="go">                        The --cores_per_task flag.</span>
+<span class="go">                        number of cores per task for the job.</span>
 <span class="go">  --gpus_per_task GPUS_PER_TASK</span>
-<span class="go">                        The --gpus_per_task flag.</span>
+<span class="go">                        number of gpus per task for the job.</span>
 <span class="go">  --num_nodes NUM_NODES</span>
-<span class="go">                        The --num_nodes flag.</span>
-<span class="go">  --exclusive           The --exclusive flag.</span>
+<span class="go">                        number of nodes for the job.</span>
+<span class="go">  --exclusive           ask for exclusive nodes for the job.</span>
+<span class="go">  --env ENVARS          "key=value pairs to provide to the job in the environment (add as many as you need)</span>
+<span class="go">                        flux-restful-cli --env PIPELINE_VAR=one ...</span>
+<span class="go">                        flux-restful-cli --env SUPERHERO=batman --env SUPERHERO_NAME=manbat ...</span>
 </pre>
             </div>
            </div>
