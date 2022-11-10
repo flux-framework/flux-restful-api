@@ -189,7 +189,7 @@ dependencies (done in devcontainer):
 
 ```console
 cd docs
-pip install -r requrements.txt
+pip install -r requirements.txt
 
 # Build the docs into _build/html
 make html
@@ -205,6 +205,16 @@ $ python -m http.server 9999
 ```
 
 And open your browser to `localhost:9999`
+
+
+### Run Tests
+
+To run tests, from within the devcontainers environment (or with a local install)
+of Flux alongside the app) you can do:
+
+```bash
+$ flux start pytest -xs tests/test_api.py
+```
 
 ### Docstrings
 

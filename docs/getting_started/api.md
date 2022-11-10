@@ -16,14 +16,6 @@ and thus exit the job and bring down the mini-cluster.
 
 List jobs owned by the flux executor (the current user).
 
-### GET `/jobs/{uid}`
-
-Get a job with a specific identifier.
-
-### POST `/jobs/{uid}/cancel`
-
-Request for a job cancellation based on identifier.
-
 ### POST `/jobs/submit`
 
 Submit a new job
@@ -45,6 +37,17 @@ Submit a new job
 - num_nodes (int): Number of nodes (defaults to None)
 - exclusive (bool): is the job exclusive? (defaults to False)
 
+### GET `/jobs/{uid}`
+
+Get a job with a specific identifier.
+
+### POST `/jobs/{uid}/cancel`
+
+Request for a job cancellation based on identifier.
+
+### GET `/jobs/{uid}/output`
+
+Get lines of job output.
 
 ## Nodes
 

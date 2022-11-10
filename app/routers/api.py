@@ -156,3 +156,28 @@ async def get_job(jobid):
     info = flux.job.job_list_id(app.handle, jobid, attrs=["all"])
     info = jsonable_encoder(json.loads(info.get_str()))
     return JSONResponse(content=info, status_code=200)
+
+
+@router.get("/jobs/{jobid}/output")
+async def get_job_output(jobid):
+    """
+    Get job output based on id.
+    """
+    lines = []
+    from app.main import app
+
+    # If the submit is too close to the log reqest, it cannot find the file handle
+    # It could be also the jobid cannot be found.
+    try:
+        for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
+            if "data" in line.context:
+                lines.append(line.context["data"])
+        output = jsonable_encoder({"Output": lines})
+        return JSONResponse(content=output, status_code=200)
+
+    except Exception:
+        pass
+    info = jsonable_encoder(
+        {"Message": "The output does not exist yet, or the jobid is incorrect."}
+    )
+    return JSONResponse(content=info, status_code=200)
