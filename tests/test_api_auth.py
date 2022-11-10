@@ -81,11 +81,15 @@ def test_cancel_job():
 def test_job_output():
 
     # Now submit a job, ensure we get one job back
-    response = client.post("/jobs/submit", json={"command": "echo pancakes 🥞️🥞️🥞️"})
+    headers = get_headers()
+
+    response = client.post(
+        "/jobs/submit", json={"command": "echo pancakes 🥞️🥞️🥞️"}, headers=headers
+    )
     assert response.status_code == 200
     result = response.json()
     jobid = result["id"]
-    res = client.get(f"/jobs/{jobid}/output")
+    res = client.get(f"/jobs/{jobid}/output", headers=headers)
     assert response.status_code == 200
     lines = res.json()
 
@@ -94,7 +98,7 @@ def test_job_output():
     time.sleep(3)
 
     # Try again - we should have it after a sleep
-    res = client.get(f"/jobs/{jobid}/output")
+    res = client.get(f"/jobs/{jobid}/output", headers=headers)
     assert response.status_code == 200
     lines = res.json()
     assert "Output" in lines
