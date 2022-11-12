@@ -1,10 +1,12 @@
 # API
 
-The following is the spec for the Flux Python RESTful API provided here:
+The following is the spec for the Flux Python RESTful API provided here.
+Generally, API endpoints are versioned (e.g., start with v1) and views
+do not.
 
 ## Service
 
-### POST `/service/stop`
+### POST `/v1/service/stop`
 
 Request to stop the server from running. This is intended for applications like
 the Flux Operator that need programmatic ability to end the flux start command
@@ -12,11 +14,20 @@ and thus exit the job and bring down the mini-cluster.
 
 ## Jobs
 
-### GET `/jobs`
+### GET `/v1/jobs`
 
 List jobs owned by the flux executor (the current user).
+By default, this returns a simple listing with "jobs" -> a list of dict with ids.
 
-### POST `/jobs/submit`
+#### Payload
+
+**Optional** parameters in the get are:
+
+- details (bool): provide details as True if you want to get complete metadata for the job
+- listing (bool): provide listing as True if you want to get details in a list
+- limit (int): provide a maximum number of jobs to retrieve (defaults to all if not provided)
+
+### POST `/v1/jobs/submit`
 
 Submit a new job
 
@@ -37,20 +48,20 @@ Submit a new job
 - num_nodes (int): Number of nodes (defaults to None)
 - exclusive (bool): is the job exclusive? (defaults to False)
 
-### GET `/jobs/{uid}`
+### GET `/v1/jobs/{uid}`
 
 Get a job with a specific identifier.
 
-### POST `/jobs/{uid}/cancel`
+### POST `/v1/jobs/{uid}/cancel`
 
 Request for a job cancellation based on identifier.
 
-### GET `/jobs/{uid}/output`
+### GET `/v1/jobs/{uid}/output`
 
 Get lines of job output.
 
 ## Nodes
 
-### GET `/nodes`
+### GET `/v1/nodes`
 
 List cluster nodes.

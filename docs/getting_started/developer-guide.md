@@ -125,7 +125,18 @@ and we will soon add a table of jobs.
 Once you have the server running, you can use an example client to interact
 with the server. See our [User Guide](https://flux-framework.org/flux-restful-api/getting_started/user-guide.html) for these instructions.
 
+## Environment
 
+Wherever you run the app, you can control variables (settings) via the environment.
+The following variables are available (with their defaults):
+
+| Name | Description | Default |
+|------|-------------|---------|
+|FLUX_REQUIRE_AUTH| The server should require basic auth for API and authenticated endpoints | False (unset) |
+|FLUX_TOKEN| The token password to require for Basic Auth (if `FLUX_REQUIRE_AUTH` is set) | unset |
+|FLUX_USER| The username to require for Basic Auth (if `FLUX_REQUIRE_AUTH` is set) | unset |
+|FLUX_HAS_GPU | GPUs are available for the user to request | unset |
+|FLUX_NUMBER_NODES| The number of nodes available in the cluster | 1 |
 
 ## Code Linting
 

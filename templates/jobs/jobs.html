@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Flux RESTFul Interface{% endblock %}
+{% block head %}
+{{ super() }}
+
+<!-- Custom styles for this template -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,600">
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css'>
+
+<!-- Custom CSS -->
+<link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
+<script src='https://code.jquery.com/jquery-3.5.1.js'></script>
+
+<link rel='stylesheet' href='https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css'>
+<style>
+#software_filter, #software_length, #software_info {
+ color: #333;
+}
+td, th {
+  color: #333;
+}
+.tag {
+  margin-right: 2px !important;
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+{% include 'include/sidebar.html' %}
+
+{% for job in jobs %}{{ job.__dict__ }}
+{% endfor %}
+
+<div class="container">
+    <a type="button" class="btn btn-info">Submit Another Job</button>
+    <a type="button" class="btn btn-info filter-reset" onclick="$('#jobs').DataTable().search('').draw()" style='float:right;padding-bottom:5px' href="#">reset</a></li>
+    <table id="jobs"  class="table table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Job</th>
+                <th>View Information</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+    $(document).ready(function () {
+
+   /* $('#jobs').DataTable({
+      data: data,
+      pageLength: 50,
+      columns: [
+        { data: "uid",
+          render: function ( data, type, row ) { return "<a href='" + row['url'] + "' target='_blank'>" + data +"</a>";},
+        },
+        { data: "description"},
+        { data: "topics",
+          render: function ( data, type, row ) {
+             var topics = ""
+             if(data.length > 0) {
+               $.each(data, function(i, e){
+                  topics += "<button onclick=$('#software').DataTable().search('"+ e +"').draw(); class='tag button btn btn-primary btn-xs'>" + e + "</button>";
+               })
+             }
+             return topics
+          },
+        },
+      ]
+    });
+    });
+
+    // Ensure search is aligned to the right!
+    $('#software_filter').parent().attr("class", "col-md-12")
+    })
+    </script>
+
+
+            <script src="/web/assets/js/bootstrap.min.js"></script>
+    <script src="/web/assets/js/retina-1.1.0.js"></script>
+    <script src="/web/assets/js/jquery.hoverdir.js"></script>
+    <script src="/web/assets/js/jquery.hoverex.min.js"></script>
+    <script src="/web/assets/js/jquery.prettyPhoto.js"></script>
+    <script src="/web/assets/js/jquery.isotope.min.js"></script>
+    <script src="/web/assets/js/toastr.min.js"></script>
+    <script src="/web/assets/tipuesearch/tipuesearch_content.js"></script>
+    <script src="/web/assets/tipuesearch/tipuesearch_set.js"></script>
+    <script src="/web/assets/tipuesearch/tipuesearch.min.js"></script>
+    <script src="/web/assets/js/custom.js"></script>
+
+    <script src='https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js'></script>
+    <script src='https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js'></script>
+
+    <script>
+    // Portfolio
+    (function($) {
+        "use strict";
+        var $container = $('.portfolio'),
+            $items = $container.find('.portfolio-item'),
+            portfolioLayout = 'fitRows';
+
+            if( $container.hasClass('portfolio-centered') ) {
+                portfolioLayout = 'masonry';
+            }
+
+            $container.isotope({
+                filter: '*',
+                animationEngine: 'best-available',
+                layoutMode: portfolioLayout,
+                animationOptions: {
+                duration: 750,
+                easing: 'linear',
+                queue: false
+            },
+            masonry: {
+            }
+            }, refreshWaypoints());
+
+            function refreshWaypoints() {
+                setTimeout(function() {
+                }, 1000);
+            }
+
+            $('nav.portfolio-filter ul a').on('click', function() {
+                    var selector = $(this).attr('data-filter');
+                    $container.isotope({ filter: selector }, refreshWaypoints());
+                    $('nav.portfolio-filter ul a').removeClass('active');
+                    $(this).addClass('active');
+                    return false;
+            });
+
+            function getColumnNumber() {
+                var winWidth = $(window).width(),
+                columnNumber = 1;
+
+                if (winWidth > 1200) {
+                    columnNumber = 5;
+                } else if (winWidth > 950) {
+                    columnNumber = 4;
+                } else if (winWidth > 600) {
+                    columnNumber = 3;
+                } else if (winWidth > 400) {
+                    columnNumber = 2;
+                } else if (winWidth > 250) {
+                    columnNumber = 1;
+                }
+                    return columnNumber;
+                }
+
+                function setColumns() {
+                    var winWidth = $(window).width(),
+                    columnNumber = getColumnNumber(),
+                    itemWidth = Math.floor(winWidth / columnNumber);
+
+                    $container.find('.portfolio-item').each(function() {
+                        $(this).css( {
+                        width : itemWidth + 'px'
+                    });
+                });
+            }
+
+            function setPortfolio() {
+                setColumns();
+                $container.isotope('reLayout');
+            }
+
+            $container.imagesLoaded(function () {
+                setPortfolio();
+            });
+
+            $(window).on('resize', function () {
+            setPortfolio();
+        });*/
+    })(jQuery);
+    </script>
+{% endblock %}

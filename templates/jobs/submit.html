@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Flux RESTFul Interface{% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block page_content %}
+{% include 'include/sidebar.html' %}
+<main role="main" class="container card" style="padding:30px">
+    <div class="row">
+        <div class="col">
+            <h3>Submit a Job</h3>
+            <form id="submitform" method="POST">
+                <button type="submit" class="btn btn-info" style="float:right; margin-bottom:5px">Submit</button>
+                <a href="/jobs" type="button" class="btn btn-info" style="float:right; margin-bottom:5px; margin-right:5px">View Jobs</a>
+                {% if form.errors %}<div class="mb-3">{% for error in form.errors %}
+                    <p class="alert alert-danger alert-dismissible">{{ error }}</p>{% endfor %}
+                </div>{% endif %}
+                <div class="mb-3">
+                  <label for="command" class="form-label">Command</label>
+                  <input class="form-control" name="command" id="command" aria-describedby="commandHelp" {% if form.command %}value="{{ form.command }}"{% endif %} required>
+                  <div id="commandHelp" class="form-text">The full command to provide to flux (required).</div>
+                </div>
+                <div class="mb-3">
+                    <label for="workdir" class="form-label">Working Directory</label>
+                    <input class="form-control" {% if form.workdir %}value="{{ form.workdir }}"{% endif %} name="workdir" id="workdir" aria-describedby="workdirHelp">
+                    <div id="workdirHelp" class="form-text">A custom working directory in the job container (optional).</div>
+                </div>
+                <div class="mb-3">
+                    <label for="runtime" class="form-label">Maximum Runtime</label>
+                    <input type="number" min="0" {% if form.runtime %}value="{{ form.runtime }}"{% endif %} class="form-control" name="runtime" id="runtime" aria-describedby="runtimeHelp">
+                    <div id="runtimeHelp" class="form-text">The maximum runtime in minutes, 0 means no limit (optional).</div>
+                </div>
+                <div class="mb-3">
+                    <label for="num_tasks" class="form-label">Number Tasks</label>
+                    <input type="number" min="1" class="form-control" name="num_tasks" id="num_tasks" {% if form.num_tasks %}value="{{ form.num_tasks }}"{% endif %} aria-describedby="num_tasksHelp">
+                    <div id="num_tasksHelp" class="form-text">Number of tasks (optional).</div>
+                </div>
+                <div class="mb-3">
+                    <label for="cores_per_task" class="form-label">Cores Per Task</label>
+                    <input type="number" min="1" class="form-control" name="cores_per_task" {% if form.cores_per_task %}value="{{ form.cores_per_task }}"{% endif %} id="cores_per_task" aria-describedby="cores_per_taskHelp">
+                    <div id="cores_per_tasksHelp" class="form-text">Cores per task, defaults to 1 (optional).</div>
+                </div>
+                <div class="mb-3">
+                    <label for="gpus_per_task" class="form-label">GPUs Per Task</label>
+                    <input type="number" min="1" class="form-control" name="gpus_per_task" {% if form.gpus_per_task %}value="{{ form.gpus_per_task }}"{% endif %} id="gpus_per_task" aria-describedby="gpus_per_taskHelp" {% if has_gpus %}disabled{% endif %}>
+                    <div id="gpus_per_tasksHelp" class="form-text">GPUs per task, defaults to 1 (optional).</div>
+                </div>
+                <div class="mb-3">
+                    <label for="num_nodes" class="form-label">Number Nodes</label>
+                    <input type="number" min="1" max="{{num_nodes}}" name="num_nodes" class="form-control" id="num_nodes" aria-describedby="num_nodesHelp">
+                    <div id="num_nodesHelp" class="form-text">Number of nodes to request for the job, defaults to 1 (optional).</div>
+                </div>
+                <div class="mb-3 form-check">
+                  <input type="checkbox" class="form-check-input" id="exclusive" aria-describedby="exclusiveHelp">
+                  <label class="form-check-label" for="exclusive" name="exlusive" {% if form.exclusive %}checked{% endif %}>Exclusive</label>
+                  <div id="exclusiveHelp" class="form-text">Ask for exclusive nodes (only used by this job).</div>
+                </div>
+                <div class="mb-3">
+                  <p class="alert alert-info">Additional environment variables are not yet supported through the user interface! If you need this, please use a command line client.</p>
+                </div>
+                <button type="submit" class="btn btn-info">Submit</button>
+              </form>
+        </div>
+    </div>
+</main><!-- /.container -->
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+{% endblock %}
