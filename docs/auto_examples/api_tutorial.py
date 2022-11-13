@@ -11,6 +11,7 @@ list, get statuses, cancel. We can use our example client for this.
 import json
 import os
 import sys
+import time
 
 import matplotlib.pyplot as plt
 from flux_restful_client.main import get_client
@@ -71,6 +72,7 @@ if res:
 # This will be added to the client
 print("😴 Submitting job to echo pancakes 🥞🥞🥞")
 res = cli.submit(command="echo pancakes are really just morning cakes.")
+time.sleep(5)
 res = cli.output(res["id"])
 if res:
     print(json.dumps(res, indent=4))
@@ -80,8 +82,8 @@ if res:
 # Now let's submit three jobs in unison so we can list them back!
 # Submit the job to flux
 print("Submitting 3 jobs to sleep!")
-for time in [10, 20, 30]:
-    cli.submit(command=["sleep", time])
+for seconds in [10, 20, 30]:
+    cli.submit(command=["sleep", seconds])
 res = cli.jobs()
 if res:
     print(json.dumps(res, indent=4))

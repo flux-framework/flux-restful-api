@@ -22,13 +22,13 @@ class SubmitForm:
     async def load_data(self):
         form = await self.request.form()
         self.command = form.get("command")
-        self.workdir = form.get("workdir") or None
-        self.num_tasks = form.get("num_tasks") or 1
-        self.num_nodes = form.get("num_nodes") or 1
+        self.workdir = form.get("workdir")
+        self.num_tasks = form.get("num_tasks")
+        self.num_nodes = form.get("num_nodes")
         self.runtime = form.get("runtime") or 0
-        self.cores_per_task = form.get("cores_per_task") or None
-        self.gpus_per_task = form.get("gpus_per_task") or None
-        self.exclusive = form.get("exclusive") or False
+        self.cores_per_task = form.get("cores_per_task")
+        self.gpus_per_task = form.get("gpus_per_task")
+        self.exclusive = form.get("exclusive")
 
     @property
     def kwargs(self):
@@ -41,11 +41,15 @@ class SubmitForm:
             "num_tasks",
             "num_nodes",
             "cores_per_task",
-            "gpys_per_task",
+            "gpus_per_task",
             "exclusive",
         ]:
             if getattr(self, key, None) is not None:
-                kwargs[key] = getattr(self, key)
+                value = getattr(self, key)
+                # Form could submit an empty value
+                if value == "":
+                    continue
+                kwargs[key] = value
         return kwargs
 
     def is_valid(self):

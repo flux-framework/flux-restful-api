@@ -25,7 +25,7 @@ This small tutorial walks through the basics of using an API.
 The most basic thing to do is submit a job to the API,
 list, get statuses, cancel. We can use our example client for this.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-27
+.. GENERATED FROM PYTHON SOURCE LINES 10-28
 
 .. code-block:: default
 
@@ -33,6 +33,7 @@ list, get statuses, cancel. We can use our example client for this.
     import json
     import os
     import sys
+    import time
 
     import matplotlib.pyplot as plt
     from flux_restful_client.main import get_client
@@ -58,13 +59,13 @@ list, get statuses, cancel. We can use our example client for this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-31
+.. GENERATED FROM PYTHON SOURCE LINES 29-32
 
 Here we instantiate a client. If you need authentication, this can optionally take
 a user and token, or also derive from the FLUX_USER and FLUX_TOKEN in the
 environment.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-34
+.. GENERATED FROM PYTHON SOURCE LINES 32-35
 
 .. code-block:: default
 
@@ -78,11 +79,11 @@ environment.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-36
+.. GENERATED FROM PYTHON SOURCE LINES 36-37
 
 Let's list the nodes in our cluster!
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-42
+.. GENERATED FROM PYTHON SOURCE LINES 37-43
 
 .. code-block:: default
 
@@ -110,11 +111,11 @@ Let's list the nodes in our cluster!
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-44
+.. GENERATED FROM PYTHON SOURCE LINES 44-45
 
 Now let's submit a job to Flux.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-53
+.. GENERATED FROM PYTHON SOURCE LINES 45-54
 
 .. code-block:: default
 
@@ -140,7 +141,7 @@ Now let's submit a job to Flux.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-60
+.. GENERATED FROM PYTHON SOURCE LINES 55-61
 
 To require auth, the server should be startup with these variables
 in the environment (and the first two found by the client here)
@@ -149,11 +150,11 @@ FLUX_USER=fluxuser
 FLUX_TOKEN=12345
 FLUX_REQUIRE_AUTH=true
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-63
+.. GENERATED FROM PYTHON SOURCE LINES 63-64
 
 And finally, let's get job info.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-69
+.. GENERATED FROM PYTHON SOURCE LINES 64-70
 
 .. code-block:: default
 
@@ -173,25 +174,25 @@ And finally, let's get job info.
 
     🍓 Getting job info...
     {
-        "id": 323743595364352,
+        "id": 361295786278912,
         "userid": 0,
         "urgency": 16,
         "priority": 16,
-        "t_submit": 1668303686.305028,
-        "t_depend": 1668303686.305028,
-        "t_run": 1668303686.3178189,
+        "t_submit": 1668305924.5898263,
+        "t_depend": 1668305924.5898263,
+        "t_run": 1668305924.6036532,
         "state": "RUN",
         "name": "sleep",
         "ntasks": 1,
         "ncores": 1,
         "duration": 0.0,
         "nnodes": 1,
-        "ranks": "0",
+        "ranks": "3",
         "nodelist": "57d0f60fce2e",
-        "expiration": 4821903686.0,
+        "expiration": 4821905924.0,
         "result": "",
         "returncode": "",
-        "runtime": 0.47638893127441406,
+        "runtime": 0.4636096954345703,
         "waitstatus": "",
         "exception": {
             "occurred": "",
@@ -204,17 +205,18 @@ And finally, let's get job info.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-72
+.. GENERATED FROM PYTHON SOURCE LINES 71-73
 
 And job logs
 This will be added to the client
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-79
+.. GENERATED FROM PYTHON SOURCE LINES 73-81
 
 .. code-block:: default
 
     print("😴 Submitting job to echo pancakes 🥞🥞🥞")
     res = cli.submit(command="echo pancakes are really just morning cakes.")
+    time.sleep(5)
     res = cli.output(res["id"])
     if res:
         print(json.dumps(res, indent=4))
@@ -230,24 +232,26 @@ This will be added to the client
 
     😴 Submitting job to echo pancakes 🥞🥞🥞
     {
-        "Message": "The output does not exist yet, or the jobid is incorrect."
+        "Output": [
+            "pancakes are really just morning cakes.\n"
+        ]
     }
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-82
+.. GENERATED FROM PYTHON SOURCE LINES 82-84
 
 Now let's submit three jobs in unison so we can list them back!
 Submit the job to flux
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-89
+.. GENERATED FROM PYTHON SOURCE LINES 84-91
 
 .. code-block:: default
 
     print("Submitting 3 jobs to sleep!")
-    for time in [10, 20, 30]:
-        cli.submit(command=["sleep", time])
+    for seconds in [10, 20, 30]:
+        cli.submit(command=["sleep", seconds])
     res = cli.jobs()
     if res:
         print(json.dumps(res, indent=4))
@@ -264,6 +268,60 @@ Submit the job to flux
     {
         "jobs": [
             {
+                "id": 361393211572224
+            },
+            {
+                "id": 361392691478528
+            },
+            {
+                "id": 361392037167104
+            },
+            {
+                "id": 361295786278912
+            },
+            {
+                "id": 360411408891904
+            },
+            {
+                "id": 361304158109696
+            },
+            {
+                "id": 360500059701248
+            },
+            {
+                "id": 360499539607552
+            },
+            {
+                "id": 360499053068288
+            },
+            {
+                "id": 360502072967168
+            },
+            {
+                "id": 360412012871680
+            },
+            {
+                "id": 356049030742016
+            },
+            {
+                "id": 356053023719424
+            },
+            {
+                "id": 356051731873792
+            },
+            {
+                "id": 356051111116800
+            },
+            {
+                "id": 356054131015680
+            },
+            {
+                "id": 356049668276224
+            },
+            {
+                "id": 323743595364352
+            },
+            {
                 "id": 323754819321856
             },
             {
@@ -273,7 +331,7 @@ Submit the job to flux
                 "id": 323752906719232
             },
             {
-                "id": 323743595364352
+                "id": 323756681592832
             },
             {
                 "id": 323752151744512
@@ -374,11 +432,11 @@ Submit the job to flux
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-91
+.. GENERATED FROM PYTHON SOURCE LINES 92-93
 
 And this is how to search (with a start, length, or query)
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-97
+.. GENERATED FROM PYTHON SOURCE LINES 93-99
 
 .. code-block:: default
 
@@ -400,25 +458,25 @@ And this is how to search (with a start, length, or query)
     {
         "data": [
             {
-                "id": 323754148233216,
+                "id": 361392691478528,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1668303686.9337833,
-                "t_depend": 1668303686.9337833,
-                "t_run": 1668303686.9520447,
+                "t_submit": 1668305930.3657866,
+                "t_depend": 1668305930.3657866,
+                "t_run": 1668305930.3788106,
                 "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
                 "ncores": 1,
                 "duration": 0.0,
                 "nnodes": 1,
-                "ranks": "0",
+                "ranks": "3",
                 "nodelist": "57d0f60fce2e",
-                "expiration": 4821903686.0,
+                "expiration": 4821905930.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.08960390090942383,
+                "runtime": 0.09533405303955078,
                 "waitstatus": "",
                 "exception": {
                     "occurred": "",
@@ -428,25 +486,25 @@ And this is how to search (with a start, length, or query)
                 }
             },
             {
-                "id": 323752906719232,
+                "id": 361392037167104,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1668303686.8595636,
-                "t_depend": 1668303686.8595636,
-                "t_run": 1668303686.872508,
+                "t_submit": 1668305930.331216,
+                "t_depend": 1668305930.331216,
+                "t_run": 1668305930.3446293,
                 "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
                 "ncores": 1,
                 "duration": 0.0,
                 "nnodes": 1,
-                "ranks": "0",
+                "ranks": "3",
                 "nodelist": "57d0f60fce2e",
-                "expiration": 4821903686.0,
+                "expiration": 4821905930.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.16966652870178223,
+                "runtime": 0.13027596473693848,
                 "waitstatus": "",
                 "exception": {
                     "occurred": "",
@@ -457,18 +515,18 @@ And this is how to search (with a start, length, or query)
             }
         ],
         "draw": 1,
-        "recordsTotal": 35,
+        "recordsTotal": 53,
         "recordsFiltered": 2
     }
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-99
+.. GENERATED FROM PYTHON SOURCE LINES 100-101
 
 Finally, let's submit and cancel a job
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-107
+.. GENERATED FROM PYTHON SOURCE LINES 101-109
 
 .. code-block:: default
 
@@ -491,7 +549,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 323756681592832
+        "id": 361395661045760
     }
     Requesting job cancel..
     {
@@ -501,11 +559,11 @@ Finally, let's submit and cancel a job
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-109
+.. GENERATED FROM PYTHON SOURCE LINES 110-111
 
 And this would be how you stop your cluster service
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-111
+.. GENERATED FROM PYTHON SOURCE LINES 111-113
 
 .. code-block:: default
 
@@ -527,7 +585,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.091 seconds)
+   **Total running time of the script:** ( 0 minutes  6.262 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:

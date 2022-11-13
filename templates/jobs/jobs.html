@@ -42,7 +42,7 @@ td, th {
 {% include 'include/sidebar.html' %}
 
 <div class="container-wide">
-    <a type="button" class="btn btn-info" style="margin-bottom:10px">Submit Another Job</button>
+    <a href="/jobs/submit" type="button" class="btn btn-info" style="margin-bottom:10px">Submit Another Job</button>
     <a type="button" class="btn btn-info filter-reset" onclick="$('#jobs').DataTable().search('').draw()" style='float:right;padding-bottom:5px' href="#">reset</a></li>
     <table id="jobs"  class="table table-bordered" cellspacing="0" width="100%">
         <thead>
