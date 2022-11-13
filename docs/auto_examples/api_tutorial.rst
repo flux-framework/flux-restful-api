@@ -173,25 +173,25 @@ And finally, let's get job info.
 
     🍓 Getting job info...
     {
-        "id": 323743595364352,
+        "id": 356049030742016,
         "userid": 0,
         "urgency": 16,
         "priority": 16,
-        "t_submit": 1668303686.305028,
-        "t_depend": 1668303686.305028,
-        "t_run": 1668303686.3178189,
+        "t_submit": 1668305611.858748,
+        "t_depend": 1668305611.858748,
+        "t_run": 1668305611.8720841,
         "state": "RUN",
         "name": "sleep",
         "ntasks": 1,
         "ncores": 1,
         "duration": 0.0,
         "nnodes": 1,
-        "ranks": "0",
+        "ranks": "3",
         "nodelist": "57d0f60fce2e",
-        "expiration": 4821903686.0,
+        "expiration": 4821905611.0,
         "result": "",
         "returncode": "",
-        "runtime": 0.47638893127441406,
+        "runtime": 0.0031113624572753906,
         "waitstatus": "",
         "exception": {
             "occurred": "",
@@ -230,7 +230,9 @@ This will be added to the client
 
     😴 Submitting job to echo pancakes 🥞🥞🥞
     {
-        "Message": "The output does not exist yet, or the jobid is incorrect."
+        "Output": [
+            "pancakes are really just morning cakes.\n"
+        ]
     }
 
 
@@ -264,6 +266,24 @@ Submit the job to flux
     {
         "jobs": [
             {
+                "id": 356053023719424
+            },
+            {
+                "id": 356051731873792
+            },
+            {
+                "id": 356051111116800
+            },
+            {
+                "id": 356049030742016
+            },
+            {
+                "id": 356049668276224
+            },
+            {
+                "id": 323743595364352
+            },
+            {
                 "id": 323754819321856
             },
             {
@@ -273,7 +293,7 @@ Submit the job to flux
                 "id": 323752906719232
             },
             {
-                "id": 323743595364352
+                "id": 323756681592832
             },
             {
                 "id": 323752151744512
@@ -400,25 +420,25 @@ And this is how to search (with a start, length, or query)
     {
         "data": [
             {
-                "id": 323754148233216,
+                "id": 356051731873792,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1668303686.9337833,
-                "t_depend": 1668303686.9337833,
-                "t_run": 1668303686.9520447,
+                "t_submit": 1668305612.0207148,
+                "t_depend": 1668305612.0207148,
+                "t_run": 1668305612.0337157,
                 "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
                 "ncores": 1,
                 "duration": 0.0,
                 "nnodes": 1,
-                "ranks": "0",
+                "ranks": "3",
                 "nodelist": "57d0f60fce2e",
-                "expiration": 4821903686.0,
+                "expiration": 4821905612.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.08960390090942383,
+                "runtime": 0.08576345443725586,
                 "waitstatus": "",
                 "exception": {
                     "occurred": "",
@@ -428,25 +448,25 @@ And this is how to search (with a start, length, or query)
                 }
             },
             {
-                "id": 323752906719232,
+                "id": 356051111116800,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1668303686.8595636,
-                "t_depend": 1668303686.8595636,
-                "t_run": 1668303686.872508,
+                "t_submit": 1668305611.9833722,
+                "t_depend": 1668305611.9833722,
+                "t_run": 1668305611.9996023,
                 "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
                 "ncores": 1,
                 "duration": 0.0,
                 "nnodes": 1,
-                "ranks": "0",
+                "ranks": "3",
                 "nodelist": "57d0f60fce2e",
-                "expiration": 4821903686.0,
+                "expiration": 4821905611.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.16966652870178223,
+                "runtime": 0.12041258811950684,
                 "waitstatus": "",
                 "exception": {
                     "occurred": "",
@@ -457,7 +477,7 @@ And this is how to search (with a start, length, or query)
             }
         ],
         "draw": 1,
-        "recordsTotal": 35,
+        "recordsTotal": 41,
         "recordsFiltered": 2
     }
 
@@ -491,7 +511,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 323756681592832
+        "id": 356054131015680
     }
     Requesting job cancel..
     {
@@ -527,7 +547,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.091 seconds)
+   **Total running time of the script:** ( 0 minutes  0.599 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:
