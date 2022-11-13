@@ -1,6 +1,4 @@
-import json
 import os
-import shlex
 
 import flux.job
 import flux.resource
@@ -8,14 +6,16 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
-from flux.job import JobspecV1
 
+import app.library.flux as flux_cli
+import app.library.helpers as helpers
 from app.core.config import settings
 from app.library.auth import alert_auth, check_auth
 
 # Print (hidden message) to give status of auth
 alert_auth()
 router = APIRouter(
+    prefix="/v1",
     tags=["jobs"],
     dependencies=[Depends(check_auth)] if settings.require_auth else [],
     responses={404: {"description": "Not found"}},
@@ -34,15 +34,68 @@ async def service_stop():
     os.system("flux shutdown")
 
 
+@router.get("/jobs/search")
+async def jobs_listing(request: Request):
+    """
+    Jobslist is intended to be used by the server to render data tables
+
+    Since this is specific to jquery datables, we don't document.
+    """
+    start = request.query_params.get("start")
+    length = request.query_params.get("length")
+    draw = request.query_params.get("draw") or 1
+    query = request.query_params.get("search[value]") or request.query_params.get(
+        "search"
+    )
+
+    # If we have a query, filter to those that have in the name
+    jobs = list(flux_cli.list_jobs_detailed().values())
+    total = len(jobs)
+
+    # Now filter
+    if query:
+        jobs = flux_cli.query_jobs(jobs, query)
+
+    # If we are filtering to a range
+    if start and int(start) < len(jobs):
+        jobs = jobs[int(start) :]
+
+    # Do we have a length?
+    if length and int(length) < len(jobs):
+        jobs = jobs[0 : int(length)]
+    return JSONResponse(
+        content={
+            "data": jobs,
+            "draw": draw,
+            "recordsTotal": total,
+            "recordsFiltered": len(jobs),
+        },
+        status_code=200,
+    )
+
+
 @router.get("/jobs")
-async def list_jobs():
+async def list_jobs(request: Request):
     """
     List flux jobs associated with the handle.
     """
-    from app.main import app
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = {}
 
-    listing = flux.job.job_list(app.handle)
-    jobs = jsonable_encoder({"jobs": listing.get_jobs()})
+    # Does the requester want details - in dict or listing form?
+    if helpers.has_boolean_arg(payload, "details"):
+
+        # Job limit (only relevant for details)
+        limit = helpers.get_int_arg(payload, "limit")
+
+        jobs = flux_cli.list_jobs_detailed(limit)
+        if helpers.has_boolean_arg(payload, "listing"):
+            jobs = list(jobs.values())
+    else:
+        listing = flux_cli.list_jobs()
+        jobs = jsonable_encoder({"jobs": listing.get_jobs()})
     return JSONResponse(content=jobs, status_code=200)
 
 
@@ -92,19 +145,21 @@ async def submit_job(request: Request):
     """
     from app.main import app
 
-    payload = await request.json()
-    if "command" not in payload or not payload["command"]:
+    # This can bork if no payload is provided
+    try:
+        payload = await request.json()
+    except Exception:
         return JSONResponse(
-            content={"Message": "'command' is required."}, status_code=400
+            content={"Message": "A 'command' is minimally required."}, status_code=400
         )
 
-    # Generate the flux job
-    command = payload["command"]
-    if isinstance(command, str):
-        command = shlex.split(command)
+    kwargs = {}
 
-    # Optional defaults
-    kwargs = {"command": command}
+    # Required arguments
+    for required in ["command"]:
+        kwargs[required] = payload.get(required)
+
+    # Optional arguments
     for optional in [
         "num_tasks",
         "cores_per_task",
@@ -114,21 +169,26 @@ async def submit_job(request: Request):
     ]:
         if optional in payload and payload[optional]:
             kwargs[optional] = payload[optional]
-    fluxjob = JobspecV1.from_command(**kwargs)
 
-    # Does the user want a working directory?
+    # One off args not provided to JobspecV1
+    envars = payload.get("envars", {})
     workdir = payload.get("workdir")
-    if workdir is not None:
-        fluxjob.workdir = workdir
+    runtime = payload.get("runtime", 0) or 0
 
-    # A duration of zero (the default) means unlimited
-    fluxjob.duration = payload.get("runtime", 0) or 0
+    # Validate the payload, return meaningful message if something is off
+    invalid_messages = flux_cli.validate_submit_kwargs(
+        kwargs, envars=envars, runtime=runtime
+    )
+    if invalid_messages:
+        return JSONResponse(
+            content={"Message": "Invalid submit request", "Errors": invalid_messages},
+            status_code=400,
+        )
 
-    # Additional envars in the payload?
-    environment = dict(os.environ)
-    extra_envars = payload.get("envars", {})
-    environment.update(extra_envars)
-    fluxjob.environment = environment
+    # Prepare the flux job!
+    fluxjob = flux_cli.prepare_job(
+        kwargs, runtime=runtime, workdir=workdir, envars=envars
+    )
 
     # Submit the job and return the ID, but allow for error
     try:
@@ -140,8 +200,6 @@ async def submit_job(request: Request):
         return JSONResponse(content=result, status_code=400)
 
     jobid = flux_future.get_id()
-
-    # TODO should we write jobid and other metadata to a database?
     result = jsonable_encoder({"Message": "Job submit.", "id": jobid})
     return JSONResponse(content=result, status_code=200)
 
@@ -151,8 +209,24 @@ async def get_job(jobid):
     """
     Get job info based on id.
     """
-    from app.main import app
+    info = flux_cli.get_job(jobid)
+    info = jsonable_encoder(info)
+    return JSONResponse(content=info, status_code=200)
 
-    info = flux.job.job_list_id(app.handle, jobid, attrs=["all"])
-    info = jsonable_encoder(json.loads(info.get_str()))
+
+@router.get("/jobs/{jobid}/output")
+async def get_job_output(jobid):
+    """
+    Get job output based on id.
+    """
+    lines = flux_cli.get_job_output(jobid)
+
+    # We have output
+    if lines:
+        output = jsonable_encoder({"Output": lines})
+        return JSONResponse(content=output, status_code=200)
+
+    info = jsonable_encoder(
+        {"Message": "The output does not exist yet, or the jobid is incorrect."}
+    )
     return JSONResponse(content=info, status_code=200)

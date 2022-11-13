@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Flux RESTFul Interface{% endblock %}
+{% block head %}
+{{ super() }}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-coy.min.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block page_content %}
+{% include 'include/sidebar.html' %}
+<main role="main" class="container-wide card" style="padding:30px">
+    <div class="row">
+        <div class="col-md-3">
+            <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Attribute</th>
+                    <th scope="col">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td scope="row">ID</td>
+                    <td>{{ job.id }}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Name</td>
+                    <td>{{ job.name }}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">State</td>
+                    <td>{% include 'include/jobs/state.html' %}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Result</td>
+                    <td>{% include 'include/jobs/result.html' %}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Urgency</td>
+                    <td>{{ job.urgency }}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Priority</td>
+                    <td>{{ job.priority }}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Number Tasks</td>
+                    <td>{{ job.ntasks }}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Cores</td>
+                    <td>{{ job.ncores }}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Nodes</td>
+                    <td>{{ job.nnodes }} ({{ job.nodelist}})</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Ranks</td>
+                    <td>{{ job.ranks }}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Runtime</td>
+                    <td>{{ job.runtime }}</td>
+                  </tr>
+                  <tr>
+                    <td scope="row">Return Code</td>
+                    <td>{{ job.returncode }}</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+        <div class="col-md-9">
+            <pre><code class="language-bash">{% if info %}{% for line in info %}{{ line }}{% endfor %}{% else %}
+            This job did not produce any output.{% endif %}
+           </code></pre>
+        </div>
+    </div>
+</main><!-- /.container -->
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+{% endblock %}

@@ -22,6 +22,7 @@ class FluxRestfulClient:
         token=None,
         quiet=False,
         settings_file=None,
+        prefix="v1",
         **kwargs,
     ):
 
@@ -33,6 +34,8 @@ class FluxRestfulClient:
         self.user = user or os.environ.get("FLUX_USER") or self.settings.flux_user
         self.token = token or os.environ.get("FLUX_TOKEN") or self.settings.flux_token
         self.headers = {}
+        self.quiet = quiet
+        self.prefix = prefix
         if self.user and self.token:
             self.set_basic_auth(self.user, self.token)
         self.session = requests.Session()
@@ -58,7 +61,7 @@ class FluxRestfulClient:
         else:
             self.headers = {}
 
-    def do_request(self, endpoint, method="GET", data=None, headers=None):
+    def do_request(self, endpoint, method="GET", data=None, headers=None, params=None):
         """
         Do a request. This is a wrapper around requests.
         """
@@ -66,10 +69,12 @@ class FluxRestfulClient:
         self.reset()
 
         headers = headers or self.headers
-        url = "%s/%s" % (self.host, endpoint)
+        url = "%s/%s/%s" % (self.host, self.prefix, endpoint)
 
         # Make the request and return to calling function, unless requires auth
-        response = self.session.request(method, url, json=data, headers=headers)
+        response = self.session.request(
+            method, url, params=params, json=data, headers=headers
+        )
 
         # A 401 response is a request for authentication
         if response.status_code != 401:
@@ -141,24 +146,51 @@ class FluxRestfulClient:
         """
         return self.do_request(f"jobs/{jobid}/cancel", "POST").json()
 
+    def output(self, jobid):
+        """
+        Request for a job to be cancelled based on identifier.
+        """
+        return self.do_request(f"jobs/{jobid}/output", "GET").json()
+
     def stop_service(self):
         """
         Stop the server running.
         """
         return self.do_request("service/stop", "POST").json()
 
-    def jobs(self, jobid=None):
+    def jobs(self, jobid=None, detail=False, listing=False):
         """
         Get a listing of jobs that the Flux RESTful API knows about!
         """
         endpoint = "jobs"
+        params = {}
         if jobid:
             endpoint += "/" + str(jobid)
-        result = self.do_request(endpoint, "GET")
+
+        # This indicates a jobs listing (not a single job)
+        else:
+            if detail:
+                params["detail"] = "true"
+            if listing:
+                params["listing"] = "true"
+        result = self.do_request(endpoint, "GET", params=params)
         if result.status_code == 404:
             print("There is no job for that identifier.")
             return
         return result.json()
+
+    def search(self, query=None, start=None, length=None):
+        """
+        Search endpoint for jobs.
+        """
+        params = {}
+        if query:
+            params["query"] = str(query)
+        if start is not None:
+            params["start"] = start
+        if length is not None:
+            params["length"] = length
+        return self.do_request("jobs/search", "GET", params=params).json()
 
     def submit(self, command, **kwargs):
         """

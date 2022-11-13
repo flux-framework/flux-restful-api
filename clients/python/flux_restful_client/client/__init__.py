@@ -173,6 +173,11 @@ flux-restful-cli config inituser""",
         description="get information for a job",
         formatter_class=argparse.RawTextHelpFormatter,
     )
+    logs = subparsers.add_parser(
+        "logs",
+        description="get log output for a job",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     subparsers.add_parser(
         "list-nodes",
         description="list node that the Flux RESTful API knows about",
@@ -188,7 +193,7 @@ flux-restful-cli config inituser""",
         description="Kill your Flux RESTFul API server (cannot be undone)",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    for command in cancel, info:
+    for command in cancel, info, logs:
         command.add_argument("jobid", help="The jobid to interact with.")
 
     return parser
@@ -247,6 +252,8 @@ def run_flux_restful_client():
         from .cancel import main
     elif args.command == "config":
         from .config import main
+    elif args.command == "logs":
+        from .logs import main
     elif args.command == "stop-service":
         from .stop import stop_service as main
     elif args.command == "list-jobs":

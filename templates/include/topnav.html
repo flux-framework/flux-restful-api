@@ -3,13 +3,17 @@
         <button type="button" id="sidebarCollapse" class="btn btn-info">
             <i class="fas fa-align-left"></i>
         </button>
+        {% if title %}<h3 style="margin-left:20px">{{ title }}</h3>{% endif %}
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item {{'active' if active_page == 'api' }}">
+                <li class="nav-item {{'active' if active_page == 'submit_job' }}">
+                    <a class="nav-link" href="/jobs/submit">Submit</a>
+                </li>
+                <li class="nav-item {{'active' if active_page == 'jobs' }}">
                     <a class="nav-link" href="/jobs">Jobs</a>
                 </li>
                 <li class="nav-item {{'active' if active_page == 'api' }}">

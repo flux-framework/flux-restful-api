@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Flux RESTFul Interface{% endblock %}
+{% block head %}
+{{ super() }}
+
+<!-- Custom styles for this template -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,600">
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css'>
+
+<!-- Custom CSS -->
+<link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
+
+<link rel='stylesheet' href='https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css'>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<style>
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0px !important
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  color: white !important;
+  border: 1px solid white;
+  background-color: white;
+}
+</style>
+
+<style>
+#software_filter, #software_length, #software_info {
+ color: #333;
+}
+td, th {
+  color: #333;
+}
+.tag {
+  margin-right: 2px !important;
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+{% include 'include/sidebar.html' %}
+
+<div class="container-wide">
+    <a type="button" class="btn btn-info" style="margin-bottom:10px">Submit Another Job</button>
+    <a type="button" class="btn btn-info filter-reset" onclick="$('#jobs').DataTable().search('').draw()" style='float:right;padding-bottom:5px' href="#">reset</a></li>
+    <table id="jobs"  class="table table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>returncode</th>
+                <th>runtime</th>
+                <th>result</th>
+                <th>urgency</th>
+                <th>priority</th>
+                <th>state</th>
+                <th>name</th>
+                <th>ntasks</th>
+                <th>ncores</th>
+                <th>duration</th>
+                <th>nnodes</th>
+                <th>ranks</th>
+                <th>nodelist</th>
+                <th>expiration</th>
+                <th>waitstatus</th>
+                <th>exception</th>
+            </tr>
+            <tbody></tbody>
+        </thead>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+<script>
+
+$(document).ready(function() {
+
+    $('#jobs').DataTable({
+    "processing": true,
+    "pageLength": 100,
+    "serverSide": true,
+    "sPaginationType": "full_numbers",
+    "order": [],
+    "ajax": {
+        "url": "/v1/jobs/search",
+        "type": 'get',
+        "dataType": 'json'
+    },
+    columnDefs: [
+             { // id
+                render: function (data, type, row) {
+                    return "<a style='color:darkmagenta' href='/job/" + data +"'>" + data + "</a>"
+                },
+                targets: 0,
+            },
+             { // exception
+                render: function (data, type, row) {
+                    if (data['occurred'] == true) {
+                        return "<span class='badge badge-warning'>" + data['note'] + "</span>"
+                    }
+                    return "no exceptions"
+                },
+                targets: 16,
+            },
+            { // result
+                createdCell: function (td, data, rowData, row, col) {
+                    color = "skyblue"
+                    if (data == "INACTIVE") {
+                        color = "grey"
+                    }
+                    if (data == "CANCELLED") {
+                        color = "yellow"
+                    }
+                    if (data == "COMPLETED") {
+                        color = "darkseagreen"
+                    }
+                    $(td).css('background-color', color);
+                },
+                targets: 3
+            },
+            { // status
+                createdCell: function (td, data, rowData, row, col) {
+                    color = "skyblue"
+                    if (data == "INACTIVE") {
+                        color = "grey"
+                    }
+                    $(td).css('background-color', color);
+                },
+                targets: 6
+            },
+        ],
+        "columns": [
+        { "data": "id" },
+        { "data": "returncode" },
+        { "data": "runtime" },
+        { "data": "result" },
+        { "data": "urgency" },
+        { "data": "priority" },
+        { "data": "state" },
+        { "data": "name" },
+        { "data": "ntasks" },
+        { "data": "ncores" },
+        { "data": "duration" },
+        { "data": "nnodes" },
+        { "data": "ranks" },
+        { "data": "nodelist" },
+        { "data": "expiration" },
+        { "data": "waitstatus" },
+        { "data": "exception" },
+    ]
+  });
+  $('#jobs_filter').parent().attr("class", "col-md-12")
+});
+</script>
+{% endblock %}

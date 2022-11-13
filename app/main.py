@@ -3,14 +3,11 @@ import os
 import sys
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.core.logging import init_loggers
 from app.routers import api, views
-
-from .library.helpers import openfile
 
 init_loggers()
 log = logging.getLogger("flux-restful")
@@ -28,6 +25,7 @@ app.mount("/static", StaticFiles(directory=static_root), name="static")
 app.mount("/data", StaticFiles(directory=data_root), name="data")
 
 app.include_router(views.router)
+app.include_router(views.auth_views_router)
 app.include_router(api.router)
 
 try:
@@ -53,21 +51,3 @@ async def load_app_data(request: Request, call_next):
             "Cannot find flux instance! Ensure you have run flux start or similar."
         )
     return await call_next(request)
-
-
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    data = openfile("index.md")
-    return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "data": data,
-        },
-    )
-
-
-@app.get("/page/{page_name}", response_class=HTMLResponse)
-async def show_page(request: Request, page_name: str):
-    data = openfile(page_name + ".md")
-    return templates.TemplateResponse("page.html", {"request": request, "data": data})

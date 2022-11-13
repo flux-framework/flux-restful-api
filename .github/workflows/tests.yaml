@@ -17,4 +17,5 @@ jobs:
     - name: Run tests
       run: |
         flux start pytest -xs tests/test_api.py
-        flux start pytest -xs tests/test_api_auth.py
+        export TEST_AUTH=true
+        flux start pytest -xs tests/test_api.py
