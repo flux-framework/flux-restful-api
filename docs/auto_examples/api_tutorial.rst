@@ -153,7 +153,7 @@ FLUX_REQUIRE_AUTH=true
 
 And finally, let's get job info.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-68
+.. GENERATED FROM PYTHON SOURCE LINES 63-69
 
 .. code-block:: default
 
@@ -166,31 +166,32 @@ And finally, let's get job info.
 
 
 
+
 .. rst-class:: sphx-glr-script-out
 
  .. code-block:: none
 
     🍓 Getting job info...
     {
-        "id": 306433887305728,
+        "id": 323743595364352,
         "userid": 0,
         "urgency": 16,
         "priority": 16,
-        "t_submit": 1668302654.5656898,
-        "t_depend": 1668302654.5656898,
-        "t_run": 1668302654.5781603,
+        "t_submit": 1668303686.305028,
+        "t_depend": 1668303686.305028,
+        "t_run": 1668303686.3178189,
         "state": "RUN",
         "name": "sleep",
         "ntasks": 1,
         "ncores": 1,
         "duration": 0.0,
         "nnodes": 1,
-        "ranks": "3",
+        "ranks": "0",
         "nodelist": "57d0f60fce2e",
-        "expiration": 4821902654.0,
+        "expiration": 4821903686.0,
         "result": "",
         "returncode": "",
-        "runtime": 0.003427743911743164,
+        "runtime": 0.47638893127441406,
         "waitstatus": "",
         "exception": {
             "occurred": "",
@@ -203,23 +204,44 @@ And finally, let's get job info.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-77
+.. GENERATED FROM PYTHON SOURCE LINES 70-72
 
 And job logs
 This will be added to the client
-print("😴 Submitting job to echo pancakes 🥞🥞🥞")
-res = cli.submit(command="echo pancakes 🥞🥞🥞")
-res = cli.output(res["id"])
-if res:
-  time.sleep(3)
-   print(json.dumps(res, indent=4))
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-81
+.. GENERATED FROM PYTHON SOURCE LINES 72-79
+
+.. code-block:: default
+
+    print("😴 Submitting job to echo pancakes 🥞🥞🥞")
+    res = cli.submit(command="echo pancakes are really just morning cakes.")
+    res = cli.output(res["id"])
+    if res:
+        print(json.dumps(res, indent=4))
+
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    😴 Submitting job to echo pancakes 🥞🥞🥞
+    {
+        "Message": "The output does not exist yet, or the jobid is incorrect."
+    }
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 80-82
 
 Now let's submit three jobs in unison so we can list them back!
 Submit the job to flux
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-88
+.. GENERATED FROM PYTHON SOURCE LINES 82-89
 
 .. code-block:: default
 
@@ -242,7 +264,79 @@ Submit the job to flux
     {
         "jobs": [
             {
+                "id": 323754819321856
+            },
+            {
+                "id": 323754148233216
+            },
+            {
+                "id": 323752906719232
+            },
+            {
+                "id": 323743595364352
+            },
+            {
+                "id": 323752151744512
+            },
+            {
+                "id": 322373450465280
+            },
+            {
+                "id": 322377242116096
+            },
+            {
+                "id": 322376034156544
+            },
+            {
+                "id": 322375480508416
+            },
+            {
+                "id": 322379221827584
+            },
+            {
+                "id": 322374071222272
+            },
+            {
+                "id": 314610330632192
+            },
+            {
+                "id": 314609810538496
+            },
+            {
+                "id": 313911777689600
+            },
+            {
+                "id": 314609307222016
+            },
+            {
+                "id": 314380113674240
+            },
+            {
+                "id": 310431579111424
+            },
+            {
+                "id": 310434615787520
+            },
+            {
+                "id": 310434011807744
+            },
+            {
+                "id": 310433458159616
+            },
+            {
+                "id": 310443658706944
+            },
+            {
+                "id": 310432183091200
+            },
+            {
+                "id": 306433887305728
+            },
+            {
                 "id": 306436286447616
+            },
+            {
+                "id": 305828548575232
             },
             {
                 "id": 306435061710848
@@ -251,10 +345,7 @@ Submit the job to flux
                 "id": 306434508062720
             },
             {
-                "id": 306433887305728
-            },
-            {
-                "id": 305828548575232
+                "id": 306436873650176
             },
             {
                 "id": 244509770252288
@@ -283,11 +374,101 @@ Submit the job to flux
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-90
+.. GENERATED FROM PYTHON SOURCE LINES 90-91
+
+And this is how to search (with a start, length, or query)
+
+.. GENERATED FROM PYTHON SOURCE LINES 91-97
+
+.. code-block:: default
+
+    print("🌓 Querying jobs!")
+    res = cli.search("sleep", start=1, length=2)
+    if res:
+        print(json.dumps(res, indent=4))
+
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    🌓 Querying jobs!
+    {
+        "data": [
+            {
+                "id": 323754148233216,
+                "userid": 0,
+                "urgency": 16,
+                "priority": 16,
+                "t_submit": 1668303686.9337833,
+                "t_depend": 1668303686.9337833,
+                "t_run": 1668303686.9520447,
+                "state": "RUN",
+                "name": "sleep",
+                "ntasks": 1,
+                "ncores": 1,
+                "duration": 0.0,
+                "nnodes": 1,
+                "ranks": "0",
+                "nodelist": "57d0f60fce2e",
+                "expiration": 4821903686.0,
+                "result": "",
+                "returncode": "",
+                "runtime": 0.08960390090942383,
+                "waitstatus": "",
+                "exception": {
+                    "occurred": "",
+                    "severity": "",
+                    "type": "",
+                    "note": ""
+                }
+            },
+            {
+                "id": 323752906719232,
+                "userid": 0,
+                "urgency": 16,
+                "priority": 16,
+                "t_submit": 1668303686.8595636,
+                "t_depend": 1668303686.8595636,
+                "t_run": 1668303686.872508,
+                "state": "RUN",
+                "name": "sleep",
+                "ntasks": 1,
+                "ncores": 1,
+                "duration": 0.0,
+                "nnodes": 1,
+                "ranks": "0",
+                "nodelist": "57d0f60fce2e",
+                "expiration": 4821903686.0,
+                "result": "",
+                "returncode": "",
+                "runtime": 0.16966652870178223,
+                "waitstatus": "",
+                "exception": {
+                    "occurred": "",
+                    "severity": "",
+                    "type": "",
+                    "note": ""
+                }
+            }
+        ],
+        "draw": 1,
+        "recordsTotal": 35,
+        "recordsFiltered": 2
+    }
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 98-99
 
 Finally, let's submit and cancel a job
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-98
+.. GENERATED FROM PYTHON SOURCE LINES 99-107
 
 .. code-block:: default
 
@@ -310,7 +491,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 306436873650176
+        "id": 323756681592832
     }
     Requesting job cancel..
     {
@@ -320,11 +501,11 @@ Finally, let's submit and cancel a job
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-100
+.. GENERATED FROM PYTHON SOURCE LINES 108-109
 
 And this would be how you stop your cluster service
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-102
+.. GENERATED FROM PYTHON SOURCE LINES 109-111
 
 .. code-block:: default
 
@@ -346,7 +527,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.513 seconds)
+   **Total running time of the script:** ( 0 minutes  1.091 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:

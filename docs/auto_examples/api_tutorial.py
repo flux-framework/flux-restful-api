@@ -65,15 +65,16 @@ res = cli.jobs(res["id"])
 if res:
     print(json.dumps(res, indent=4))
 
+
 #%%
 # And job logs
 # This will be added to the client
-# print("😴 Submitting job to echo pancakes 🥞🥞🥞")
-# res = cli.submit(command="echo pancakes 🥞🥞🥞")
-# res = cli.output(res["id"])
-# if res:
-#   time.sleep(3)
-#    print(json.dumps(res, indent=4))
+print("😴 Submitting job to echo pancakes 🥞🥞🥞")
+res = cli.submit(command="echo pancakes are really just morning cakes.")
+res = cli.output(res["id"])
+if res:
+    print(json.dumps(res, indent=4))
+
 
 #%%
 # Now let's submit three jobs in unison so we can list them back!
@@ -84,6 +85,14 @@ for time in [10, 20, 30]:
 res = cli.jobs()
 if res:
     print(json.dumps(res, indent=4))
+
+#%%
+# And this is how to search (with a start, length, or query)
+print("🌓 Querying jobs!")
+res = cli.search("sleep", start=1, length=2)
+if res:
+    print(json.dumps(res, indent=4))
+
 
 #%%
 # Finally, let's submit and cancel a job

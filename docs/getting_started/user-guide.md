@@ -169,6 +169,21 @@ $ flux-restful-cli info 12402053611520
 }
 ```
 
+### Logs
+
+To see output for a job, just do:
+
+```bash
+$ flux-restful-cli logs 12402053611520
+```
+```console
+# flux-restful-cli logs 244509770252288
+pancakes 🥞🥞🥞🥞🥞
+```
+
+If you get a message that the output doesn't exist, it usually means your job didn't have output (e.g., sleep),
+or the job was not found.
+
 ### List Jobs
 
 You can list jobs:

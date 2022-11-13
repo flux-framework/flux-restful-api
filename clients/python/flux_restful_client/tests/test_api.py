@@ -53,3 +53,53 @@ def test_cancel_job():
     response = client.cancel(jobid)
     assert "Message" in response
     assert "cannot be cancelled" in response["Message"]
+
+
+def test_job_output():
+    """
+    Test endpoint to retrieve list of job output
+    """
+    client = get_client()
+
+    # Now submit a job, ensure we get one job back
+    result = client.submit("echo pancakes 🥞️🥞️🥞️")
+    jobid = result["id"]
+    lines = client.output(jobid)
+
+    # First try, often we won't have output yet
+    if "Message" in lines:
+        assert "not exist yet" in lines["Message"]
+    time.sleep(3)
+
+    # Try again - we should have it after a sleep
+    lines = client.output(jobid)
+    assert "Output" in lines
+    assert "pancakes 🥞️🥞️🥞️\n" in lines["Output"]
+
+
+def test_job_query():
+    """
+    Test endpoint to query jobs
+    """
+    client = get_client()
+
+    # Submit 5 jobs
+    for _ in range(5):
+        client.submit("sleep 1")
+    result = client.search()
+
+    for key in ["recordsTotal", "recordsFiltered", "draw", "data"]:
+        assert key in result
+
+    total = result["recordsTotal"]
+    assert len(result["data"]) == total
+
+    # Ask to start at 2 (should be one less record)
+    result = client.search(start=1)
+    assert result["recordsFiltered"] == total - 1
+    assert result["recordsTotal"] == total
+
+    # Ask for specific length
+    result = client.search(start=1, length=3)
+    assert result["recordsFiltered"] == 3
+    assert result["recordsTotal"] == total

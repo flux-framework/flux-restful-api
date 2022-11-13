@@ -150,7 +150,7 @@ class FluxRestfulClient:
         """
         Request for a job to be cancelled based on identifier.
         """
-        return self.do_request(f"jobs/{jobid}/output", "POST").json()
+        return self.do_request(f"jobs/{jobid}/output", "GET").json()
 
     def stop_service(self):
         """
@@ -178,6 +178,19 @@ class FluxRestfulClient:
             print("There is no job for that identifier.")
             return
         return result.json()
+
+    def search(self, query=None, start=None, length=None):
+        """
+        Search endpoint for jobs.
+        """
+        params = {}
+        if query:
+            params["query"] = str(query)
+        if start is not None:
+            params["start"] = start
+        if length is not None:
+            params["length"] = length
+        return self.do_request("jobs/search", "GET", params=params).json()
 
     def submit(self, command, **kwargs):
         """
