@@ -34,6 +34,46 @@ async def service_stop():
     os.system("flux shutdown")
 
 
+@router.get("/jobs/search")
+async def jobs_listing(request: Request):
+    """
+    Jobslist is intended to be used by the server to render data tables
+
+    Since this is specific to jquery datables, we don't document.
+    """
+    start = request.query_params.get("start")
+    length = request.query_params.get("length")
+    draw = request.query_params.get("draw") or 1
+    query = request.query_params.get("search[value]") or request.query_params.get(
+        "search"
+    )
+
+    # If we have a query, filter to those that have in the name
+    jobs = list(flux_cli.list_jobs_detailed().values())
+    total = len(jobs)
+
+    # Now filter
+    if query:
+        jobs = flux_cli.query_jobs(jobs, query)
+
+    # If we are filtering to a range
+    if start and int(start) < len(jobs):
+        jobs = jobs[int(start) :]
+
+    # Do we have a length?
+    if length and int(length) < len(jobs):
+        jobs = jobs[0 : int(length)]
+    return JSONResponse(
+        content={
+            "data": jobs,
+            "draw": draw,
+            "recordsTotal": total,
+            "recordsFiltered": len(jobs),
+        },
+        status_code=200,
+    )
+
+
 @router.get("/jobs")
 async def list_jobs(request: Request):
     """
@@ -179,20 +219,13 @@ async def get_job_output(jobid):
     """
     Get job output based on id.
     """
-    lines = []
-    from app.main import app
+    lines = flux_cli.get_job_output(jobid)
 
-    # If the submit is too close to the log reqest, it cannot find the file handle
-    # It could be also the jobid cannot be found.
-    try:
-        for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
-            if "data" in line.context:
-                lines.append(line.context["data"])
+    # We have output
+    if lines:
         output = jsonable_encoder({"Output": lines})
         return JSONResponse(content=output, status_code=200)
 
-    except Exception:
-        pass
     info = jsonable_encoder(
         {"Message": "The output does not exist yet, or the jobid is incorrect."}
     )

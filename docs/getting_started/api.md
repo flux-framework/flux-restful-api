@@ -27,6 +27,24 @@ By default, this returns a simple listing with "jobs" -> a list of dict with ids
 - listing (bool): provide listing as True if you want to get details in a list
 - limit (int): provide a maximum number of jobs to retrieve (defaults to all if not provided)
 
+### GET '/v1/jobs/search'
+
+A custom search endpoint to query for jobs. It is used internally by the site to
+render data tables and similar.
+
+**Optional** parameters:
+
+- start: a number to start at, must be <= the length of total jobs
+- length: a length to stop at, after the start is applied (if applicable)
+- query: a string to search all attributes for
+
+**Returns** parameters:
+
+ - data: the list of jobs
+ - recordsTotal: the total number of jobs available
+ - recordsFiltered: the total after fitlering by the query, length, start
+ - draw: an integer used by Jquery Datatables
+
 ### POST `/v1/jobs/submit`
 
 Submit a new job

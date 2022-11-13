@@ -39,13 +39,30 @@ async def home(request: Request):
 
 # List jobs
 @auth_views_router.get("/jobs", response_class=HTMLResponse)
-async def jobs_table(request: Request, messages=None):
+async def jobs_table(request: Request):
+    jobs = list(flux_cli.list_jobs_detailed().values())
+    print(jobs)
     return templates.TemplateResponse(
         "jobs/jobs.html",
         {
             "request": request,
-            "jobs": flux_cli.list_jobs_detailed(),
-            "messages": messages or [],
+            "jobs": jobs,
+        },
+    )
+
+
+# View job detail (and log)
+@auth_views_router.get("/job/{jobid}", response_class=HTMLResponse)
+async def job_info(request: Request, jobid):
+    job = flux_cli.get_job(jobid)
+    info = flux_cli.get_job_output(jobid)
+    return templates.TemplateResponse(
+        "jobs/job.html",
+        {
+            "title": f"Job {jobid}",
+            "request": request,
+            "job": job,
+            "info": info,
         },
     )
 

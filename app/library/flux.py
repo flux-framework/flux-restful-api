@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import shlex
 
 import flux
@@ -72,7 +73,45 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     return fluxjob
 
 
-def list_jobs_detailed(limit=None):
+def query_job(jobinfo, query):
+    """
+    This would be better suited for a database, but should work for small numbers.
+    """
+    searchstr = "".join([str(x) for x in list(jobinfo.values())])
+    return re.search(query, searchstr)
+
+
+def query_jobs(contenders, query):
+    """
+    Wrapper to query more than one job.
+    """
+    jobs = []
+    for contender in contenders:
+        if not query_job(contender, query):
+            continue
+        jobs.append(contender)
+    return jobs
+
+
+def get_job_output(jobid):
+    """
+    Given a jobid, get the output.
+    """
+    lines = []
+    from app.main import app
+
+    # If the submit is too close to the log reqest, it cannot find the file handle
+    # It could be also the jobid cannot be found.
+    try:
+        for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
+            if "data" in line.context:
+                lines.append(line.context["data"])
+    except Exception:
+        pass
+    return lines
+
+
+def list_jobs_detailed(limit=None, query=None):
     """
     Get a detailed listing of jobs.
     """
@@ -84,8 +123,14 @@ def list_jobs_detailed(limit=None):
         # Stop if a limit is defined and we have hit it!
         if limit is not None and len(jobs) >= limit:
             break
+
         try:
-            jobs[job["id"]] = get_job(job["id"])
+            jobinfo = get_job(job["id"])
+
+            # Best effort hack to do a query
+            if query and not query_job(jobinfo, query):
+                continue
+            jobs[job["id"]] = jobinfo
         except Exception:
             pass
     return jobs
@@ -119,25 +164,27 @@ def get_job(jobid):
     payload = {"id": int(jobid), "attrs": ["all"]}
     rpc = flux.job.list.JobListIdRPC(app.handle, "job-list.list-id", payload)
     try:
-        jobinfo = rpc.get()["job"]
-
-        # User friendly string from integer
-        state = jobinfo["state"]
-        jobinfo["state"] = flux.job.info.statetostr(state)
-
-        # Get job info to add to result
-        info = rpc.get_jobinfo()
-        jobinfo["nnodes"] = info._nnodes
-        jobinfo["result"] = info.result
-        jobinfo["returncode"] = info.returncode
-        jobinfo["runtime"] = info.runtime
-        jobinfo["priority"] = info._priority
-        jobinfo["waitstatus"] = info._waitstatus
-        jobinfo["nodelist"] = info._nodelist
-        jobinfo["nodelist"] = info._nodelist
-        jobinfo["exception"] = info._exception.__dict__
-        return jobinfo
+        jobinfo = rpc.get()
 
     # The job does not exist!
     except FileNotFoundError:
         return None
+
+    jobinfo = jobinfo["job"]
+
+    # User friendly string from integer
+    state = jobinfo["state"]
+    jobinfo["state"] = flux.job.info.statetostr(state)
+
+    # Get job info to add to result
+    info = rpc.get_jobinfo()
+    jobinfo["nnodes"] = info._nnodes
+    jobinfo["result"] = info.result
+    jobinfo["returncode"] = info.returncode
+    jobinfo["runtime"] = info.runtime
+    jobinfo["priority"] = info._priority
+    jobinfo["waitstatus"] = info._waitstatus
+    jobinfo["nodelist"] = info._nodelist
+    jobinfo["nodelist"] = info._nodelist
+    jobinfo["exception"] = info._exception.__dict__
+    return jobinfo

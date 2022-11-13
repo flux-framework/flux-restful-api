@@ -11,9 +11,20 @@
 
 <!-- Custom CSS -->
 <link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
-<script src='https://code.jquery.com/jquery-3.5.1.js'></script>
 
 <link rel='stylesheet' href='https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css'>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<style>
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0px !important
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  color: white !important;
+  border: 1px solid white;
+  background-color: white;
+}
+</style>
+
 <style>
 #software_filter, #software_length, #software_info {
  color: #333;
@@ -30,18 +41,31 @@ td, th {
 {% block page_content %}
 {% include 'include/sidebar.html' %}
 
-{% for job in jobs %}{{ job.__dict__ }}
-{% endfor %}
-
-<div class="container">
-    <a type="button" class="btn btn-info">Submit Another Job</button>
+<div class="container-wide">
+    <a type="button" class="btn btn-info" style="margin-bottom:10px">Submit Another Job</button>
     <a type="button" class="btn btn-info filter-reset" onclick="$('#jobs').DataTable().search('').draw()" style='float:right;padding-bottom:5px' href="#">reset</a></li>
     <table id="jobs"  class="table table-bordered" cellspacing="0" width="100%">
         <thead>
             <tr>
-                <th>Job</th>
-                <th>View Information</th>
+                <th>id</th>
+                <th>returncode</th>
+                <th>runtime</th>
+                <th>result</th>
+                <th>urgency</th>
+                <th>priority</th>
+                <th>state</th>
+                <th>name</th>
+                <th>ntasks</th>
+                <th>ncores</th>
+                <th>duration</th>
+                <th>nnodes</th>
+                <th>ranks</th>
+                <th>nodelist</th>
+                <th>expiration</th>
+                <th>waitstatus</th>
+                <th>exception</th>
             </tr>
+            <tbody></tbody>
         </thead>
     </table>
 </div>
@@ -51,133 +75,87 @@ td, th {
 {% block scripts %}
 {{ super() }}
 
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
 <script>
-    $(document).ready(function () {
 
-   /* $('#jobs').DataTable({
-      data: data,
-      pageLength: 50,
-      columns: [
-        { data: "uid",
-          render: function ( data, type, row ) { return "<a href='" + row['url'] + "' target='_blank'>" + data +"</a>";},
-        },
-        { data: "description"},
-        { data: "topics",
-          render: function ( data, type, row ) {
-             var topics = ""
-             if(data.length > 0) {
-               $.each(data, function(i, e){
-                  topics += "<button onclick=$('#software').DataTable().search('"+ e +"').draw(); class='tag button btn btn-primary btn-xs'>" + e + "</button>";
-               })
-             }
-             return topics
-          },
-        },
-      ]
-    });
-    });
+$(document).ready(function() {
 
-    // Ensure search is aligned to the right!
-    $('#software_filter').parent().attr("class", "col-md-12")
-    })
-    </script>
-
-
-            <script src="/web/assets/js/bootstrap.min.js"></script>
-    <script src="/web/assets/js/retina-1.1.0.js"></script>
-    <script src="/web/assets/js/jquery.hoverdir.js"></script>
-    <script src="/web/assets/js/jquery.hoverex.min.js"></script>
-    <script src="/web/assets/js/jquery.prettyPhoto.js"></script>
-    <script src="/web/assets/js/jquery.isotope.min.js"></script>
-    <script src="/web/assets/js/toastr.min.js"></script>
-    <script src="/web/assets/tipuesearch/tipuesearch_content.js"></script>
-    <script src="/web/assets/tipuesearch/tipuesearch_set.js"></script>
-    <script src="/web/assets/tipuesearch/tipuesearch.min.js"></script>
-    <script src="/web/assets/js/custom.js"></script>
-
-    <script src='https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js'></script>
-    <script src='https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js'></script>
-
-    <script>
-    // Portfolio
-    (function($) {
-        "use strict";
-        var $container = $('.portfolio'),
-            $items = $container.find('.portfolio-item'),
-            portfolioLayout = 'fitRows';
-
-            if( $container.hasClass('portfolio-centered') ) {
-                portfolioLayout = 'masonry';
-            }
-
-            $container.isotope({
-                filter: '*',
-                animationEngine: 'best-available',
-                layoutMode: portfolioLayout,
-                animationOptions: {
-                duration: 750,
-                easing: 'linear',
-                queue: false
+    $('#jobs').DataTable({
+    "processing": true,
+    "pageLength": 100,
+    "serverSide": true,
+    "sPaginationType": "full_numbers",
+    "order": [],
+    "ajax": {
+        "url": "/v1/jobs/search",
+        "type": 'get',
+        "dataType": 'json'
+    },
+    columnDefs: [
+             { // id
+                render: function (data, type, row) {
+                    return "<a style='color:darkmagenta' href='/job/" + data +"'>" + data + "</a>"
+                },
+                targets: 0,
             },
-            masonry: {
-            }
-            }, refreshWaypoints());
-
-            function refreshWaypoints() {
-                setTimeout(function() {
-                }, 1000);
-            }
-
-            $('nav.portfolio-filter ul a').on('click', function() {
-                    var selector = $(this).attr('data-filter');
-                    $container.isotope({ filter: selector }, refreshWaypoints());
-                    $('nav.portfolio-filter ul a').removeClass('active');
-                    $(this).addClass('active');
-                    return false;
-            });
-
-            function getColumnNumber() {
-                var winWidth = $(window).width(),
-                columnNumber = 1;
-
-                if (winWidth > 1200) {
-                    columnNumber = 5;
-                } else if (winWidth > 950) {
-                    columnNumber = 4;
-                } else if (winWidth > 600) {
-                    columnNumber = 3;
-                } else if (winWidth > 400) {
-                    columnNumber = 2;
-                } else if (winWidth > 250) {
-                    columnNumber = 1;
-                }
-                    return columnNumber;
-                }
-
-                function setColumns() {
-                    var winWidth = $(window).width(),
-                    columnNumber = getColumnNumber(),
-                    itemWidth = Math.floor(winWidth / columnNumber);
-
-                    $container.find('.portfolio-item').each(function() {
-                        $(this).css( {
-                        width : itemWidth + 'px'
-                    });
-                });
-            }
-
-            function setPortfolio() {
-                setColumns();
-                $container.isotope('reLayout');
-            }
-
-            $container.imagesLoaded(function () {
-                setPortfolio();
-            });
-
-            $(window).on('resize', function () {
-            setPortfolio();
-        });*/
-    })(jQuery);
-    </script>
+             { // exception
+                render: function (data, type, row) {
+                    if (data['occurred'] == true) {
+                        return "<span class='badge badge-warning'>" + data['note'] + "</span>"
+                    }
+                    return "no exceptions"
+                },
+                targets: 16,
+            },
+            { // result
+                createdCell: function (td, data, rowData, row, col) {
+                    color = "skyblue"
+                    if (data == "INACTIVE") {
+                        color = "grey"
+                    }
+                    if (data == "CANCELLED") {
+                        color = "yellow"
+                    }
+                    if (data == "COMPLETED") {
+                        color = "darkseagreen"
+                    }
+                    $(td).css('background-color', color);
+                },
+                targets: 3
+            },
+            { // status
+                createdCell: function (td, data, rowData, row, col) {
+                    color = "skyblue"
+                    if (data == "INACTIVE") {
+                        color = "grey"
+                    }
+                    $(td).css('background-color', color);
+                },
+                targets: 6
+            },
+        ],
+        "columns": [
+        { "data": "id" },
+        { "data": "returncode" },
+        { "data": "runtime" },
+        { "data": "result" },
+        { "data": "urgency" },
+        { "data": "priority" },
+        { "data": "state" },
+        { "data": "name" },
+        { "data": "ntasks" },
+        { "data": "ncores" },
+        { "data": "duration" },
+        { "data": "nnodes" },
+        { "data": "ranks" },
+        { "data": "nodelist" },
+        { "data": "expiration" },
+        { "data": "waitstatus" },
+        { "data": "exception" },
+    ]
+  });
+  $('#jobs_filter').parent().attr("class", "col-md-12")
+});
+</script>
 {% endblock %}
