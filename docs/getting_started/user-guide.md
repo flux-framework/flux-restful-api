@@ -4,7 +4,8 @@ Welcome to the Flux RESTful API user guide! If you come here, we are assuming
 that you have a deployment available to use to interact with. If you need
 to deploy your own API, see the [Developer Documentation](https://flux-framework.org/flux-restful-api/getting_started/developer-guide.html).
 We provide [clients](https://github.com/flux-framework/flux-restful-api/tree/main/clients) to interact with
-a running server, each described below. The Python client is also included in our [Tutorials](https://flux-framework.org/flux-restful-api/auto_examples/index.html).
+a running server, each described below, along with a quick container tutorial (coming soon).
+The Python client is also included in our [Tutorials](https://flux-framework.org/flux-restful-api/auto_examples/index.html).
 
 ## Environment
 

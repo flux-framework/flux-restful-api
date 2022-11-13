@@ -116,10 +116,13 @@ def test_cancel_job():
     jobid = result["id"]
     response = client.post(f"/v1/jobs/{jobid}/cancel", headers=headers)
     assert response.status_code == 200
-    # TODO we don't have way to actually verify this!
+    # TODO we don't have way to actually verify that cancel happened
 
 
 def test_job_output():
+    """
+    Test endpoint to retrieve list of job output
+    """
 
     # Now submit a job, ensure we get one job back
     response = client.post(
@@ -132,8 +135,9 @@ def test_job_output():
     assert response.status_code == 200
     lines = res.json()
 
-    # First try, we won't have output yet
-    assert "Message" in lines
+    # First try, often we won't have output yet
+    if "Message" in lines:
+        assert "not exist yet" in lines["Message"]
     time.sleep(3)
 
     # Try again - we should have it after a sleep
@@ -142,3 +146,35 @@ def test_job_output():
     lines = res.json()
     assert "Output" in lines
     assert "pancakes 🥞️🥞️🥞️\n" in lines["Output"]
+
+
+def test_job_query():
+    """
+    Test endpoint to query jobs
+    """
+    # Submit 5 jobs
+    for _ in range(5):
+        client.post("/v1/jobs/submit", json={"command": "sleep 1"}, headers=headers)
+
+    response = client.get("/v1/jobs/search", headers=headers)
+    assert response.status_code == 200
+    result = response.json()
+
+    for key in ["recordsTotal", "recordsFiltered", "draw", "data"]:
+        assert key in result
+    total = result["recordsTotal"]
+    assert len(result["data"]) == total
+
+    # Ask to start at 2 (should be one less record)
+    response = client.get("/v1/jobs/search", params={"start": 1}, headers=headers)
+    assert response.status_code == 200
+    result = response.json()
+    assert result["recordsFiltered"] == total - 1
+    assert result["recordsTotal"] == total
+
+    # Ask for specific length
+    response = client.get("/v1/jobs/search", params={"length": 3}, headers=headers)
+    assert response.status_code == 200
+    result = response.json()
+    assert result["recordsFiltered"] == 3
+    assert result["recordsTotal"] == total
