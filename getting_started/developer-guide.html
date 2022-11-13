@@ -72,7 +72,7 @@
   <link href="../_static/favicon.ico" rel="shortcut icon"/>
   <link href="../genindex.html" rel="index" title="Index"/>
   <link href="../search.html" rel="search" title="Search"/>
-  <link href="api.html" rel="next" title="API"/>
+  <link href="interface.html" rel="next" title="Interface"/>
   <link href="user-guide.html" rel="prev" title="User Guide"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <!-- Social: Facebook / Open Graph -->
@@ -335,6 +335,11 @@
                    </a>
                   </li>
                   <li class="md-nav__item">
+                   <a class="md-nav__link" href="#environment">
+                    Environment
+                   </a>
+                  </li>
+                  <li class="md-nav__item">
                    <a class="md-nav__link" href="#code-linting">
                     Code Linting
                    </a>
@@ -356,6 +361,11 @@
                       </a>
                      </li>
                      <li class="md-nav__item">
+                      <a class="md-nav__link" href="#run-tests">
+                       Run Tests
+                      </a>
+                     </li>
+                     <li class="md-nav__item">
                       <a class="md-nav__link" href="#docstrings">
                        Docstrings
                       </a>
@@ -373,6 +383,11 @@
                </li>
               </ul>
              </nav>
+            </li>
+            <li class="md-nav__item">
+             <a class="md-nav__link" href="interface.html">
+              Interface
+             </a>
             </li>
             <li class="md-nav__item">
              <a class="md-nav__link" href="api.html">
@@ -467,6 +482,11 @@
               </a>
              </li>
              <li class="md-nav__item">
+              <a class="md-nav__link" href="#environment">
+               Environment
+              </a>
+             </li>
+             <li class="md-nav__item">
               <a class="md-nav__link" href="#code-linting">
                Code Linting
               </a>
@@ -485,6 +505,11 @@
                 <li class="md-nav__item">
                  <a class="md-nav__link" href="#preview-documentation">
                   Preview Documentation
+                 </a>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#run-tests">
+                  Run Tests
                  </a>
                 </li>
                 <li class="md-nav__item">
@@ -829,6 +854,98 @@ with the server. See our
           for these instructions.
          </p>
         </section>
+        <section id="environment">
+         <h2 id="environment">
+          Environment
+          <a class="headerlink" href="#environment" title="Permalink to this heading">
+           ¶
+          </a>
+         </h2>
+         <p>
+          Wherever you run the app, you can control variables (settings) via the environment.
+The following variables are available (with their defaults):
+         </p>
+         <table border="1">
+          <thead>
+           <tr>
+            <th>
+             Name
+            </th>
+            <th>
+             Description
+            </th>
+            <th>
+             Default
+            </th>
+           </tr>
+          </thead>
+          <tbody>
+           <tr>
+            <td>
+             FLUX_REQUIRE_AUTH
+            </td>
+            <td>
+             The server should require basic auth for API and authenticated endpoints
+            </td>
+            <td>
+             False (unset)
+            </td>
+           </tr>
+           <tr>
+            <td>
+             FLUX_TOKEN
+            </td>
+            <td>
+             The token password to require for Basic Auth (if
+             <code>
+              FLUX_REQUIRE_AUTH
+             </code>
+             is set)
+            </td>
+            <td>
+             unset
+            </td>
+           </tr>
+           <tr>
+            <td>
+             FLUX_USER
+            </td>
+            <td>
+             The username to require for Basic Auth (if
+             <code>
+              FLUX_REQUIRE_AUTH
+             </code>
+             is set)
+            </td>
+            <td>
+             unset
+            </td>
+           </tr>
+           <tr>
+            <td>
+             FLUX_HAS_GPU
+            </td>
+            <td>
+             GPUs are available for the user to request
+            </td>
+            <td>
+             unset
+            </td>
+           </tr>
+           <tr>
+            <td>
+             FLUX_NUMBER_NODES
+            </td>
+            <td>
+             The number of nodes available in the cluster
+            </td>
+            <td>
+             1
+            </td>
+           </tr>
+          </tbody>
+         </table>
+        </section>
         <section id="code-linting">
          <h2 id="code-linting">
           Code Linting
@@ -959,7 +1076,7 @@ dependencies (done in devcontainer):
           <div class="highlight-console notranslate">
            <div class="highlight">
             <pre><span></span><span class="go">cd docs</span>
-<span class="go">pip install -r requrements.txt</span>
+<span class="go">pip install -r requirements.txt</span>
 
 <span class="gp"># </span>Build the docs into _build/html
 <span class="go">make html</span>
@@ -1007,6 +1124,24 @@ server to preview:
             </span>
            </code>
           </p>
+         </section>
+         <section id="run-tests">
+          <h3 id="run-tests">
+           Run Tests
+           <a class="headerlink" href="#run-tests" title="Permalink to this heading">
+            ¶
+           </a>
+          </h3>
+          <p>
+           To run tests, from within the devcontainers environment (or with a local install)
+of Flux alongside the app) you can do:
+          </p>
+          <div class="highlight-bash notranslate">
+           <div class="highlight">
+            <pre><span></span>$ flux start pytest -xs tests/test_api.py
+</pre>
+           </div>
+          </div>
          </section>
          <section id="docstrings">
           <h3 id="docstrings">
@@ -1061,13 +1196,13 @@ functions from oras-py source code.
        </span>
       </div>
      </a>
-     <a class="md-flex md-footer-nav__link md-footer-nav__link--next" href="api.html" rel="next" title="API">
+     <a class="md-flex md-footer-nav__link md-footer-nav__link--next" href="interface.html" rel="next" title="Interface">
       <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
        <span class="md-flex__ellipsis">
         <span class="md-footer-nav__direction">
          Next
         </span>
-        API
+        Interface
        </span>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
@@ -1084,7 +1219,7 @@ functions from oras-py source code.
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 09, 2022.
+              Nov 13, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

@@ -4,7 +4,8 @@ Welcome to the Flux RESTful API user guide! If you come here, we are assuming
 that you have a deployment available to use to interact with. If you need
 to deploy your own API, see the [Developer Documentation](https://flux-framework.org/flux-restful-api/getting_started/developer-guide.html).
 We provide [clients](https://github.com/flux-framework/flux-restful-api/tree/main/clients) to interact with
-a running server, each described below. The Python client is also included in our [Tutorials](https://flux-framework.org/flux-restful-api/auto_examples/index.html).
+a running server, each described below, along with a quick container tutorial (coming soon).
+The Python client is also included in our [Tutorials](https://flux-framework.org/flux-restful-api/auto_examples/index.html).
 
 ## Environment
 
@@ -167,6 +168,21 @@ $ flux-restful-cli info 12402053611520
     }
 }
 ```
+
+### Logs
+
+To see output for a job, just do:
+
+```bash
+$ flux-restful-cli logs 12402053611520
+```
+```console
+# flux-restful-cli logs 244509770252288
+pancakes 🥞🥞🥞🥞🥞
+```
+
+If you get a message that the output doesn't exist, it usually means your job didn't have output (e.g., sleep),
+or the job was not found.
 
 ### List Jobs
 

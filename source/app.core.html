@@ -360,6 +360,15 @@
                     </a>
                    </li>
                    <li class="md-nav__item">
+                    <a class="md-nav__link" href="#app.core.config.Settings.flux_nodes">
+                     <code class="docutils literal notranslate">
+                      <span class="pre">
+                       Settings.flux_nodes
+                      </span>
+                     </code>
+                    </a>
+                   </li>
+                   <li class="md-nav__item">
                     <a class="md-nav__link" href="#app.core.config.Settings.flux_token">
                      <code class="docutils literal notranslate">
                       <span class="pre">
@@ -378,6 +387,15 @@
                     </a>
                    </li>
                    <li class="md-nav__item">
+                    <a class="md-nav__link" href="#app.core.config.Settings.has_gpus">
+                     <code class="docutils literal notranslate">
+                      <span class="pre">
+                       Settings.has_gpus
+                      </span>
+                     </code>
+                    </a>
+                   </li>
+                   <li class="md-nav__item">
                     <a class="md-nav__link" href="#app.core.config.Settings.require_auth">
                      <code class="docutils literal notranslate">
                       <span class="pre">
@@ -388,6 +406,24 @@
                    </li>
                   </ul>
                  </nav>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#app.core.config.get_bool_envar">
+                  <code class="docutils literal notranslate">
+                   <span class="pre">
+                    get_bool_envar()
+                   </span>
+                  </code>
+                 </a>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#app.core.config.get_int_envar">
+                  <code class="docutils literal notranslate">
+                   <span class="pre">
+                    get_int_envar()
+                   </span>
+                  </code>
+                 </a>
                 </li>
                </ul>
               </nav>
@@ -870,6 +906,74 @@
            <em class="sig-param">
             <span class="n">
              <span class="pre">
+              has_gpus
+             </span>
+            </span>
+            <span class="p">
+             <span class="pre">
+              :
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="n">
+             <span class="pre">
+              bool
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="o">
+             <span class="pre">
+              =
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="default_value">
+             <span class="pre">
+              False
+             </span>
+            </span>
+           </em>
+           ,
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              flux_nodes
+             </span>
+            </span>
+            <span class="p">
+             <span class="pre">
+              :
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="n">
+             <span class="pre">
+              int
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="o">
+             <span class="pre">
+              =
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="default_value">
+             <span class="pre">
+              1
+             </span>
+            </span>
+           </em>
+           ,
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
               flux_user
              </span>
             </span>
@@ -991,6 +1095,9 @@
              </span>
             </code>
            </p>
+           <p>
+            Basic settings and defaults for the Flux RESTFul API
+           </p>
            <dl class="py attribute">
             <dt class="sig sig-object py" id="app.core.config.Settings.app_name">
              <span class="sig-name descname">
@@ -1011,6 +1118,32 @@
               </span>
              </em>
              <a class="headerlink" href="#app.core.config.Settings.app_name" title="Permalink to this definition">
+              ¶
+             </a>
+            </dt>
+            <dd>
+            </dd>
+           </dl>
+           <dl class="py attribute">
+            <dt class="sig sig-object py" id="app.core.config.Settings.flux_nodes">
+             <span class="sig-name descname">
+              <span class="pre">
+               flux_nodes
+              </span>
+             </span>
+             <em class="property">
+              <span class="p">
+               <span class="pre">
+                :
+               </span>
+              </span>
+              <span class="w">
+              </span>
+              <span class="pre">
+               int
+              </span>
+             </em>
+             <a class="headerlink" href="#app.core.config.Settings.flux_nodes" title="Permalink to this definition">
               ¶
              </a>
             </dt>
@@ -1070,6 +1203,32 @@
             </dd>
            </dl>
            <dl class="py attribute">
+            <dt class="sig sig-object py" id="app.core.config.Settings.has_gpus">
+             <span class="sig-name descname">
+              <span class="pre">
+               has_gpus
+              </span>
+             </span>
+             <em class="property">
+              <span class="p">
+               <span class="pre">
+                :
+               </span>
+              </span>
+              <span class="w">
+              </span>
+              <span class="pre">
+               bool
+              </span>
+             </em>
+             <a class="headerlink" href="#app.core.config.Settings.has_gpus" title="Permalink to this definition">
+              ¶
+             </a>
+            </dt>
+            <dd>
+            </dd>
+           </dl>
+           <dl class="py attribute">
             <dt class="sig sig-object py" id="app.core.config.Settings.require_auth">
              <span class="sig-name descname">
               <span class="pre">
@@ -1095,6 +1254,126 @@
             <dd>
             </dd>
            </dl>
+          </dd>
+         </dl>
+         <dl class="py function">
+          <dt class="sig sig-object py" id="app.core.config.get_bool_envar">
+           <span class="sig-prename descclassname">
+            <span class="pre">
+             app.core.config.
+            </span>
+           </span>
+           <span class="sig-name descname">
+            <span class="pre">
+             get_bool_envar
+            </span>
+           </span>
+           <span class="sig-paren">
+            (
+           </span>
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              key
+             </span>
+            </span>
+           </em>
+           ,
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              default
+             </span>
+            </span>
+            <span class="o">
+             <span class="pre">
+              =
+             </span>
+            </span>
+            <span class="default_value">
+             <span class="pre">
+              False
+             </span>
+            </span>
+           </em>
+           <span class="sig-paren">
+            )
+           </span>
+           <a class="reference internal" href="../_modules/app/core/config.html#get_bool_envar">
+            <span class="viewcode-link">
+             <span class="pre">
+              [source]
+             </span>
+            </span>
+           </a>
+           <a class="headerlink" href="#app.core.config.get_bool_envar" title="Permalink to this definition">
+            ¶
+           </a>
+          </dt>
+          <dd>
+           <p>
+            Get a boolean from the environment, meaning the value is set.
+           </p>
+          </dd>
+         </dl>
+         <dl class="py function">
+          <dt class="sig sig-object py" id="app.core.config.get_int_envar">
+           <span class="sig-prename descclassname">
+            <span class="pre">
+             app.core.config.
+            </span>
+           </span>
+           <span class="sig-name descname">
+            <span class="pre">
+             get_int_envar
+            </span>
+           </span>
+           <span class="sig-paren">
+            (
+           </span>
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              key
+             </span>
+            </span>
+           </em>
+           ,
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              default
+             </span>
+            </span>
+            <span class="o">
+             <span class="pre">
+              =
+             </span>
+            </span>
+            <span class="default_value">
+             <span class="pre">
+              None
+             </span>
+            </span>
+           </em>
+           <span class="sig-paren">
+            )
+           </span>
+           <a class="reference internal" href="../_modules/app/core/config.html#get_int_envar">
+            <span class="viewcode-link">
+             <span class="pre">
+              [source]
+             </span>
+            </span>
+           </a>
+           <a class="headerlink" href="#app.core.config.get_int_envar" title="Permalink to this definition">
+            ¶
+           </a>
+          </dt>
+          <dd>
+           <p>
+            Get (and parse) an integer environment variable
+           </p>
           </dd>
          </dl>
         </section>
@@ -1229,7 +1508,7 @@
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 09, 2022.
+              Nov 13, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

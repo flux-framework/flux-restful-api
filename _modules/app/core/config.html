@@ -324,13 +324,43 @@
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseSettings</span>
 
 
+<div class="viewcode-block" id="get_int_envar"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_int_envar">[docs]</a><span class="k">def</span> <span class="nf">get_int_envar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Get (and parse) an integer environment variable</span>
+<span class="sd">    """</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">default</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default</span></div>
+
+
+<div class="viewcode-block" id="get_bool_envar"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_bool_envar">[docs]</a><span class="k">def</span> <span class="nf">get_bool_envar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Get a boolean from the environment, meaning the value is set.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">default</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">else</span> <span class="ow">not</span> <span class="n">default</span></div>
+
+
 <div class="viewcode-block" id="Settings"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.Settings">[docs]</a><span class="k">class</span> <span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Basic settings and defaults for the Flux RESTFul API</span>
+<span class="sd">    """</span>
+
     <span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Flux RESTFul API"</span>
 
     <span class="c1"># These map to envars, e.g., FLUX_USER</span>
+    <span class="n">has_gpus</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">get_bool_envar</span><span class="p">(</span><span class="s2">"FLUX_HAS_GPUS"</span><span class="p">)</span>
+
+    <span class="c1"># Assume there is at least one node!</span>
+    <span class="n">flux_nodes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">get_int_envar</span><span class="p">(</span><span class="s2">"FLUX_NUMBER_NODES"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
     <span class="n">flux_user</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FLUX_USER"</span><span class="p">)</span>
     <span class="n">flux_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FLUX_TOKEN"</span><span class="p">)</span>
-    <span class="n">require_auth</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FLUX_REQUIRE_AUTH"</span><span class="p">)</span> <span class="k">else</span> <span class="kc">True</span></div>
+    <span class="n">require_auth</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">get_bool_envar</span><span class="p">(</span><span class="s2">"FLUX_REQUIRE_AUTH"</span><span class="p">)</span></div>
 
 
 <span class="n">settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
@@ -353,7 +383,7 @@
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 09, 2022.
+              Nov 13, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

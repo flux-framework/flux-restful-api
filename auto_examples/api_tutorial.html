@@ -406,7 +406,7 @@ environment.
           <pre><span></span>Listing nodes
 {
     "nodes": [
-        "eb2696be629a"
+        "c1f4bfd26f66"
     ]
 }
 </pre>
@@ -457,19 +457,52 @@ FLUX_REQUIRE_AUTH=true
          <div class="highlight">
           <pre><span></span>🍓 Getting job info...
 {
-    "job": {
-        "id": 1020256059392,
-        "userid": 0,
-        "urgency": 16,
-        "priority": 16,
-        "t_submit": 1668018458.7403858,
-        "t_depend": 1668018458.7403858,
-        "state": 8,
-        "name": "sleep",
-        "ntasks": 1,
-        "ncores": 1,
-        "duration": 0.0
+    "id": 1218965405696,
+    "userid": 0,
+    "urgency": 16,
+    "priority": 16,
+    "t_submit": 1668304942.8245206,
+    "t_depend": 1668304942.8245206,
+    "state": "SCHED",
+    "name": "sleep",
+    "ntasks": 1,
+    "ncores": 1,
+    "duration": 0.0,
+    "nnodes": "",
+    "result": "",
+    "returncode": "",
+    "runtime": 0.0,
+    "waitstatus": "",
+    "nodelist": "",
+    "exception": {
+        "occurred": "",
+        "severity": "",
+        "type": "",
+        "note": ""
     }
+}
+</pre>
+         </div>
+        </div>
+        <p>
+         And job logs
+This will be added to the client
+        </p>
+        <div class="highlight-default notranslate">
+         <div class="highlight">
+          <pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"😴 Submitting job to echo pancakes 🥞🥞🥞"</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">cli</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s2">"echo pancakes are really just morning cakes."</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">cli</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">res</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre>
+         </div>
+        </div>
+        <div class="sphx-glr-script-out highlight-none notranslate">
+         <div class="highlight">
+          <pre><span></span>😴 Submitting job to echo pancakes 🥞🥞🥞
+{
+    "Message": "The output does not exist yet, or the jobid is incorrect."
 }
 </pre>
          </div>
@@ -495,18 +528,99 @@ Submit the job to flux
 {
     "jobs": [
         {
-            "id": 1021430464512
+            "id": 1220945117184
         },
         {
-            "id": 1021917003776
+            "id": 1221347770368
         },
         {
-            "id": 1020910370816
+            "id": 1220408246272
         },
         {
-            "id": 1020256059392
+            "id": 1218965405696
+        },
+        {
+            "id": 1219636494336
         }
     ]
+}
+</pre>
+         </div>
+        </div>
+        <p>
+         And this is how to search (with a start, length, or query)
+        </p>
+        <div class="highlight-default notranslate">
+         <div class="highlight">
+          <pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"🌓 Querying jobs!"</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">cli</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">"sleep"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">res</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre>
+         </div>
+        </div>
+        <div class="sphx-glr-script-out highlight-none notranslate">
+         <div class="highlight">
+          <pre><span></span>🌓 Querying jobs!
+{
+    "data": [
+        {
+            "id": 1221347770368,
+            "userid": 0,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1668304942.9659178,
+            "t_depend": 1668304942.9659178,
+            "state": "SCHED",
+            "name": "sleep",
+            "ntasks": 1,
+            "ncores": 1,
+            "duration": 0.0,
+            "nnodes": "",
+            "result": "",
+            "returncode": "",
+            "runtime": 0.0,
+            "waitstatus": "",
+            "nodelist": "",
+            "exception": {
+                "occurred": "",
+                "severity": "",
+                "type": "",
+                "note": ""
+            }
+        },
+        {
+            "id": 1220408246272,
+            "userid": 0,
+            "urgency": 16,
+            "priority": 16,
+            "t_submit": 1668304942.9104924,
+            "t_depend": 1668304942.9104924,
+            "t_run": 1668304942.9298275,
+            "state": "RUN",
+            "name": "sleep",
+            "ntasks": 1,
+            "ncores": 1,
+            "duration": 0.0,
+            "nnodes": 1,
+            "ranks": "0",
+            "nodelist": "c1f4bfd26f66",
+            "expiration": 4821904942.0,
+            "result": "",
+            "returncode": "",
+            "runtime": 0.06096339225769043,
+            "waitstatus": "",
+            "exception": {
+                "occurred": "",
+                "severity": "",
+                "type": "",
+                "note": ""
+            }
+        }
+    ],
+    "draw": 1,
+    "recordsTotal": 5,
+    "recordsFiltered": 2
 }
 </pre>
          </div>
@@ -531,7 +645,7 @@ Submit the job to flux
           <pre><span></span>Submitting job sleep 60 intending to cancel..
 {
     "Message": "Job submit.",
-    "id": 1022504206336
+    "id": 1222119522304
 }
 Requesting job cancel..
 {
@@ -560,7 +674,7 @@ Requesting job cancel..
          <strong>
           Total running time of the script:
          </strong>
-         ( 0 minutes  0.440 seconds)
+         ( 0 minutes  0.527 seconds)
         </p>
         <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-api-tutorial-py">
          <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -658,7 +772,7 @@ Requesting job cancel..
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 09, 2022.
+              Nov 13, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

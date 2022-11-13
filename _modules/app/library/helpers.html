@@ -325,6 +325,26 @@
 <span class="kn">import</span> <span class="nn">markdown</span>
 
 
+<div class="viewcode-block" id="has_boolean_arg"><a class="viewcode-back" href="../../../source/app.library.html#app.library.helpers.has_boolean_arg">[docs]</a><span class="k">def</span> <span class="nf">has_boolean_arg</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    A helper to determine if a payload has a key, and it's in some derivation of True</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">payload</span> <span class="ow">and</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="s2">"true"</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_int_arg"><a class="viewcode-back" href="../../../source/app.library.html#app.library.helpers.get_int_arg">[docs]</a><span class="k">def</span> <span class="nf">get_int_arg</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Attempt to get (and parse) and integer argument. Fallback to None.</span>
+<span class="sd">    """</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">arg</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">arg</span></div>
+
+
 <div class="viewcode-block" id="read_json"><a class="viewcode-back" href="../../../source/app.library.html#app.library.helpers.read_json">[docs]</a><span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
         <span class="n">content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
@@ -358,7 +378,7 @@
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 09, 2022.
+              Nov 13, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

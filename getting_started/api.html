@@ -73,7 +73,7 @@
   <link href="../genindex.html" rel="index" title="Index"/>
   <link href="../search.html" rel="search" title="Search"/>
   <link href="../auto_examples/index.html" rel="next" title="Tutorials"/>
-  <link href="developer-guide.html" rel="prev" title="Developer Guide"/>
+  <link href="interface.html" rel="prev" title="Interface"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <!-- Social: Facebook / Open Graph -->
   <title>
@@ -282,6 +282,11 @@
              </a>
             </li>
             <li class="md-nav__item">
+             <a class="md-nav__link" href="interface.html">
+              Interface
+             </a>
+            </li>
+            <li class="md-nav__item">
              <input class="md-toggle md-nav__toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
              <label class="md-nav__link md-nav__link--active" for="__toc">
               API
@@ -307,11 +312,11 @@
                    <nav class="md-nav">
                     <ul class="md-nav__list">
                      <li class="md-nav__item">
-                      <a class="md-nav__link" href="#post-service-stop">
+                      <a class="md-nav__link" href="#post-v1-service-stop">
                        POST
                        <code class="docutils literal notranslate">
                         <span class="pre">
-                         /service/stop
+                         /v1/service/stop
                         </span>
                        </code>
                       </a>
@@ -326,41 +331,11 @@
                    <nav class="md-nav">
                     <ul class="md-nav__list">
                      <li class="md-nav__item">
-                      <a class="md-nav__link" href="#get-jobs">
+                      <a class="md-nav__link" href="#get-v1-jobs">
                        GET
                        <code class="docutils literal notranslate">
                         <span class="pre">
-                         /jobs
-                        </span>
-                       </code>
-                      </a>
-                     </li>
-                     <li class="md-nav__item">
-                      <a class="md-nav__link" href="#get-jobs-uid">
-                       GET
-                       <code class="docutils literal notranslate">
-                        <span class="pre">
-                         /jobs/{uid}
-                        </span>
-                       </code>
-                      </a>
-                     </li>
-                     <li class="md-nav__item">
-                      <a class="md-nav__link" href="#post-jobs-uid-cancel">
-                       POST
-                       <code class="docutils literal notranslate">
-                        <span class="pre">
-                         /jobs/{uid}/cancel
-                        </span>
-                       </code>
-                      </a>
-                     </li>
-                     <li class="md-nav__item">
-                      <a class="md-nav__link" href="#post-jobs-submit">
-                       POST
-                       <code class="docutils literal notranslate">
-                        <span class="pre">
-                         /jobs/submit
+                         /v1/jobs
                         </span>
                        </code>
                       </a>
@@ -374,6 +349,60 @@
                        </ul>
                       </nav>
                      </li>
+                     <li class="md-nav__item">
+                      <a class="md-nav__link" href="#get-v1-jobs-search">
+                       GET ‘/v1/jobs/search’
+                      </a>
+                     </li>
+                     <li class="md-nav__item">
+                      <a class="md-nav__link" href="#post-v1-jobs-submit">
+                       POST
+                       <code class="docutils literal notranslate">
+                        <span class="pre">
+                         /v1/jobs/submit
+                        </span>
+                       </code>
+                      </a>
+                      <nav class="md-nav">
+                       <ul class="md-nav__list">
+                        <li class="md-nav__item">
+                         <a class="md-nav__link" href="#id1">
+                          Payload
+                         </a>
+                        </li>
+                       </ul>
+                      </nav>
+                     </li>
+                     <li class="md-nav__item">
+                      <a class="md-nav__link" href="#get-v1-jobs-uid">
+                       GET
+                       <code class="docutils literal notranslate">
+                        <span class="pre">
+                         /v1/jobs/{uid}
+                        </span>
+                       </code>
+                      </a>
+                     </li>
+                     <li class="md-nav__item">
+                      <a class="md-nav__link" href="#post-v1-jobs-uid-cancel">
+                       POST
+                       <code class="docutils literal notranslate">
+                        <span class="pre">
+                         /v1/jobs/{uid}/cancel
+                        </span>
+                       </code>
+                      </a>
+                     </li>
+                     <li class="md-nav__item">
+                      <a class="md-nav__link" href="#get-v1-jobs-uid-output">
+                       GET
+                       <code class="docutils literal notranslate">
+                        <span class="pre">
+                         /v1/jobs/{uid}/output
+                        </span>
+                       </code>
+                      </a>
+                     </li>
                     </ul>
                    </nav>
                   </li>
@@ -384,11 +413,11 @@
                    <nav class="md-nav">
                     <ul class="md-nav__list">
                      <li class="md-nav__item">
-                      <a class="md-nav__link" href="#get-nodes">
+                      <a class="md-nav__link" href="#get-v1-nodes">
                        GET
                        <code class="docutils literal notranslate">
                         <span class="pre">
-                         /nodes
+                         /v1/nodes
                         </span>
                        </code>
                       </a>
@@ -462,11 +491,11 @@
               <nav class="md-nav">
                <ul class="md-nav__list">
                 <li class="md-nav__item">
-                 <a class="md-nav__link" href="#post-service-stop">
+                 <a class="md-nav__link" href="#post-v1-service-stop">
                   POST
                   <code class="docutils literal notranslate">
                    <span class="pre">
-                    /service/stop
+                    /v1/service/stop
                    </span>
                   </code>
                  </a>
@@ -481,41 +510,11 @@
               <nav class="md-nav">
                <ul class="md-nav__list">
                 <li class="md-nav__item">
-                 <a class="md-nav__link" href="#get-jobs">
+                 <a class="md-nav__link" href="#get-v1-jobs">
                   GET
                   <code class="docutils literal notranslate">
                    <span class="pre">
-                    /jobs
-                   </span>
-                  </code>
-                 </a>
-                </li>
-                <li class="md-nav__item">
-                 <a class="md-nav__link" href="#get-jobs-uid">
-                  GET
-                  <code class="docutils literal notranslate">
-                   <span class="pre">
-                    /jobs/{uid}
-                   </span>
-                  </code>
-                 </a>
-                </li>
-                <li class="md-nav__item">
-                 <a class="md-nav__link" href="#post-jobs-uid-cancel">
-                  POST
-                  <code class="docutils literal notranslate">
-                   <span class="pre">
-                    /jobs/{uid}/cancel
-                   </span>
-                  </code>
-                 </a>
-                </li>
-                <li class="md-nav__item">
-                 <a class="md-nav__link" href="#post-jobs-submit">
-                  POST
-                  <code class="docutils literal notranslate">
-                   <span class="pre">
-                    /jobs/submit
+                    /v1/jobs
                    </span>
                   </code>
                  </a>
@@ -529,6 +528,60 @@
                   </ul>
                  </nav>
                 </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#get-v1-jobs-search">
+                  GET ‘/v1/jobs/search’
+                 </a>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#post-v1-jobs-submit">
+                  POST
+                  <code class="docutils literal notranslate">
+                   <span class="pre">
+                    /v1/jobs/submit
+                   </span>
+                  </code>
+                 </a>
+                 <nav class="md-nav">
+                  <ul class="md-nav__list">
+                   <li class="md-nav__item">
+                    <a class="md-nav__link" href="#id1">
+                     Payload
+                    </a>
+                   </li>
+                  </ul>
+                 </nav>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#get-v1-jobs-uid">
+                  GET
+                  <code class="docutils literal notranslate">
+                   <span class="pre">
+                    /v1/jobs/{uid}
+                   </span>
+                  </code>
+                 </a>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#post-v1-jobs-uid-cancel">
+                  POST
+                  <code class="docutils literal notranslate">
+                   <span class="pre">
+                    /v1/jobs/{uid}/cancel
+                   </span>
+                  </code>
+                 </a>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#get-v1-jobs-uid-output">
+                  GET
+                  <code class="docutils literal notranslate">
+                   <span class="pre">
+                    /v1/jobs/{uid}/output
+                   </span>
+                  </code>
+                 </a>
+                </li>
                </ul>
               </nav>
              </li>
@@ -539,11 +592,11 @@
               <nav class="md-nav">
                <ul class="md-nav__list">
                 <li class="md-nav__item">
-                 <a class="md-nav__link" href="#get-nodes">
+                 <a class="md-nav__link" href="#get-v1-nodes">
                   GET
                   <code class="docutils literal notranslate">
                    <span class="pre">
-                    /nodes
+                    /v1/nodes
                    </span>
                   </code>
                  </a>
@@ -576,7 +629,9 @@
          </a>
         </h1>
         <p>
-         The following is the spec for the Flux Python RESTful API provided here:
+         The following is the spec for the Flux Python RESTful API provided here.
+Generally, API endpoints are versioned (e.g., start with v1) and views
+do not.
         </p>
         <section id="service">
          <h2 id="service">
@@ -585,15 +640,15 @@
            ¶
           </a>
          </h2>
-         <section id="post-service-stop">
-          <h3 id="post-service-stop">
+         <section id="post-v1-service-stop">
+          <h3 id="post-v1-service-stop">
            POST
            <code class="docutils literal notranslate">
             <span class="pre">
-             /service/stop
+             /v1/service/stop
             </span>
            </code>
-           <a class="headerlink" href="#post-service-stop" title="Permalink to this heading">
+           <a class="headerlink" href="#post-v1-service-stop" title="Permalink to this heading">
             ¶
            </a>
           </h3>
@@ -611,73 +666,136 @@ and thus exit the job and bring down the mini-cluster.
            ¶
           </a>
          </h2>
-         <section id="get-jobs">
-          <h3 id="get-jobs">
+         <section id="get-v1-jobs">
+          <h3 id="get-v1-jobs">
            GET
            <code class="docutils literal notranslate">
             <span class="pre">
-             /jobs
+             /v1/jobs
             </span>
            </code>
-           <a class="headerlink" href="#get-jobs" title="Permalink to this heading">
+           <a class="headerlink" href="#get-v1-jobs" title="Permalink to this heading">
             ¶
            </a>
           </h3>
           <p>
            List jobs owned by the flux executor (the current user).
+By default, this returns a simple listing with “jobs” -&gt; a list of dict with ids.
           </p>
+          <section id="payload">
+           <h4 id="payload">
+            Payload
+            <a class="headerlink" href="#payload" title="Permalink to this heading">
+             ¶
+            </a>
+           </h4>
+           <p>
+            <strong>
+             Optional
+            </strong>
+            parameters in the get are:
+           </p>
+           <ul class="simple">
+            <li>
+             <p>
+              details (bool): provide details as True if you want to get complete metadata for the job
+             </p>
+            </li>
+            <li>
+             <p>
+              listing (bool): provide listing as True if you want to get details in a list
+             </p>
+            </li>
+            <li>
+             <p>
+              limit (int): provide a maximum number of jobs to retrieve (defaults to all if not provided)
+             </p>
+            </li>
+           </ul>
+          </section>
          </section>
-         <section id="get-jobs-uid">
-          <h3 id="get-jobs-uid">
-           GET
-           <code class="docutils literal notranslate">
-            <span class="pre">
-             /jobs/{uid}
-            </span>
-           </code>
-           <a class="headerlink" href="#get-jobs-uid" title="Permalink to this heading">
+         <section id="get-v1-jobs-search">
+          <h3 id="get-v1-jobs-search">
+           GET ‘/v1/jobs/search’
+           <a class="headerlink" href="#get-v1-jobs-search" title="Permalink to this heading">
             ¶
            </a>
           </h3>
           <p>
-           Get a job with a specific identifier.
+           A custom search endpoint to query for jobs. It is used internally by the site to
+render data tables and similar.
           </p>
-         </section>
-         <section id="post-jobs-uid-cancel">
-          <h3 id="post-jobs-uid-cancel">
-           POST
-           <code class="docutils literal notranslate">
-            <span class="pre">
-             /jobs/{uid}/cancel
-            </span>
-           </code>
-           <a class="headerlink" href="#post-jobs-uid-cancel" title="Permalink to this heading">
-            ¶
-           </a>
-          </h3>
           <p>
-           Request for a job cancellation based on identifier.
+           <strong>
+            Optional
+           </strong>
+           parameters:
           </p>
+          <ul class="simple">
+           <li>
+            <p>
+             start: a number to start at, must be &lt;= the length of total jobs
+            </p>
+           </li>
+           <li>
+            <p>
+             length: a length to stop at, after the start is applied (if applicable)
+            </p>
+           </li>
+           <li>
+            <p>
+             query: a string to search all attributes for
+            </p>
+           </li>
+          </ul>
+          <p>
+           <strong>
+            Returns
+           </strong>
+           parameters:
+          </p>
+          <ul class="simple">
+           <li>
+            <p>
+             data: the list of jobs
+            </p>
+           </li>
+           <li>
+            <p>
+             recordsTotal: the total number of jobs available
+            </p>
+           </li>
+           <li>
+            <p>
+             recordsFiltered: the total after fitlering by the query, length, start
+            </p>
+           </li>
+           <li>
+            <p>
+             draw: an integer used by Jquery Datatables
+            </p>
+           </li>
+          </ul>
          </section>
-         <section id="post-jobs-submit">
-          <h3 id="post-jobs-submit">
+         <section id="post-v1-jobs-submit">
+          <h3 id="post-v1-jobs-submit">
            POST
            <code class="docutils literal notranslate">
             <span class="pre">
-             /jobs/submit
+             /v1/jobs/submit
             </span>
            </code>
-           <a class="headerlink" href="#post-jobs-submit" title="Permalink to this heading">
+           <a class="headerlink" href="#post-v1-jobs-submit" title="Permalink to this heading">
             ¶
            </a>
           </h3>
           <p>
            Submit a new job
           </p>
-          <section id="payload">
-           <h4 id="payload">
+          <section id="id1">
+           <h4 id="id1">
             Payload
-            <a class="headerlink" href="#payload" title="Permalink to this heading">
+            <a class="headerlink" href="#id1" title="Permalink to this heading">
              ¶
             </a>
            </h4>
@@ -744,6 +862,54 @@ and thus exit the job and bring down the mini-cluster.
            </ul>
           </section>
          </section>
+         <section id="get-v1-jobs-uid">
+          <h3 id="get-v1-jobs-uid">
+           GET
+           <code class="docutils literal notranslate">
+            <span class="pre">
+             /v1/jobs/{uid}
+            </span>
+           </code>
+           <a class="headerlink" href="#get-v1-jobs-uid" title="Permalink to this heading">
+            ¶
+           </a>
+          </h3>
+          <p>
+           Get a job with a specific identifier.
+          </p>
+         </section>
+         <section id="post-v1-jobs-uid-cancel">
+          <h3 id="post-v1-jobs-uid-cancel">
+           POST
+           <code class="docutils literal notranslate">
+            <span class="pre">
+             /v1/jobs/{uid}/cancel
+            </span>
+           </code>
+           <a class="headerlink" href="#post-v1-jobs-uid-cancel" title="Permalink to this heading">
+            ¶
+           </a>
+          </h3>
+          <p>
+           Request for a job cancellation based on identifier.
+          </p>
+         </section>
+         <section id="get-v1-jobs-uid-output">
+          <h3 id="get-v1-jobs-uid-output">
+           GET
+           <code class="docutils literal notranslate">
+            <span class="pre">
+             /v1/jobs/{uid}/output
+            </span>
+           </code>
+           <a class="headerlink" href="#get-v1-jobs-uid-output" title="Permalink to this heading">
+            ¶
+           </a>
+          </h3>
+          <p>
+           Get lines of job output.
+          </p>
+         </section>
         </section>
         <section id="nodes">
          <h2 id="nodes">
@@ -752,15 +918,15 @@ and thus exit the job and bring down the mini-cluster.
            ¶
           </a>
          </h2>
-         <section id="get-nodes">
-          <h3 id="get-nodes">
+         <section id="get-v1-nodes">
+          <h3 id="get-v1-nodes">
            GET
            <code class="docutils literal notranslate">
             <span class="pre">
-             /nodes
+             /v1/nodes
             </span>
            </code>
-           <a class="headerlink" href="#get-nodes" title="Permalink to this heading">
+           <a class="headerlink" href="#get-v1-nodes" title="Permalink to this heading">
             ¶
            </a>
           </h3>
@@ -778,7 +944,7 @@ and thus exit the job and bring down the mini-cluster.
   <footer class="md-footer">
    <div class="md-footer-nav">
     <nav class="md-footer-nav__inner md-grid">
-     <a class="md-flex md-footer-nav__link md-footer-nav__link--prev" href="developer-guide.html" rel="prev" title="Developer Guide">
+     <a class="md-flex md-footer-nav__link md-footer-nav__link--prev" href="interface.html" rel="prev" title="Interface">
       <div class="md-flex__cell md-flex__cell--shrink">
        <i class="md-icon md-icon--arrow-back md-footer-nav__button">
        </i>
@@ -788,7 +954,7 @@ and thus exit the job and bring down the mini-cluster.
         <span class="md-footer-nav__direction">
          Previous
         </span>
-        Developer Guide
+        Interface
        </span>
       </div>
      </a>
@@ -815,7 +981,7 @@ and thus exit the job and bring down the mini-cluster.
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 09, 2022.
+              Nov 13, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
