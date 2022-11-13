@@ -296,6 +296,11 @@
                    </a>
                   </li>
                   <li class="md-nav__item">
+                   <a class="md-nav__link" href="#container-tutorial">
+                    Container Tutorial
+                   </a>
+                  </li>
+                  <li class="md-nav__item">
                    <a class="md-nav__link" href="#python">
                     Python
                    </a>
@@ -453,6 +458,11 @@
               </a>
              </li>
              <li class="md-nav__item">
+              <a class="md-nav__link" href="#container-tutorial">
+               Container Tutorial
+              </a>
+             </li>
+             <li class="md-nav__item">
               <a class="md-nav__link" href="#python">
                Python
               </a>
@@ -567,7 +577,7 @@ We provide
           clients
          </a>
          to interact with
-a running server, each described below, along with a quick container tutorial (coming soon).
+a running server, each described below, along with a quick container tutorial.
 The Python client is also included in our
          <a class="reference external" href="https://flux-framework.org/flux-restful-api/auto_examples/index.html">
           Tutorials
@@ -605,6 +615,99 @@ or see our Python
            examples
           </a>
           folder.
+         </p>
+        </section>
+        <section id="container-tutorial">
+         <h2 id="container-tutorial">
+          Container Tutorial
+          <a class="headerlink" href="#container-tutorial" title="Permalink to this heading">
+           ¶
+          </a>
+         </h2>
+         <p>
+          If you don’t want to use a command line client (or you want to do a quick tutorial just using an interface)
+this one is for you! You can run our demo container as follows:
+         </p>
+         <div class="highlight-bash notranslate">
+          <div class="highlight">
+           <pre><span></span>$ docker run -it -p <span class="m">5000</span>:5000 ghcr.io/flux-framework/flux-restful-api:latest
+</pre>
+          </div>
+         </div>
+         <p>
+          To start the image. Then open your browser to
+          <a class="reference external" href="http://0.0.0.0:5000">
+           http://0.0.0.0:5000
+          </a>
+          .
+Note for those adventurous - you
+          <em>
+           can
+          </em>
+          in fact use this server to test the clients below! But
+this is not required.
+         </p>
+         <ol class="arabic simple">
+          <li>
+           <p>
+            Go to the “Submit” interface in the navigation to ask to submit a job.
+           </p>
+          </li>
+          <li>
+           <p>
+            We recommend something with output like
+            <code class="docutils literal notranslate">
+             <span class="pre">
+              echo
+             </span>
+             <span class="pre">
+              pancakes
+             </span>
+             <span class="pre">
+              🥞🥞🥞🥞🥞
+             </span>
+            </code>
+           </p>
+          </li>
+          <li>
+           <p>
+            Then click on “View Jobs” to see your job.
+           </p>
+          </li>
+         </ol>
+         <p>
+          <img alt="img/pancakes-job.png" src="../_images/pancakes-job.png"/>
+         </p>
+         <p>
+          And then explore other API endpoints by clicking “Docs.” And that’s it!
+If you want to build a similar container with your own software, we recommend you
+use this as a base container, ensure your needed executables are on the path,
+and then you can submit jobs to your heart’s content. Here is an example:
+         </p>
+         <div class="highlight-dockerfile notranslate">
+          <div class="highlight">
+           <pre><span></span><span class="k">FROM</span><span class="w"> </span><span class="s">ghcr.io/flux-framework/flux-restful-api:latest</span>
+<span class="k">RUN</span><span class="w"> </span>pip install pokemon
+</pre>
+          </div>
+         </div>
+         <p>
+          To build locally:
+         </p>
+         <div class="highlight-bash notranslate">
+          <div class="highlight">
+           <pre><span></span>$ docker build -t flux-pokemon .
+</pre>
+          </div>
+         </div>
+         <p>
+          And run the same as before to submit a job. But this time… we have access to generate ascii-art pokemon!
+         </p>
+         <p>
+          <img alt="img/pokemon-output.png" src="../_images/pokemon-output.png"/>
+         </p>
+         <p>
+          Yay! But seriously, you should like, do real science work. Only dinosaurs generate pokemon!
          </p>
         </section>
         <section id="python">
