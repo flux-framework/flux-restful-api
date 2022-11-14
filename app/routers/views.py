@@ -31,7 +31,7 @@ async def home(request: Request):
     """
     from app.main import here
 
-    data = openfile(os.path.join(here, "index.md"))
+    data = openfile(os.path.join(here, "pages", "index.md"))
     return templates.TemplateResponse(
         "index.html",
         {
@@ -131,5 +131,5 @@ async def submit_job_post(request: Request):
 async def show_page(request: Request, page_name: str):
     from app.main import here
 
-    data = openfile(os.path.join(here, page_name + ".md"))
+    data = openfile(os.path.join(here, "pages", page_name + ".md"))
     return templates.TemplateResponse("page.html", {"request": request, "data": data})
