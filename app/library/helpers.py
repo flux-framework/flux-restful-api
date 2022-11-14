@@ -11,6 +11,15 @@ def has_boolean_arg(payload, key):
     return key in payload and payload.get(key) in [True, "true"]
 
 
+def get_template(name):
+    """
+    Get a template (usually html or snippet) from the root templates.
+    """
+    from app.main import root
+
+    return os.path.join(root, "templates", name)
+
+
 def get_int_arg(payload, key):
     """
     Attempt to get (and parse) and integer argument. Fallback to None.
@@ -30,11 +39,15 @@ def read_json(filename):
     return content
 
 
-def openfile(filename):
-    filepath = os.path.join("app/pages/", filename)
+def get_page(name):
+    """
+    Get a <page>.md file from the app root.
+    """
+    from app.main import root
+
+    filepath = os.path.join(root, "app", "pages", name)
     with open(filepath, "r", encoding="utf-8") as input_file:
         text = input_file.read()
-
     html = markdown.markdown(text)
     data = {"text": html}
     return data
