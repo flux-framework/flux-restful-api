@@ -11,15 +11,6 @@ def has_boolean_arg(payload, key):
     return key in payload and payload.get(key) in [True, "true"]
 
 
-def get_template(name):
-    """
-    Get a template (usually html or snippet) from the root templates.
-    """
-    from app.main import root
-
-    return os.path.join(root, "templates", name)
-
-
 def get_int_arg(payload, key):
     """
     Attempt to get (and parse) and integer argument. Fallback to None.

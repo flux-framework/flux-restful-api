@@ -29,7 +29,7 @@ async def home(request: Request):
     """
     data = helpers.get_page("index.md")
     return templates.TemplateResponse(
-        helpers.get_template("index.html"),
+        "index.html",
         {
             "request": request,
             "data": data,
@@ -43,7 +43,7 @@ async def jobs_table(request: Request):
     jobs = list(flux_cli.list_jobs_detailed().values())
     print(jobs)
     return templates.TemplateResponse(
-        helpers.get_template("jobs/jobs.html"),
+        "jobs/jobs.html",
         {
             "request": request,
             "jobs": jobs,
@@ -57,7 +57,7 @@ async def job_info(request: Request, jobid):
     job = flux_cli.get_job(jobid)
     info = flux_cli.get_job_output(jobid)
     return templates.TemplateResponse(
-        helpers.get_template("jobs/job.html"),
+        "jobs/job.html",
         {
             "title": f"Job {jobid}",
             "request": request,
@@ -72,7 +72,7 @@ async def job_info(request: Request, jobid):
 async def submit_job(request: Request):
     form = SubmitForm(request)
     return templates.TemplateResponse(
-        helpers.get_template("jobs/submit.html"),
+        "jobs/submit.html",
         {"request": request, "has_gpus": settings.has_gpus, "form": form},
     )
 
@@ -100,7 +100,7 @@ async def submit_job_post(request: Request):
             flux_future = flux.job.submit_async(app.handle, fluxjob)
             jobid = flux_future.get_id()
             return templates.TemplateResponse(
-                helpers.get_template("jobs/submit.html"),
+                "jobs/submit.html",
                 context={
                     "request": request,
                     "form": form,
@@ -112,7 +112,7 @@ async def submit_job_post(request: Request):
     else:
         print("🍒 Submit form is NOT valid!")
     return templates.TemplateResponse(
-        helpers.get_template("jobs/submit.html"),
+        "jobs/submit.html",
         context={
             "request": request,
             "form": form,
@@ -126,6 +126,4 @@ async def submit_job_post(request: Request):
 @auth_views_router.get("/page/{page_name}", response_class=HTMLResponse)
 async def show_page(request: Request, page_name: str):
     data = helpers.get_page(page_name + ".md")
-    return templates.TemplateResponse(
-        helpers.get_template("page.html"), {"request": request, "data": data}
-    )
+    return templates.TemplateResponse("page.html", {"request": request, "data": data})
