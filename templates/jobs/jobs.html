@@ -105,7 +105,7 @@ $(document).ready(function() {
                     }
                     return "no exceptions"
                 },
-                targets: 16,
+                targets: 15,
             },
             { // result
                 createdCell: function (td, data, rowData, row, col) {
@@ -123,7 +123,7 @@ $(document).ready(function() {
                 },
                 targets: 3
             },
-            { // status
+            { // state
                 createdCell: function (td, data, rowData, row, col) {
                     color = "skyblue"
                     if (data == "INACTIVE") {
