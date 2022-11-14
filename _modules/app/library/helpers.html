@@ -351,11 +351,15 @@
     <span class="k">return</span> <span class="n">content</span></div>
 
 
-<div class="viewcode-block" id="openfile"><a class="viewcode-back" href="../../../source/app.library.html#app.library.helpers.openfile">[docs]</a><span class="k">def</span> <span class="nf">openfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"app/pages/"</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+<div class="viewcode-block" id="get_page"><a class="viewcode-back" href="../../../source/app.library.html#app.library.helpers.get_page">[docs]</a><span class="k">def</span> <span class="nf">get_page</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Get a &lt;page&gt;.md file from the app root.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span> <span class="nn">app.main</span> <span class="kn">import</span> <span class="n">root</span>
+
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">"app"</span><span class="p">,</span> <span class="s2">"pages"</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
         <span class="n">text</span> <span class="o">=</span> <span class="n">input_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
     <span class="n">html</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">data</span></div>
@@ -378,7 +382,7 @@
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 13, 2022.
+              Nov 14, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
