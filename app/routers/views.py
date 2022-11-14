@@ -29,7 +29,9 @@ async def home(request: Request):
     """
     Home page to show welcome, etc.
     """
-    data = openfile("index.md")
+    from app.main import here
+
+    data = openfile(os.path.join(here, "index.md"))
     return templates.TemplateResponse(
         "index.html",
         {
