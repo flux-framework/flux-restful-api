@@ -55,7 +55,7 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     command = kwargs["command"]
     if isinstance(command, str):
         command = shlex.split(command)
-    print("⭐️ Command being submit: {command}")
+    print(f"⭐️ Command being submit: {command}")
 
     # Delete command from the kwargs (we added because is required and validated that way)
     del kwargs["command"]
