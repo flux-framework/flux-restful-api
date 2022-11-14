@@ -63,7 +63,7 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
 
     print(f"⭐️ Workdir provided: {workdir}")
     if workdir is not None:
-        fluxjob.workdir = workdir
+        fluxjob.cwd = workdir
 
     # A duration of zero (the default) means unlimited
     fluxjob.duration = runtime
