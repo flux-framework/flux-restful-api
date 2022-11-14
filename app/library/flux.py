@@ -1,13 +1,12 @@
 import json
 import os
 import re
+import shlex
 
 import flux
 import flux.job
 
 from app.core.config import settings
-
-# import shlex
 
 
 def validate_submit_kwargs(kwargs, envars=None, runtime=None):
@@ -54,8 +53,8 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
 
     # Generate the flux job
     command = kwargs["command"]
-    # if isinstance(command, str):
-    #    command = shlex.split(command)
+    if isinstance(command, str):
+        command = shlex.split(command)
     print(f"⭐️ Command being submit: {command}")
 
     # Delete command from the kwargs (we added because is required and validated that way)
