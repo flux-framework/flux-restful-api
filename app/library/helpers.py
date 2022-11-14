@@ -30,11 +30,15 @@ def read_json(filename):
     return content
 
 
-def openfile(filename):
-    filepath = os.path.join("app/pages/", filename)
+def get_page(name):
+    """
+    Get a <page>.md file from the app root.
+    """
+    from app.main import root
+
+    filepath = os.path.join(root, "app", "pages", name)
     with open(filepath, "r", encoding="utf-8") as input_file:
         text = input_file.read()
-
     html = markdown.markdown(text)
     data = {"text": html}
     return data

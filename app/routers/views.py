@@ -5,10 +5,10 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 import app.library.flux as flux_cli
+import app.library.helpers as helpers
 from app.core.config import settings
 from app.forms import SubmitForm
 from app.library.auth import check_auth
-from app.library.helpers import openfile
 
 # These views never have auth!
 router = APIRouter(tags=["views"])
@@ -27,7 +27,7 @@ async def home(request: Request):
     """
     Home page to show welcome, etc.
     """
-    data = openfile("index.md")
+    data = helpers.get_page("index.md")
     return templates.TemplateResponse(
         "index.html",
         {
@@ -88,6 +88,7 @@ async def submit_job_post(request: Request):
     await form.load_data()
     if form.is_valid():
         print("🍦 Submit form is valid!")
+        print(form.kwargs)
 
         # Prepare the flux job! We don't support envars here yet
         fluxjob = flux_cli.prepare_job(
@@ -124,5 +125,5 @@ async def submit_job_post(request: Request):
 # These are generic informational pages
 @auth_views_router.get("/page/{page_name}", response_class=HTMLResponse)
 async def show_page(request: Request, page_name: str):
-    data = openfile(page_name + ".md")
+    data = helpers.get_page(page_name + ".md")
     return templates.TemplateResponse("page.html", {"request": request, "data": data})

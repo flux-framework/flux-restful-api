@@ -55,13 +55,15 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     command = kwargs["command"]
     if isinstance(command, str):
         command = shlex.split(command)
+    print(f"⭐️ Command being submit: {command}")
 
     # Delete command from the kwargs (we added because is required and validated that way)
     del kwargs["command"]
     fluxjob = flux.job.JobspecV1.from_command(command, **kwargs)
 
+    print(f"⭐️ Workdir provided: {workdir}")
     if workdir is not None:
-        fluxjob.workdir = workdir
+        fluxjob.cwd = workdir
 
     # A duration of zero (the default) means unlimited
     fluxjob.duration = runtime
@@ -187,4 +189,8 @@ def get_job(jobid):
     jobinfo["nodelist"] = info._nodelist
     jobinfo["nodelist"] = info._nodelist
     jobinfo["exception"] = info._exception.__dict__
+
+    # Only appears after finished?
+    if "duration" not in jobinfo:
+        jobinfo["duration"] = ""
     return jobinfo

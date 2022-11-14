@@ -16,7 +16,7 @@ RUN apt-get update
 COPY ./requirements.txt /requirements.txt
 
 EXPOSE ${port}
-ENV PYTHONPATH=/usr/lib/flux/python3.8
+ENV PYTHONPATH=/usr/lib/flux/python3.8:/code
 
 # For easier Python development.
 RUN python3 -m pip install -r /requirements.txt

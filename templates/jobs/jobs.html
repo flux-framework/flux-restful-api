@@ -56,7 +56,6 @@ td, th {
                 <th>state</th>
                 <th>name</th>
                 <th>ntasks</th>
-                <th>ncores</th>
                 <th>duration</th>
                 <th>nnodes</th>
                 <th>ranks</th>
@@ -106,7 +105,7 @@ $(document).ready(function() {
                     }
                     return "no exceptions"
                 },
-                targets: 16,
+                targets: 15,
             },
             { // result
                 createdCell: function (td, data, rowData, row, col) {
@@ -124,7 +123,7 @@ $(document).ready(function() {
                 },
                 targets: 3
             },
-            { // status
+            { // state
                 createdCell: function (td, data, rowData, row, col) {
                     color = "skyblue"
                     if (data == "INACTIVE") {
@@ -145,7 +144,6 @@ $(document).ready(function() {
         { "data": "state" },
         { "data": "name" },
         { "data": "ntasks" },
-        { "data": "ncores" },
         { "data": "duration" },
         { "data": "nnodes" },
         { "data": "ranks" },
