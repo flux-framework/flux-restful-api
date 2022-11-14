@@ -61,6 +61,7 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     del kwargs["command"]
     fluxjob = flux.job.JobspecV1.from_command(command, **kwargs)
 
+    print(f"⭐️ Workdir provided: {workdir}")
     if workdir is not None:
         fluxjob.workdir = workdir
 
