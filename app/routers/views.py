@@ -1,3 +1,5 @@
+import os
+
 import flux
 import flux.job
 from fastapi import APIRouter, Depends, Request
@@ -88,6 +90,7 @@ async def submit_job_post(request: Request):
     await form.load_data()
     if form.is_valid():
         print("🍦 Submit form is valid!")
+        print(form.kwargs)
 
         # Prepare the flux job! We don't support envars here yet
         fluxjob = flux_cli.prepare_job(
@@ -124,5 +127,7 @@ async def submit_job_post(request: Request):
 # These are generic informational pages
 @auth_views_router.get("/page/{page_name}", response_class=HTMLResponse)
 async def show_page(request: Request, page_name: str):
-    data = openfile(page_name + ".md")
+    from app.main import here
+
+    data = openfile(os.path.join(here, page_name + ".md"))
     return templates.TemplateResponse("page.html", {"request": request, "data": data})
