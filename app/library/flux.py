@@ -188,4 +188,8 @@ def get_job(jobid):
     jobinfo["nodelist"] = info._nodelist
     jobinfo["nodelist"] = info._nodelist
     jobinfo["exception"] = info._exception.__dict__
+
+    # Only appears after finished?
+    if "duration" not in jobinfo:
+        jobinfo["duration"] = ""
     return jobinfo
