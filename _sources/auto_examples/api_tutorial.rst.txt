@@ -104,7 +104,7 @@ Let's list the nodes in our cluster!
     Listing nodes
     {
         "nodes": [
-            "a7117172abdf"
+            "c7b4c72e611a"
         ]
     }
 
@@ -174,23 +174,26 @@ And finally, let's get job info.
 
     🍓 Getting job info...
     {
-        "id": 1057853800448,
+        "id": 892078129152,
         "userid": 0,
         "urgency": 16,
         "priority": 16,
-        "t_submit": 1668476341.0227726,
-        "t_depend": 1668476341.0227726,
-        "state": "SCHED",
+        "t_submit": 1668651252.8523846,
+        "t_depend": 1668651252.8523846,
+        "t_run": 1668651252.8679156,
+        "state": "RUN",
         "name": "sleep",
         "ntasks": 1,
         "ncores": 1,
         "duration": 0.0,
-        "nnodes": "",
+        "nnodes": 1,
+        "ranks": "0",
+        "nodelist": "c7b4c72e611a",
+        "expiration": 4822251252.0,
         "result": "",
         "returncode": "",
-        "runtime": 0.0,
+        "runtime": 0.0025475025177001953,
         "waitstatus": "",
-        "nodelist": "",
         "exception": {
             "occurred": "",
             "severity": "",
@@ -265,19 +268,19 @@ Submit the job to flux
     {
         "jobs": [
             {
-                "id": 1146588495872
+                "id": 980292730880
             },
             {
-                "id": 1147158921216
+                "id": 980779270144
             },
             {
-                "id": 1145967738880
+                "id": 979772637184
             },
             {
-                "id": 1057853800448
+                "id": 892078129152
             },
             {
-                "id": 1058491334656
+                "id": 892698886144
             }
         ]
     }
@@ -311,12 +314,12 @@ And this is how to search (with a start, length, or query)
     {
         "data": [
             {
-                "id": 1147158921216,
+                "id": 980779270144,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1668476346.3464744,
-                "t_depend": 1668476346.3464744,
+                "t_submit": 1668651258.1395535,
+                "t_depend": 1668651258.1395535,
                 "state": "SCHED",
                 "name": "sleep",
                 "ntasks": 1,
@@ -336,13 +339,13 @@ And this is how to search (with a start, length, or query)
                 }
             },
             {
-                "id": 1145967738880,
+                "id": 979772637184,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1668476346.2753577,
-                "t_depend": 1668476346.2753577,
-                "t_run": 1668476346.2941122,
+                "t_submit": 1668651258.0787182,
+                "t_depend": 1668651258.0787182,
+                "t_run": 1668651258.0922654,
                 "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
@@ -350,11 +353,11 @@ And this is how to search (with a start, length, or query)
                 "duration": 0.0,
                 "nnodes": 1,
                 "ranks": "0",
-                "nodelist": "a7117172abdf",
-                "expiration": 4822076346.0,
+                "nodelist": "c7b4c72e611a",
+                "expiration": 4822251258.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.07764458656311035,
+                "runtime": 0.07124543190002441,
                 "waitstatus": "",
                 "exception": {
                     "occurred": "",
@@ -399,7 +402,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 1147947450368
+        "id": 981517467648
     }
     Requesting job cancel..
     {
@@ -435,7 +438,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.703 seconds)
+   **Total running time of the script:** ( 0 minutes  5.614 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:

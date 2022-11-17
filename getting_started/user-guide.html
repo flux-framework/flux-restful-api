@@ -939,7 +939,7 @@ Here is submitting a basic job to sleep.
            </a>
           </h3>
           <p>
-           To see output for a job, just do:
+           To see output for a job, there are two options. You can ask for all logs (blocking, will return when job is done):
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
@@ -951,6 +951,15 @@ Here is submitting a basic job to sleep.
            <div class="highlight">
             <pre><span></span><span class="gp"># </span>flux-restful-cli logs <span class="m">244509770252288</span>
 <span class="go">pancakes 🥞🥞🥞🥞🥞</span>
+</pre>
+           </div>
+          </div>
+          <p>
+           Or you can ask to stream:
+          </p>
+          <div class="highlight-bash notranslate">
+           <div class="highlight">
+            <pre><span></span>$ flux-restful-cli logs --stream <span class="m">12402053611520</span>
 </pre>
            </div>
           </div>
@@ -1224,7 +1233,7 @@ example!
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 15, 2022.
+              Nov 17, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

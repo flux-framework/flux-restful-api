@@ -212,7 +212,7 @@ $ flux-restful-cli info 12402053611520
 
 ### Logs
 
-To see output for a job, just do:
+To see output for a job, there are two options. You can ask for all logs (blocking, will return when job is done):
 
 ```bash
 $ flux-restful-cli logs 12402053611520
@@ -220,6 +220,12 @@ $ flux-restful-cli logs 12402053611520
 ```console
 # flux-restful-cli logs 244509770252288
 pancakes 🥞🥞🥞🥞🥞
+```
+
+Or you can ask to stream:
+
+```bash
+$ flux-restful-cli logs --stream 12402053611520
 ```
 
 If you get a message that the output doesn't exist, it usually means your job didn't have output (e.g., sleep),

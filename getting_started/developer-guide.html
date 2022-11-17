@@ -722,6 +722,18 @@ $ docker stop flux-restful
 </pre>
           </div>
          </div>
+         <p>
+          Finally, if you want to install a custom branch (and/or repository) of the RESTFul API, we provide
+an environment variable to do this. E.g., this makes it easy to test a custom branch in CI without
+needing to push a container to a registry. Here is how to specify a branch (and default to flux-framework/flux-restful-api)
+or your own repository base:
+         </p>
+         <div class="highlight-bash notranslate">
+          <div class="highlight">
+           <pre><span></span>$ docker run  --env <span class="nv">INSTALL_BRANCH</span><span class="o">=</span>add/feature --env <span class="nv">INSTALL_REPO</span><span class="o">=</span>user/flux-restful-api -d --rm -it -p <span class="m">5000</span>:5000 ghcr.io/flux-framework/flux-restful-api
+</pre>
+          </div>
+         </div>
         </section>
         <section id="local">
          <h2 id="local">
@@ -1219,7 +1231,7 @@ functions from oras-py source code.
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Nov 15, 2022.
+              Nov 17, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
