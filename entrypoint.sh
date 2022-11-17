@@ -9,7 +9,8 @@ if [[ ! -z ${install_branch} ]]; then
     printf "Custom install of https://github.com:${install_repo}@${install_branch}"
     rm -rf /code
     git clone -b ${install_branch} https://github.com/${install_repo} /code
-    cd /code
 fi
 
+# We always need to start in this PWD
+cd /code
 flux start uvicorn app.main:app --host=${HOST} --port=${PORT}
