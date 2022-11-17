@@ -37,7 +37,7 @@ jobs:
         pytest -xs flux_restful_client/tests/test_api.py
 
   test-auth:
-    needs: [build-container]
+    needs: [prepare-container]
     runs-on: ubuntu-latest
     services:
       api:
