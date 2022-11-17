@@ -9,7 +9,7 @@ def main(args, parser, extra, subparser):
     # Update config settings on the fly
     cli.settings.update_params(args.config_params)
     if args.stream:
-        for line in cli.output(jobid=args.jobid, stream=args.stream):
+        for line in cli.stream_output(jobid=args.jobid, stream=args.stream):
             print(line.strip())
     else:
         logs = cli.output(jobid=args.jobid, stream=args.stream)

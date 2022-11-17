@@ -148,16 +148,20 @@ class FluxRestfulClient:
         """
         return self.do_request(f"jobs/{jobid}/cancel", "POST").json()
 
-    def output(self, jobid, stream=False):
+    def stream_output(self, jobid):
         """
-        Request for a job to be cancelled based on identifier.
+        Request for job output to be streamed
         """
-        if not stream:
-            return self.do_request(f"jobs/{jobid}/output", "GET").json()
         response = self.do_request(f"jobs/{jobid}/output/stream", "GET", stream=True)
         for line in response.iter_lines():
             if line:
                 yield line.decode("utf-8")
+
+    def output(self, jobid):
+        """
+        Request for a job to be cancelled based on identifier.
+        """
+        return self.do_request(f"jobs/{jobid}/output", "GET").json()
 
     def stop_service(self):
         """
