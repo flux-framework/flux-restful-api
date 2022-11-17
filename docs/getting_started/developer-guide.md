@@ -59,6 +59,16 @@ $ docker run --name flux-restful -d --rm -it -p 5000:5000 ghcr.io/flux-framework
 $ docker stop flux-restful
 ```
 
+Finally, if you want to install a custom branch (and/or repository) of the RESTFul API, we provide
+an environment variable to do this. E.g., this makes it easy to test a custom branch in CI without
+needing to push a container to a registry. Here is how to specify a branch (and default to flux-framework/flux-restful-api)
+or your own repository base:
+
+```bash
+$ docker run  --env INSTALL_BRANCH=add/feature --env INSTALL_REPO=user/flux-restful-api -d --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
+```
+
+
 ### Local
 
 You can use this setup locally (if you have flux and Python available) or within the Dev Container
