@@ -1,10 +1,11 @@
+import asyncio
 import os
 
 import flux.job
 import flux.resource
 from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
 import app.library.flux as flux_cli
@@ -20,6 +21,8 @@ router = APIRouter(
     dependencies=[Depends(check_auth)] if settings.require_auth else [],
     responses={404: {"description": "Not found"}},
 )
+no_auth_router = APIRouter(prefix="/v1", tags=["jobs"])
+
 templates = Jinja2Templates(directory="templates/")
 
 
@@ -230,3 +233,23 @@ async def get_job_output(jobid):
         {"Message": "The output does not exist yet, or the jobid is incorrect."}
     )
     return JSONResponse(content=info, status_code=200)
+
+
+async def streamer(generator):
+    """
+    Helper function to stream output lines, break if cancelled.
+    """
+    try:
+        for line in generator:
+            yield line
+    except asyncio.CancelledError:
+        print("caught cancelled error")
+
+
+@router.get("/jobs/{jobid}/output/stream")
+async def get_job_stream_output(jobid):
+    """
+    Non-blocking variant to stream output until control+c.
+    """
+    stream = flux_cli.stream_job_output(jobid)
+    return StreamingResponse(streamer(stream))

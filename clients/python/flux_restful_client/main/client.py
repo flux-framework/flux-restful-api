@@ -61,7 +61,9 @@ class FluxRestfulClient:
         else:
             self.headers = {}
 
-    def do_request(self, endpoint, method="GET", data=None, headers=None, params=None):
+    def do_request(
+        self, endpoint, method="GET", data=None, headers=None, params=None, stream=False
+    ):
         """
         Do a request. This is a wrapper around requests.
         """
@@ -73,7 +75,7 @@ class FluxRestfulClient:
 
         # Make the request and return to calling function, unless requires auth
         response = self.session.request(
-            method, url, params=params, json=data, headers=headers
+            method, url, params=params, json=data, headers=headers, stream=stream
         )
 
         # A 401 response is a request for authentication
@@ -146,11 +148,16 @@ class FluxRestfulClient:
         """
         return self.do_request(f"jobs/{jobid}/cancel", "POST").json()
 
-    def output(self, jobid):
+    def output(self, jobid, stream=False):
         """
         Request for a job to be cancelled based on identifier.
         """
-        return self.do_request(f"jobs/{jobid}/output", "GET").json()
+        if not stream:
+            return self.do_request(f"jobs/{jobid}/output", "GET").json()
+        response = self.do_request(f"jobs/{jobid}/output/stream", "GET", stream=True)
+        for line in response.iter_lines():
+            if line:
+                yield line.decode("utf-8")
 
     def stop_service(self):
         """

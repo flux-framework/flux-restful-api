@@ -2,6 +2,7 @@ import json
 import os
 import re
 import shlex
+import time
 
 import flux
 import flux.job
@@ -95,11 +96,28 @@ def query_jobs(contenders, query):
     return jobs
 
 
-def get_job_output(jobid):
+def stream_job_output(jobid):
+    """
+    Given a jobid, stream the output
+    """
+    from app.main import app
+
+    try:
+        for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
+            if "data" in line.context:
+                yield line.context["data"]
+    except Exception:
+        pass
+
+
+def get_job_output(jobid, delay=None):
     """
     Given a jobid, get the output.
+
+    If there is a delay, we are requesting on demand, so we want to return early.
     """
     lines = []
+    start = time.time()
     from app.main import app
 
     # If the submit is too close to the log reqest, it cannot find the file handle
@@ -108,6 +126,9 @@ def get_job_output(jobid):
         for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
             if "data" in line.context:
                 lines.append(line.context["data"])
+            now = time.time()
+            if delay is not None and (now - start) > delay:
+                return lines
     except Exception:
         pass
     return lines

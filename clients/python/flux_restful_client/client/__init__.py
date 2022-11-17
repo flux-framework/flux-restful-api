@@ -178,6 +178,14 @@ flux-restful-cli config inituser""",
         description="get log output for a job",
         formatter_class=argparse.RawTextHelpFormatter,
     )
+
+    logs.add_argument(
+        "--stream",
+        help="stream logs as they are available (does not block).",
+        default=False,
+        action="store_true",
+    )
+
     subparsers.add_parser(
         "list-nodes",
         description="list node that the Flux RESTful API knows about",

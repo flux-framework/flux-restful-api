@@ -1,6 +1,7 @@
-{% if job.state == "INACTIVE" %}<button class="btn" style="background-color:grey;color:white">{{ job.state }} 😴 </button>{% elif job.state == "RUN" %}
-<button class="btn" style="background-color:grey">{{ job.state }} 🏃 </button>{% elif job.state == "CANCELLED" %}
-<button class="btn" style="background-color:grey">{{ job.state }} 🎉  </button>{% elif job.state == "COMPLETED" %}
-<button class="btn" style="background-color:grey">{{ job.state }} 🚧  </button>{% else %}
-<button class="btn" style="background-color:skyblue">{{ job.state }}</button>
+{% if job.state == "INACTIVE" %}<button class="btn" style="min-width:150px; background-color:grey;color:white">{{ job.state }} 😴 </button>{% elif job.state == "RUN" %}
+<button class="btn" style="min-width:150px; background-color:skyblue">{{ job.state }} 🏃 </button>{% elif job.state == "SCHED" %}
+<button class="btn" style="min-width:150px; background-color:skyblue">{{ job.state }} 📅  </button>{% elif job.state == "DEPEND" %}
+<button class="btn" style="min-width:150px; background-color:skyblue">{{ job.state }} 🚧  </button>{% elif job.state == "CLEANUP" %}
+<button class="btn" style="min-width:150px; background-color:skyblue">{{ job.state }} 🧼 </button>{% else %}
+<button class="btn" style="min-width:150px; background-color:skyblue">PENDING ⌚</button>
 {% endif %}
