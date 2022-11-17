@@ -110,15 +110,22 @@ $(document).ready(function() {
             { // result
                 createdCell: function (td, data, rowData, row, col) {
                     color = "skyblue"
+                    fontcolor = "white"
                     if (data == "INACTIVE") {
                         color = "grey"
                     }
-                    if (data == "CANCELLED") {
-                        color = "yellow"
+                    if (data == "CANCELED") {
+                        color = "goldenrod"
+                        fontcolor = "black"
                     }
                     if (data == "COMPLETED") {
                         color = "darkseagreen"
+                        fontcolor = "black"
                     }
+                    if (data == "FAILED") {
+                        color = "darkred"
+                    }
+                    $(td).css('color', fontcolor);
                     $(td).css('background-color', color);
                 },
                 targets: 3

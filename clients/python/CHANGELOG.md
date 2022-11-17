@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+ - support for streaming job output (0.0.13)
  - ensure logs end with one newline! (0.0.12)
  - support for job info and logs (0.0.11)
  - Parse envars from the command line, add descriptions for submit (0.0.1)

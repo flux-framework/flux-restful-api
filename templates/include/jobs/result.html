@@ -1,3 +1,7 @@
-{% if job.result == "COMPLETED "%}<button class="btn" style="background-color:darkseagreen">{{ job.result }}</button>{% else %}
-<button class="btn" style="background-color:skyblue">{{ job.result }}</button>
+{% if job.result == "COMPLETED "%}<button class="btn" style="min-width:150px; background-color:darkseagreen">{{ job.result }} 💚</button>{% elif job.result == "FAILED" %}
+<button class="btn" style="min-width:150px; color:white; background-color:darkred">{{ job.result }} 😭</button>{% elif job.result == "CANCELED" %}
+<button class="btn" style="min-width:150px; background-color: goldenrod">{{ job.result }} 🥐</button>{% elif job.result == "TIMEOUT" %}
+<button class="btn" style="min-width:150px; background-color:skyblue">{{ job.result }} 🍕</button>
+{% else %}
+<button class="btn" style="min-width:150px; background-color:gray;color:white">NO RESULT 😞</button>
 {% endif %}

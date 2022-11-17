@@ -3,7 +3,7 @@
    <div class="row">
       <div class="col">
         <div class="mb-3">{% for message in messages %}
-            <p class="alert alert-info alert-dismissible">{{ message }}</p>{% endfor %}
+            <p class="alert alert-info alert-dismissible">{{ message | safe }}</p>{% endfor %}
         </div>
       </div>
    </div>

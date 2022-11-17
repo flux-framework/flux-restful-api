@@ -55,7 +55,15 @@ async def jobs_table(request: Request):
 @auth_views_router.get("/job/{jobid}", response_class=HTMLResponse)
 async def job_info(request: Request, jobid):
     job = flux_cli.get_job(jobid)
-    info = flux_cli.get_job_output(jobid)
+
+    # If not completed, ask info to return after a second of waiting
+    if job["state"] == "INACTIVE":
+        info = flux_cli.get_job_output(jobid)
+
+    # Otherwise ensure we get all the logs!
+    else:
+        info = flux_cli.get_job_output(jobid, delay=1)
+
     return templates.TemplateResponse(
         "jobs/job.html",
         {
@@ -99,12 +107,15 @@ async def submit_job_post(request: Request):
         try:
             flux_future = flux.job.submit_async(app.handle, fluxjob)
             jobid = flux_future.get_id()
+            intid = int(jobid)
             return templates.TemplateResponse(
                 "jobs/submit.html",
                 context={
                     "request": request,
                     "form": form,
-                    "messages": [f"Your job was successfully submit! 🦊 {jobid}"],
+                    "messages": [
+                        f"Your job was successfully submit! 🦊 <a target='_blank' style='color:magenta' href='/job/{intid}'>{jobid}</a>"
+                    ],
                 },
             )
         except Exception as e:
