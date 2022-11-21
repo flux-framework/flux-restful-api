@@ -110,6 +110,22 @@ def stream_job_output(jobid):
         pass
 
 
+def cancel_job(jobid):
+    """
+    Request a job to be cancelled by id.
+
+    Returns a message to the user and a return code.
+    """
+    from app.main import app
+
+    try:
+        flux.job.cancel(app.handle, jobid)
+    # This is usually FileNotFoundError
+    except Exception as e:
+        return "Job cannot be cancelled: %s." % e, 400
+    return "Job is requested to cancel.", 200
+
+
 def get_job_output(jobid, delay=None):
     """
     Given a jobid, get the output.

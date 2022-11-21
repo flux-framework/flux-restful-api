@@ -69,6 +69,10 @@
                     <td scope="row">Return Code</td>
                     <td>{{ job.returncode }}</td>
                   </tr>
+                  {% if job.state != "INACTIVE" %}<tr>
+                    <td scope="row">Actions</td>
+                    <td><a href="/job/{{ job.id }}/cancel" type="button" class="btn-warning btn">Request Cancel</a></td>
+                  </tr>{% endif %}
                 </tbody>
               </table>
         </div>

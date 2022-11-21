@@ -20,7 +20,9 @@ static_root = os.path.join(root, "static")
 data_root = os.path.join(root, "data")
 template_root = os.path.join(root, "templates")
 
+# Create templates, ensure we can get flashed messages from template session
 templates = Jinja2Templates(directory=template_root)
+
 app.mount("/static", StaticFiles(directory=static_root), name="static")
 app.mount("/data", StaticFiles(directory=data_root), name="data")
 

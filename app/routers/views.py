@@ -1,7 +1,7 @@
 import flux
 import flux.job
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 import app.library.flux as flux_cli
@@ -52,9 +52,17 @@ async def jobs_table(request: Request):
 
 
 # View job detail (and log)
-@auth_views_router.get("/job/{jobid}", response_class=HTMLResponse)
-async def job_info(request: Request, jobid):
+@auth_views_router.get(
+    "/job/{jobid}",
+    response_class=HTMLResponse,
+    name="job_info",
+    operation_id="job_info",
+)
+async def job_info(request: Request, jobid, msg=None):
     job = flux_cli.get_job(jobid)
+
+    # If we have a message, add to messages
+    messages = [msg] if msg else []
 
     # If not completed, ask info to return after a second of waiting
     if job["state"] == "INACTIVE":
@@ -68,6 +76,7 @@ async def job_info(request: Request, jobid):
         "jobs/job.html",
         {
             "title": f"Job {jobid}",
+            "messages": messages,
             "request": request,
             "job": job,
             "info": info,
@@ -83,6 +92,16 @@ async def submit_job(request: Request):
         "jobs/submit.html",
         {"request": request, "has_gpus": settings.has_gpus, "form": form},
     )
+
+
+# Button to cancel a job
+@auth_views_router.get("/job/{jobid}/cancel", response_class=HTMLResponse)
+async def cancel_job(request: Request, jobid):
+    from app.main import app
+
+    message, _ = flux_cli.cancel_job(jobid)
+    url = app.url_path_for(name="job_info", jobid=jobid) + "?msg=" + message
+    return RedirectResponse(url=url)
 
 
 @auth_views_router.post("/jobs/submit")

@@ -122,19 +122,8 @@ async def cancel_job(jobid):
     """
     Cancel a running flux job
     """
-    from app.main import app
-
-    try:
-        flux.job.cancel(app.handle, jobid)
-    # This is usually FileNotFoundError
-    except Exception as e:
-        return JSONResponse(
-            content={"Message": "Job cannot be cancelled: %s." % e}, status_code=400
-        )
-
-    return JSONResponse(
-        content={"Message": "Job is requested to cancel."}, status_code=200
-    )
+    message, return_code = flux_cli.cancel_job(jobid)
+    return JSONResponse(content={"Message": message}, status_code=return_code)
 
 
 @router.post("/jobs/submit")
