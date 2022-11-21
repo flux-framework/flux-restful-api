@@ -104,7 +104,7 @@ Let's list the nodes in our cluster!
     Listing nodes
     {
         "nodes": [
-            "959a42d45cdd"
+            "d024eafd24a9"
         ]
     }
 
@@ -174,13 +174,13 @@ And finally, let's get job info.
 
     🍓 Getting job info...
     {
-        "id": 934323159040,
+        "id": 1339878801408,
         "userid": 0,
         "urgency": 16,
         "priority": 16,
-        "t_submit": 1668664341.015164,
-        "t_depend": 1668664341.015164,
-        "t_run": 1668664341.0316799,
+        "t_submit": 1668998625.1401892,
+        "t_depend": 1668998625.1401892,
+        "t_run": 1668998625.1562088,
         "state": "RUN",
         "name": "sleep",
         "ntasks": 1,
@@ -188,11 +188,11 @@ And finally, let's get job info.
         "duration": 0.0,
         "nnodes": 1,
         "ranks": "0",
-        "nodelist": "959a42d45cdd",
-        "expiration": 4822264341.0,
+        "nodelist": "d024eafd24a9",
+        "expiration": 4822598625.0,
         "result": "",
         "returncode": "",
-        "runtime": 0.0012974739074707031,
+        "runtime": 0.003388643264770508,
         "waitstatus": "",
         "exception": {
             "occurred": "",
@@ -268,19 +268,90 @@ Submit the job to flux
     {
         "jobs": [
             {
-                "id": 1022420320256
+                "id": 1429032927232,
+                "userid": 0,
+                "urgency": 16,
+                "priority": 16,
+                "t_submit": 1668998630.453929,
+                "t_depend": 1668998630.453929,
+                "state": 8,
+                "name": "sleep",
+                "ntasks": 1,
+                "ncores": 1,
+                "duration": 0.0
             },
             {
-                "id": 1022906859520
+                "id": 1429553020928,
+                "userid": 0,
+                "urgency": 16,
+                "priority": 16,
+                "t_submit": 1668998630.484993,
+                "t_depend": 1668998630.484993,
+                "state": 8,
+                "name": "sleep",
+                "ntasks": 1,
+                "ncores": 1,
+                "duration": 0.0
             },
             {
-                "id": 1021883449344
+                "id": 1428445724672,
+                "userid": 0,
+                "urgency": 16,
+                "priority": 16,
+                "t_submit": 1668998630.4187214,
+                "t_depend": 1668998630.4187214,
+                "t_run": 1668998630.4326613,
+                "state": 16,
+                "name": "sleep",
+                "ntasks": 1,
+                "ncores": 1,
+                "duration": 0.0,
+                "nnodes": 1,
+                "ranks": "0",
+                "nodelist": "d024eafd24a9",
+                "expiration": 4822598630.0
             },
             {
-                "id": 934323159040
+                "id": 1339878801408,
+                "userid": 0,
+                "urgency": 16,
+                "priority": 16,
+                "t_submit": 1668998625.1401892,
+                "t_depend": 1668998625.1401892,
+                "t_run": 1668998625.1562088,
+                "state": 16,
+                "name": "sleep",
+                "ntasks": 1,
+                "ncores": 1,
+                "duration": 0.0,
+                "nnodes": 1,
+                "ranks": "0",
+                "nodelist": "d024eafd24a9",
+                "expiration": 4822598625.0
             },
             {
-                "id": 934943916032
+                "id": 1340583444480,
+                "userid": 0,
+                "urgency": 16,
+                "priority": 16,
+                "t_submit": 1668998625.181354,
+                "t_depend": 1668998625.181354,
+                "t_run": 1668998625.198001,
+                "t_cleanup": 1668998625.226101,
+                "t_inactive": 1668998625.2283006,
+                "state": 64,
+                "name": "echo",
+                "ntasks": 1,
+                "ncores": 1,
+                "duration": 0.0,
+                "nnodes": 1,
+                "ranks": "0",
+                "nodelist": "d024eafd24a9",
+                "success": true,
+                "exception_occurred": false,
+                "result": 1,
+                "expiration": 4822598625.0,
+                "waitstatus": 0
             }
         ]
     }
@@ -314,12 +385,12 @@ And this is how to search (with a start, length, or query)
     {
         "data": [
             {
-                "id": 1022906859520,
+                "id": 1429553020928,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1668664346.295831,
-                "t_depend": 1668664346.295831,
+                "t_submit": 1668998630.484993,
+                "t_depend": 1668998630.484993,
                 "state": "SCHED",
                 "name": "sleep",
                 "ntasks": 1,
@@ -339,13 +410,13 @@ And this is how to search (with a start, length, or query)
                 }
             },
             {
-                "id": 1021883449344,
+                "id": 1428445724672,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1668664346.2347538,
-                "t_depend": 1668664346.2347538,
-                "t_run": 1668664346.2500813,
+                "t_submit": 1668998630.4187214,
+                "t_depend": 1668998630.4187214,
+                "t_run": 1668998630.4326613,
                 "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
@@ -353,11 +424,11 @@ And this is how to search (with a start, length, or query)
                 "duration": 0.0,
                 "nnodes": 1,
                 "ranks": "0",
-                "nodelist": "959a42d45cdd",
-                "expiration": 4822264346.0,
+                "nodelist": "d024eafd24a9",
+                "expiration": 4822598630.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.06763696670532227,
+                "runtime": 0.07952880859375,
                 "waitstatus": "",
                 "exception": {
                     "occurred": "",
@@ -402,7 +473,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 1023611502592
+        "id": 1430408658944
     }
     Requesting job cancel..
     {
@@ -438,7 +509,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.597 seconds)
+   **Total running time of the script:** ( 0 minutes  5.759 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:
