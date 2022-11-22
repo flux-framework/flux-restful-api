@@ -29,10 +29,8 @@ def launch(kwargs, workdir=None, envars=None):
     environment.update(envars)
 
     print(f"⭐️ Workdir provided: {workdir}")
-    print(f"⭐️ Command being submit: {command}")
 
-    # TODO need to install conda stuffs
-    # Submit using subprocess (we can see output in terminal)
+    # Submit using subprocess (we can see output in terminal, if any)
     try:
         subprocess.Popen(
             command, cwd=workdir, env=environment, stdout=None, stderr=None, stdin=None

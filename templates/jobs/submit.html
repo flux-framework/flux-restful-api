@@ -59,7 +59,7 @@
                     <div id="num_nodesHelp" class="form-text">Number of nodes to request for the job, defaults to 1 (optional).</div>
                 </div>
                 <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" name="exlusive" {% if form.exclusive %}checked{% endif %} id="exclusive" aria-describedby="exclusiveHelp">
+                  <input type="checkbox" class="form-check-input" name="exclusive" {% if form.exclusive %}checked{% endif %} id="exclusive" aria-describedby="exclusiveHelp">
                   <label class="form-check-label" for="exclusive">Exclusive</label>
                   <div id="exclusiveHelp" class="form-text">Ask for exclusive nodes (only used by this job).</div>
                 </div>

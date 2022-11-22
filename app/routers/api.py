@@ -184,7 +184,7 @@ async def submit_job(request: Request):
     is_launcher = payload.get("is_launcher", False)
     if is_launcher:
         message = launcher.launch(kwargs, workdir=workdir, envars=envars)
-        result = jsonable_encoder({"Message": message, "id": ""})
+        result = jsonable_encoder({"Message": message, "id": "MANY"})
     else:
         # Prepare the flux job!
         fluxjob = flux_cli.prepare_job(
@@ -250,5 +250,4 @@ async def get_job_stream_output(jobid):
     Non-blocking variant to stream output until control+c.
     """
     stream = flux_cli.stream_job_output(jobid)
-    print(stream)
     return StreamingResponse(streamer(stream))
