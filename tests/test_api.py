@@ -65,7 +65,7 @@ def test_submit_list_job():
     assert "id" in result
     jobid = result["id"]
 
-    # List jobs with details
+    # List jobs with and without details
     response = client.get("/v1/jobs", headers=headers)
     assert response.status_code == 200
     result = response.json()
@@ -73,9 +73,6 @@ def test_submit_list_job():
     result = result["jobs"]
     assert len(result) == 1
     assert result[0]["id"] == jobid
-
-    # No details
-    assert len(result[0].keys()) == 1
 
     response = client.get("/v1/jobs", headers=headers, json={"details": True})
     assert response.status_code == 200

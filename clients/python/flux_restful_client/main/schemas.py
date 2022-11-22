@@ -46,6 +46,10 @@ submit_properties = {
         "type": ["boolean", "null"],
         "description": "ask for exclusive nodes for the job.",
     },
+    "is_launcher": {
+        "type": ["boolean", "null"],
+        "description": "indicate the command is for a launcher (e.g., nextflow, snakemake)",
+    },
 }
 
 job_submit_schema = {

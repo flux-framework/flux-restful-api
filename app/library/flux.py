@@ -23,7 +23,7 @@ def validate_submit_kwargs(kwargs, envars=None, runtime=None):
 
     # We can't ask for more nodes than available!
     num_nodes = kwargs.get("num_nodes")
-    if num_nodes and num_nodes > settings.flux_nodes:
+    if num_nodes and int(num_nodes) > settings.flux_nodes:
         errors.append(
             f"The server only has {settings.flux_nodes} nodes, you requested {num_nodes}"
         )
