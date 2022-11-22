@@ -7,7 +7,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/flux-framework/flux-restful-api:latest
+      image: ghcr.io/flux-framework/flux-restful-api:test
       ports:
        - 5000
     steps:
