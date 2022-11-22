@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 import app.library.flux as flux_cli
 import app.library.helpers as helpers
+import app.library.launcher as launcher
 from app.core.config import settings
 from app.library.auth import alert_auth, check_auth
 
@@ -152,15 +153,17 @@ async def submit_job(request: Request):
         kwargs[required] = payload.get(required)
 
     # Optional arguments
-    for optional in [
-        "num_tasks",
-        "cores_per_task",
-        "gpus_per_task",
-        "num_nodes",
-        "exclusive",
-    ]:
+    as_int = ["num_tasks", "cores_per_task", "gpus_per_task", "num_nodes"]
+    as_bool = ["exclusive"]
+
+    for optional in as_int + as_bool:
         if optional in payload and payload[optional]:
-            kwargs[optional] = payload[optional]
+            if optional in as_bool:
+                kwargs[optional] = bool(payload[optional])
+            elif optional in as_int:
+                kwargs[optional] = int(payload[optional])
+            else:
+                kwargs[optional] = payload[optional]
 
     # One off args not provided to JobspecV1
     envars = payload.get("envars", {})
@@ -177,22 +180,28 @@ async def submit_job(request: Request):
             status_code=400,
         )
 
-    # Prepare the flux job!
-    fluxjob = flux_cli.prepare_job(
-        kwargs, runtime=runtime, workdir=workdir, envars=envars
-    )
-
-    # Submit the job and return the ID, but allow for error
-    try:
-        flux_future = flux.job.submit_async(app.handle, fluxjob)
-    except Exception as e:
-        result = jsonable_encoder(
-            {"Message": "There was an issue submitting that job.", "Error": str(e)}
+    # Are we using a launcher instead?
+    is_launcher = payload.get("is_launcher", False)
+    if is_launcher:
+        message = launcher.launch(kwargs, workdir=workdir, envars=envars)
+        result = jsonable_encoder({"Message": message, "id": ""})
+    else:
+        # Prepare the flux job!
+        fluxjob = flux_cli.prepare_job(
+            kwargs, runtime=runtime, workdir=workdir, envars=envars
         )
-        return JSONResponse(content=result, status_code=400)
+        # Submit the job and return the ID, but allow for error
+        try:
+            flux_future = flux.job.submit_async(app.handle, fluxjob)
+        except Exception as e:
+            result = jsonable_encoder(
+                {"Message": "There was an issue submitting that job.", "Error": str(e)}
+            )
+            return JSONResponse(content=result, status_code=400)
+        jobid = flux_future.get_id()
+        result = jsonable_encoder({"Message": "Job submit.", "id": jobid})
 
-    jobid = flux_future.get_id()
-    result = jsonable_encoder({"Message": "Job submit.", "id": jobid})
+    # If we get down here, either launcher derived or submit
     return JSONResponse(content=result, status_code=200)
 
 
@@ -241,4 +250,5 @@ async def get_job_stream_output(jobid):
     Non-blocking variant to stream output until control+c.
     """
     stream = flux_cli.stream_job_output(jobid)
+    print(stream)
     return StreamingResponse(streamer(stream))

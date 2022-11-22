@@ -123,6 +123,7 @@ optional arguments:
   --num_nodes NUM_NODES
                         number of nodes for the job.
   --exclusive           ask for exclusive nodes for the job.
+  --is_launcher         indicate the command is for a launcher (e.g., nextflow, snakemake)
   --env ENVARS          "key=value pairs to provide to the job in the environment (add as many as you need)
                         flux-restful-cli --env PIPELINE_VAR=one ...
                         flux-restful-cli --env SUPERHERO=batman --env SUPERHERO_NAME=manbat ...

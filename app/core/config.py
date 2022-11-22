@@ -41,5 +41,9 @@ class Settings(BaseSettings):
     flux_token: str = os.environ.get("FLUX_TOKEN")
     require_auth: bool = get_bool_envar("FLUX_REQUIRE_AUTH")
 
+    # If the user requests a launcher, be strict.
+    # We only allow nextflow and snakemake, sorry
+    known_launchers: list = ["nextflow", "snakemake"]
+
 
 settings = Settings()

@@ -23,6 +23,13 @@ You likely want to submit jobs, and then see them progress. We first do this via
 
 ![img/submit.png](img/submit.png)
 
+Notice that there is a checkbox for a "launcher" - current launchers supported
+are NextFlow and Snakemake. Essentially, a launcher is going to submit multiple
+Flux jobs for you instead of providing a single command to flux. When you submit
+via a NextFlow launcher, for example, the one command results in many jobs:
+
+![img/launcher.png](img/launcher.png)
+
 
 ### `GET /jobs`
 

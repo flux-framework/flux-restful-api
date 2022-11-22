@@ -214,6 +214,8 @@ class FluxRestfulClient:
         gpus_per_task (int): Number of gpus per task (defaults to None)
         num_nodes (int): Number of nodes (defaults to None)
         exclusive (bool): is the job exclusive? (defaults to False)
+        is_launcher (bool): the command should be submit to a launcher.
+        This is currently supported for snakemake and nextflow.
         """
         # Allow the user to provide a list (and stringify everything)
         if isinstance(command, list):
@@ -225,6 +227,7 @@ class FluxRestfulClient:
             "gpus_per_task",
             "num_nodes",
             "exclusive",
+            "is_launcher",
             "workdir",
             "envars",
         ]:

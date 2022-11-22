@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 
 import app.library.flux as flux_cli
 import app.library.helpers as helpers
+import app.library.launcher as launcher
 from app.core.config import settings
 from app.forms import SubmitForm
 from app.library.auth import check_auth
@@ -41,7 +42,6 @@ async def home(request: Request):
 @auth_views_router.get("/jobs", response_class=HTMLResponse)
 async def jobs_table(request: Request):
     jobs = list(flux_cli.list_jobs_detailed().values())
-    print(jobs)
     return templates.TemplateResponse(
         "jobs/jobs.html",
         {
@@ -71,7 +71,6 @@ async def job_info(request: Request, jobid, msg=None):
     # Otherwise ensure we get all the logs!
     else:
         info = flux_cli.get_job_output(jobid, delay=1)
-
     return templates.TemplateResponse(
         "jobs/job.html",
         {
@@ -111,36 +110,58 @@ async def submit_job_post(request: Request):
     """
     from app.main import app
 
+    messages = []
     form = SubmitForm(request)
     await form.load_data()
     if form.is_valid():
         print("🍦 Submit form is valid!")
         print(form.kwargs)
 
-        # Prepare the flux job! We don't support envars here yet
-        fluxjob = flux_cli.prepare_job(
-            form.kwargs, runtime=form.runtime, workdir=form.workdir
-        )
-
-        # Submit the job and return the ID, but allow for error
-        try:
-            flux_future = flux.job.submit_async(app.handle, fluxjob)
-            jobid = flux_future.get_id()
-            intid = int(jobid)
-            return templates.TemplateResponse(
-                "jobs/submit.html",
-                context={
-                    "request": request,
-                    "form": form,
-                    "messages": [
-                        f"Your job was successfully submit! 🦊 <a target='_blank' style='color:magenta' href='/job/{intid}'>{jobid}</a>"
-                    ],
-                },
-            )
-        except Exception as e:
-            form.errors.append("There was an issue submitting that job: %s" % str(e))
+        if form.kwargs.get("is_launcher") is True:
+            messages.append(launcher.launch(form.kwargs, workdir=form.workdir))
+        else:
+            return submit_job_helper(request, app, form)
     else:
         print("🍒 Submit form is NOT valid!")
+    return templates.TemplateResponse(
+        "jobs/submit.html",
+        context={
+            "request": request,
+            "form": form,
+            "messages": messages,
+            "has_gpus": settings.has_gpus,
+            **form.__dict__,
+        },
+    )
+
+
+def submit_job_helper(request, app, form):
+    """
+    A helper to submit a flux job (not a launcher)
+    """
+
+    # Prepare the flux job! We don't support envars here yet
+    fluxjob = flux_cli.prepare_job(
+        form.kwargs, runtime=form.runtime, workdir=form.workdir
+    )
+
+    # Submit the job and return the ID, but allow for error
+    try:
+        flux_future = flux.job.submit_async(app.handle, fluxjob)
+        jobid = flux_future.get_id()
+        intid = int(jobid)
+        message = f"Your job was successfully submit! 🦊 <a target='_blank' style='color:magenta' href='/job/{intid}'>{jobid}</a>"
+        return templates.TemplateResponse(
+            "jobs/submit.html",
+            context={
+                "request": request,
+                "form": form,
+                "messages": [message],
+            },
+        )
+    except Exception as e:
+        form.errors.append("There was an issue submitting that job: %s" % str(e))
+
     return templates.TemplateResponse(
         "jobs/submit.html",
         context={

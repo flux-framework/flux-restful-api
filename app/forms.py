@@ -17,6 +17,8 @@ class SubmitForm:
         self.cores_per_task: Optional[int] = None
         self.gpus_per_task: Optional[int] = None
         self.exclusive: Optional[bool] = False
+        self.is_launcher: Optional[bool] = False
+        self.exclusive: Optional[bool] = False
 
     # STOPPED HERE - serialize in jquery from form, submit as application/json.
     async def load_data(self):
@@ -28,7 +30,8 @@ class SubmitForm:
         self.runtime = form.get("runtime") or 0
         self.cores_per_task = form.get("cores_per_task")
         self.gpus_per_task = form.get("gpus_per_task")
-        self.exclusive = form.get("exclusive")
+        self.exclusive = True if form.get("exclusive") == "on" else False
+        self.is_launcher = True if form.get("is_launcher") == "on" else False
 
     @property
     def kwargs(self):
@@ -36,20 +39,22 @@ class SubmitForm:
         Prepared key value dictionary of items.
         """
         kwargs = {}
-        for key in [
-            "command",
-            "num_tasks",
-            "num_nodes",
-            "cores_per_task",
-            "gpus_per_task",
-            "exclusive",
-        ]:
+        as_int = ["num_tasks", "num_nodes", "cores_per_task", "gpus_per_task"]
+        as_bool = ["exclusive", "is_launcher"]
+        for key in as_int + as_bool + ["command"]:
             if getattr(self, key, None) is not None:
                 value = getattr(self, key)
                 # Form could submit an empty value
                 if value == "":
                     continue
-                kwargs[key] = value
+
+                # Parse as integer
+                if key in as_int:
+                    kwargs[key] = int(value)
+                elif key in as_bool:
+                    kwargs[key] = True
+                else:
+                    kwargs[key] = value
         return kwargs
 
     def is_valid(self):
