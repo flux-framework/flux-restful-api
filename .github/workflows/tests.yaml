@@ -4,12 +4,25 @@ on:
   pull_request: []
 
 jobs:
+  prepare-container:
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.extract_branch.outputs.branch }}
+    steps:
+    - name: Extract branch name
+      run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+      id: extract_branch
+
   test:
     runs-on: ubuntu-latest
+    needs: [prepare-container]
     container:
-      image: ghcr.io/flux-framework/flux-restful-api:test
+      image: ghcr.io/flux-framework/flux-restful-api:latest
       ports:
        - 5000
+      env:
+        INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
+        INSTALL_REPO: ${{ github.repository }}
     steps:
     - uses: actions/checkout@v3
     - name: Install Dependencies (in case changes)
