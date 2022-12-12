@@ -43,6 +43,11 @@ jobs:
         echo "Tagging and releasing ${{ env.container }}:${tag}"
         docker tag ${{env.container}}:latest ${{env.container}}:${tag}
         docker push ${{env.container}}:${tag}
+        # Named tag
+        tag=$(cat ./VERSION)
+        echo "Tagging and releasing ${{ env.container }}:${tag}"
+        docker tag ${{env.container}}:latest ${{env.container}}:${tag}
+        docker push ${{env.container}}:${tag}
 
     - name: Deploy
       if: (github.event_name != 'pull_request')

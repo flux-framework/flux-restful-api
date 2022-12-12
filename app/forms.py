@@ -20,7 +20,6 @@ class SubmitForm:
         self.is_launcher: Optional[bool] = False
         self.exclusive: Optional[bool] = False
 
-    # STOPPED HERE - serialize in jquery from form, submit as application/json.
     async def load_data(self):
         form = await self.request.form()
         self.command = form.get("command")
@@ -44,6 +43,7 @@ class SubmitForm:
         for key in as_int + as_bool + ["command"]:
             if getattr(self, key, None) is not None:
                 value = getattr(self, key)
+
                 # Form could submit an empty value
                 if value == "":
                     continue
@@ -52,7 +52,7 @@ class SubmitForm:
                 if key in as_int:
                     kwargs[key] = int(value)
                 elif key in as_bool:
-                    kwargs[key] = True
+                    kwargs[key] = value
                 else:
                     kwargs[key] = value
         return kwargs
