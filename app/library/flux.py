@@ -60,7 +60,10 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
 
     # Delete command from the kwargs (we added because is required and validated that way)
     del kwargs["command"]
-    del kwargs["is_launcher"]
+
+    # From the command line API client this won't be here, in the UI it will.
+    if "is_launcher" in kwargs:
+        del kwargs["is_launcher"]
     fluxjob = flux.job.JobspecV1.from_command(command, **kwargs)
 
     print(f"⭐️ Workdir provided: {workdir}")
