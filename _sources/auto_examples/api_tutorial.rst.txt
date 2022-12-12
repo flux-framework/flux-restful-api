@@ -104,7 +104,7 @@ Let's list the nodes in our cluster!
     Listing nodes
     {
         "nodes": [
-            "f742fb3649dc"
+            "91f9e9f0e687"
         ]
     }
 
@@ -174,13 +174,13 @@ And finally, let's get job info.
 
     🍓 Getting job info...
     {
-        "id": 1307481997312,
+        "id": 858876018688,
         "userid": 0,
         "urgency": 16,
         "priority": 16,
-        "t_submit": 1669093133.839089,
-        "t_depend": 1669093133.839089,
-        "t_run": 1669093133.853935,
+        "t_submit": 1670876517.3867252,
+        "t_depend": 1670876517.3867252,
+        "t_run": 1670876517.4075696,
         "state": "RUN",
         "name": "sleep",
         "ntasks": 1,
@@ -188,11 +188,11 @@ And finally, let's get job info.
         "duration": 0.0,
         "nnodes": 1,
         "ranks": "0",
-        "nodelist": "f742fb3649dc",
-        "expiration": 4822693133.0,
+        "nodelist": "91f9e9f0e687",
+        "expiration": 4824476517.0,
         "result": "",
         "returncode": "",
-        "runtime": 0.006267547607421875,
+        "runtime": 0.011110305786132812,
         "waitstatus": "",
         "exception": {
             "occurred": "",
@@ -268,12 +268,12 @@ Submit the job to flux
     {
         "jobs": [
             {
-                "id": 1396988444672,
+                "id": 947963035648,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1669093139.1746497,
-                "t_depend": 1669093139.1746497,
+                "t_submit": 1670876522.6973193,
+                "t_depend": 1670876522.6973193,
                 "state": 8,
                 "name": "sleep",
                 "ntasks": 1,
@@ -281,12 +281,12 @@ Submit the job to flux
                 "duration": 0.0
             },
             {
-                "id": 1397558870016,
+                "id": 948516683776,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1669093139.2080557,
-                "t_depend": 1669093139.2080557,
+                "t_submit": 1670876522.731287,
+                "t_depend": 1670876522.731287,
                 "state": 8,
                 "name": "sleep",
                 "ntasks": 1,
@@ -294,13 +294,13 @@ Submit the job to flux
                 "duration": 0.0
             },
             {
-                "id": 1396334133248,
+                "id": 947409387520,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1669093139.1356504,
-                "t_depend": 1669093139.1356504,
-                "t_run": 1669093139.1538224,
+                "t_submit": 1670876522.6641228,
+                "t_depend": 1670876522.6641228,
+                "t_run": 1670876522.6806996,
                 "state": 16,
                 "name": "sleep",
                 "ntasks": 1,
@@ -308,17 +308,17 @@ Submit the job to flux
                 "duration": 0.0,
                 "nnodes": 1,
                 "ranks": "0",
-                "nodelist": "f742fb3649dc",
-                "expiration": 4822693139.0
+                "nodelist": "91f9e9f0e687",
+                "expiration": 4824476522.0
             },
             {
-                "id": 1307481997312,
+                "id": 858876018688,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1669093133.839089,
-                "t_depend": 1669093133.839089,
-                "t_run": 1669093133.853935,
+                "t_submit": 1670876517.3867252,
+                "t_depend": 1670876517.3867252,
+                "t_run": 1670876517.4075696,
                 "state": 16,
                 "name": "sleep",
                 "ntasks": 1,
@@ -326,19 +326,19 @@ Submit the job to flux
                 "duration": 0.0,
                 "nnodes": 1,
                 "ranks": "0",
-                "nodelist": "f742fb3649dc",
-                "expiration": 4822693133.0
+                "nodelist": "91f9e9f0e687",
+                "expiration": 4824476517.0
             },
             {
-                "id": 1308236972032,
+                "id": 859815542784,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1669093133.8841333,
-                "t_depend": 1669093133.8841333,
-                "t_run": 1669093133.8996544,
-                "t_cleanup": 1669093133.9313586,
-                "t_inactive": 1669093133.933679,
+                "t_submit": 1670876517.443309,
+                "t_depend": 1670876517.443309,
+                "t_run": 1670876517.459268,
+                "t_cleanup": 1670876517.4918206,
+                "t_inactive": 1670876517.494473,
                 "state": 64,
                 "name": "echo",
                 "ntasks": 1,
@@ -346,11 +346,11 @@ Submit the job to flux
                 "duration": 0.0,
                 "nnodes": 1,
                 "ranks": "0",
-                "nodelist": "f742fb3649dc",
+                "nodelist": "91f9e9f0e687",
                 "success": true,
                 "exception_occurred": false,
                 "result": 1,
-                "expiration": 4822693133.0,
+                "expiration": 4824476517.0,
                 "waitstatus": 0
             }
         ]
@@ -385,12 +385,12 @@ And this is how to search (with a start, length, or query)
     {
         "data": [
             {
-                "id": 1397558870016,
+                "id": 948516683776,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1669093139.2080557,
-                "t_depend": 1669093139.2080557,
+                "t_submit": 1670876522.731287,
+                "t_depend": 1670876522.731287,
                 "state": "SCHED",
                 "name": "sleep",
                 "ntasks": 1,
@@ -410,13 +410,13 @@ And this is how to search (with a start, length, or query)
                 }
             },
             {
-                "id": 1396334133248,
+                "id": 947409387520,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1669093139.1356504,
-                "t_depend": 1669093139.1356504,
-                "t_run": 1669093139.1538224,
+                "t_submit": 1670876522.6641228,
+                "t_depend": 1670876522.6641228,
+                "t_run": 1670876522.6806996,
                 "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
@@ -424,11 +424,11 @@ And this is how to search (with a start, length, or query)
                 "duration": 0.0,
                 "nnodes": 1,
                 "ranks": "0",
-                "nodelist": "f742fb3649dc",
-                "expiration": 4822693139.0,
+                "nodelist": "91f9e9f0e687",
+                "expiration": 4824476522.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.08323860168457031,
+                "runtime": 0.07676506042480469,
                 "waitstatus": "",
                 "exception": {
                     "occurred": "",
@@ -473,7 +473,7 @@ Finally, let's submit and cancel a job
     Submitting job sleep 60 intending to cancel..
     {
         "Message": "Job submit.",
-        "id": 1398464839680
+        "id": 949355544576
     }
     Requesting job cancel..
     {
@@ -509,7 +509,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.797 seconds)
+   **Total running time of the script:** ( 0 minutes  5.762 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:
