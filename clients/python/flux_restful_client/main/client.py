@@ -213,6 +213,7 @@ class FluxRestfulClient:
         cores_per_task (int): Number of cores per task (default to 1)
         gpus_per_task (int): Number of gpus per task (defaults to None)
         num_nodes (int): Number of nodes (defaults to None)
+        option_flags (dict): Option flags (as dict, defaults to {})
         exclusive (bool): is the job exclusive? (defaults to False)
         is_launcher (bool): the command should be submit to a launcher.
         This is currently supported for snakemake and nextflow.
@@ -225,6 +226,7 @@ class FluxRestfulClient:
             "num_tasks",
             "cores_per_task",
             "gpus_per_task",
+            "option_flags",
             "num_nodes",
             "exclusive",
             "is_launcher",
@@ -237,6 +239,7 @@ class FluxRestfulClient:
                 data[optional] = kwargs[optional]
 
         # Validate the data first.
+        print(data)
         jsonschema.validate(data, schema=schemas.job_submit_schema)
         result = self.do_request("jobs/submit", "POST", data=data)
         if result.status_code == 404:

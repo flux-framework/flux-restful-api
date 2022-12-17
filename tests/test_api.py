@@ -116,6 +116,45 @@ def test_cancel_job():
     # TODO we don't have way to actually verify that cancel happened
 
 
+def test_submit_option_flags():
+    """
+    Test that option flags are parsed.
+    """
+    # Submit a job with invalid flags
+    response = client.post(
+        "/v1/jobs/submit",
+        json={"command": "sleep 1", "option_flags": "invalid"},
+        headers=headers,
+    )
+    assert response.status_code == 400
+    result = response.json()
+    errors = result.get("Errors")
+    assert errors
+    assert "is invalid" in errors[0]
+
+    # Another invalid pattern
+    response = client.post(
+        "/v1/jobs/submit",
+        json={"command": "sleep 1", "option_flags": {"-ompi": "nope"}},
+        headers=headers,
+    )
+    assert response.status_code == 400
+    result = response.json()
+    errors = result.get("Errors")
+    assert errors
+    assert "keys without -o" in errors[0]
+
+    # Valid
+    response = client.post(
+        "/v1/jobs/submit",
+        json={"command": "sleep 1", "option_flags": {"ompi": "openmpi@5"}},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert "id" in result
+
+
 def test_job_output():
     """
     Test endpoint to retrieve list of job output

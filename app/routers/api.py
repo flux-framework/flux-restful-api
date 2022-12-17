@@ -8,10 +8,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
+import app.core.config as config
 import app.library.flux as flux_cli
 import app.library.helpers as helpers
 import app.library.launcher as launcher
-from app.core.config import settings
 from app.library.auth import alert_auth, check_auth
 
 # Print (hidden message) to give status of auth
@@ -19,7 +19,7 @@ alert_auth()
 router = APIRouter(
     prefix="/v1",
     tags=["jobs"],
-    dependencies=[Depends(check_auth)] if settings.require_auth else [],
+    dependencies=[Depends(check_auth)] if config.settings.require_auth else [],
     responses={404: {"description": "Not found"}},
 )
 no_auth_router = APIRouter(prefix="/v1", tags=["jobs"])
@@ -155,8 +155,9 @@ async def submit_job(request: Request):
     # Optional arguments
     as_int = ["num_tasks", "cores_per_task", "gpus_per_task", "num_nodes"]
     as_bool = ["exclusive"]
+    as_is = ["option_flags"]
 
-    for optional in as_int + as_bool:
+    for optional in as_int + as_bool + as_is:
         if optional in payload and payload[optional]:
             if optional in as_bool:
                 kwargs[optional] = bool(payload[optional])

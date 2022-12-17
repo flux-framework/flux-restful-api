@@ -42,6 +42,10 @@ submit_properties = {
         "type": ["number", "null"],
         "description": "number of nodes for the job.",
     },
+    "option_flags": {
+        "type": "object",
+        "description": "option flags (dict) or key value pairs for flux.",
+    },
     "exclusive": {
         "type": ["boolean", "null"],
         "description": "ask for exclusive nodes for the job.",

@@ -28,6 +28,17 @@ def validate_submit_kwargs(kwargs, envars=None, runtime=None):
             f"The server only has {settings.flux_nodes} nodes, you requested {num_nodes}"
         )
 
+    # Make sure if option_flags defined, we don't have a -o prefix
+    option_flags = kwargs.get("option_flags") or {}
+    if not isinstance(option_flags, dict):
+        errors.append(
+            f"Please provide option args as a dictionary, type {type(option_flags)} is invalid."
+        )
+    else:
+        for option, _ in option_flags.items():
+            if "-o" in option:
+                errors.append(f"Please provide keys without -o, {option} is invalid.")
+
     # If the user asks for gpus and we don't have any, no go
     if "gpus_per_task" in kwargs and not settings.has_gpus:
         errors.append("This server does not support gpus: gpus_per_task cannot be set.")
@@ -51,6 +62,7 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     After validation, prepare the job (shared function).
     """
     envars = envars or {}
+    option_flags = kwargs.get("option_flags") or {}
 
     # Generate the flux job
     command = kwargs["command"]
@@ -59,12 +71,16 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     print(f"⭐️ Command being submit: {command}")
 
     # Delete command from the kwargs (we added because is required and validated that way)
-    del kwargs["command"]
+    # From the command line API client is_launcher won't be here, in the UI it will.
+    for key in ["command", "option_flags", "is_launcher"]:
+        if key in kwargs:
+            del kwargs[key]
 
-    # From the command line API client this won't be here, in the UI it will.
-    if "is_launcher" in kwargs:
-        del kwargs["is_launcher"]
+    # Assemble the flux job!
     fluxjob = flux.job.JobspecV1.from_command(command, **kwargs)
+    for option, value in option_flags.items():
+        print(f"⭐️ Setting shell option: {option}={value}")
+        fluxjob.setattr_shell_option(option, value)
 
     print(f"⭐️ Workdir provided: {workdir}")
     if workdir is not None:

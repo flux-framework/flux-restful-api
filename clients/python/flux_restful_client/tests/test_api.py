@@ -1,5 +1,7 @@
 import time
 
+import jsonschema
+import pytest
 from flux_restful_client.main import get_client
 
 
@@ -75,6 +77,22 @@ def test_job_output():
     lines = client.output(jobid)
     assert "Output" in lines
     assert "pancakes 🥞️🥞️🥞️\n" in lines["Output"]
+
+
+def test_option_flags():
+    """
+    Test adding valid and invalid option flags
+    """
+    client = get_client()
+
+    with pytest.raises(jsonschema.ValidationError):
+        client.submit("sleep 1", option_flags="invalid format")
+
+    # The server should reject a key with -o
+    result = client.submit("sleep 1", option_flags={"-ompi": "noodles"})
+    assert "Errors" in result
+    assert result["Errors"]
+    assert "keys without -o" in result["Errors"][0]
 
 
 def test_job_query():
