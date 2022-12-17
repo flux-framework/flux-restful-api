@@ -147,6 +147,30 @@ The following variables are available (with their defaults):
 |FLUX_USER| The username to require for Basic Auth (if `FLUX_REQUIRE_AUTH` is set) | unset |
 |FLUX_HAS_GPU | GPUs are available for the user to request | unset |
 |FLUX_NUMBER_NODES| The number of nodes available in the cluster | 1 |
+|FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
+
+### Flux Option Flags
+
+Option flags can be set server-wide or on the fly by a user in the interface
+(or restful API). An option set by a user will over-ride the server setting.
+An example setting a server-level option flags is below:
+
+```bash
+export FLUX_OPTION_FLAGS="-ompi=openmpi@5"
+```
+
+This would be translated to:
+
+```python
+fluxjob = flux.job.JobspecV1.from_command(command, **kwargs)
+fluxjob.setattr_shell_option("mpi", "openmpi@5")
+```
+
+And note that you can easily set more than one:
+
+```bash
+export FLUX_OPTION_FLAGS="-ompi=openmpi@5 -okey=value"
+```
 
 ## Code Linting
 

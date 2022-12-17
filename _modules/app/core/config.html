@@ -319,9 +319,14 @@
        </h1>
        <div class="highlight">
         <pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
 
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseSettings</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_int_envar"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_int_envar">[docs]</a><span class="k">def</span> <span class="nf">get_int_envar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -345,6 +350,35 @@
     <span class="k">return</span> <span class="n">default</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">else</span> <span class="ow">not</span> <span class="n">default</span></div>
 
 
+<div class="viewcode-block" id="get_option_flags"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_option_flags">[docs]</a><span class="k">def</span> <span class="nf">get_option_flags</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"-o"</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Wrapper around parse_option_flags to get from environment.</span>
+
+<span class="sd">    The function can then be shared to parse flags from the UI</span>
+<span class="sd">    in the same way.</span>
+<span class="sd">    """</span>
+    <span class="n">flags</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flags</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">flags</span>
+    <span class="k">return</span> <span class="n">parse_option_flags</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse_option_flags"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.parse_option_flags">[docs]</a><span class="k">def</span> <span class="nf">parse_option_flags</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"-o"</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Parse key value pairs (optionally with a prefix) from the environment.</span>
+<span class="sd">    """</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">flags</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">"="</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing '=' in flag </span><span class="si">{</span><span class="n">flag</span><span class="si">}</span><span class="s2">, cannot parse."</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">option</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">flag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"="</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+            <span class="n">option</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">"^</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+        <span class="n">values</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">values</span></div>
+
+
 <div class="viewcode-block" id="Settings"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.Settings">[docs]</a><span class="k">class</span> <span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="sd">"""</span>
 <span class="sd">    Basic settings and defaults for the Flux RESTFul API</span>
@@ -361,6 +395,9 @@
     <span class="n">flux_user</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FLUX_USER"</span><span class="p">)</span>
     <span class="n">flux_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FLUX_TOKEN"</span><span class="p">)</span>
     <span class="n">require_auth</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">get_bool_envar</span><span class="p">(</span><span class="s2">"FLUX_REQUIRE_AUTH"</span><span class="p">)</span>
+
+    <span class="c1"># Default server option flags</span>
+    <span class="n">option_flags</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">get_option_flags</span><span class="p">(</span><span class="s2">"FLUX_OPTION_FLAGS"</span><span class="p">)</span>
 
     <span class="c1"># If the user requests a launcher, be strict.</span>
     <span class="c1"># We only allow nextflow and snakemake, sorry</span>
@@ -387,7 +424,7 @@
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Dec 12, 2022.
+              Dec 17, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

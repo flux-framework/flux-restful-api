@@ -405,6 +405,15 @@
                     </a>
                    </li>
                    <li class="md-nav__item">
+                    <a class="md-nav__link" href="#app.core.config.Settings.option_flags">
+                     <code class="docutils literal notranslate">
+                      <span class="pre">
+                       Settings.option_flags
+                      </span>
+                     </code>
+                    </a>
+                   </li>
+                   <li class="md-nav__item">
                     <a class="md-nav__link" href="#app.core.config.Settings.require_auth">
                      <code class="docutils literal notranslate">
                       <span class="pre">
@@ -430,6 +439,24 @@
                   <code class="docutils literal notranslate">
                    <span class="pre">
                     get_int_envar()
+                   </span>
+                  </code>
+                 </a>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#app.core.config.get_option_flags">
+                  <code class="docutils literal notranslate">
+                   <span class="pre">
+                    get_option_flags()
+                   </span>
+                  </code>
+                 </a>
+                </li>
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#app.core.config.parse_option_flags">
+                  <code class="docutils literal notranslate">
+                   <span class="pre">
+                    parse_option_flags()
                    </span>
                   </code>
                  </a>
@@ -1085,6 +1112,40 @@
            <em class="sig-param">
             <span class="n">
              <span class="pre">
+              option_flags
+             </span>
+            </span>
+            <span class="p">
+             <span class="pre">
+              :
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="n">
+             <span class="pre">
+              dict
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="o">
+             <span class="pre">
+              =
+             </span>
+            </span>
+            <span class="w">
+            </span>
+            <span class="default_value">
+             <span class="pre">
+              {}
+             </span>
+            </span>
+           </em>
+           ,
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
               known_launchers
              </span>
             </span>
@@ -1301,6 +1362,32 @@
             </dd>
            </dl>
            <dl class="py attribute">
+            <dt class="sig sig-object py" id="app.core.config.Settings.option_flags">
+             <span class="sig-name descname">
+              <span class="pre">
+               option_flags
+              </span>
+             </span>
+             <em class="property">
+              <span class="p">
+               <span class="pre">
+                :
+               </span>
+              </span>
+              <span class="w">
+              </span>
+              <span class="pre">
+               dict
+              </span>
+             </em>
+             <a class="headerlink" href="#app.core.config.Settings.option_flags" title="Permalink to this definition">
+              ¶
+             </a>
+            </dt>
+            <dd>
+            </dd>
+           </dl>
+           <dl class="py attribute">
             <dt class="sig sig-object py" id="app.core.config.Settings.require_auth">
              <span class="sig-name descname">
               <span class="pre">
@@ -1448,6 +1535,130 @@
            </p>
           </dd>
          </dl>
+         <dl class="py function">
+          <dt class="sig sig-object py" id="app.core.config.get_option_flags">
+           <span class="sig-prename descclassname">
+            <span class="pre">
+             app.core.config.
+            </span>
+           </span>
+           <span class="sig-name descname">
+            <span class="pre">
+             get_option_flags
+            </span>
+           </span>
+           <span class="sig-paren">
+            (
+           </span>
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              key
+             </span>
+            </span>
+           </em>
+           ,
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              prefix
+             </span>
+            </span>
+            <span class="o">
+             <span class="pre">
+              =
+             </span>
+            </span>
+            <span class="default_value">
+             <span class="pre">
+              '-o'
+             </span>
+            </span>
+           </em>
+           <span class="sig-paren">
+            )
+           </span>
+           <a class="reference internal" href="../_modules/app/core/config.html#get_option_flags">
+            <span class="viewcode-link">
+             <span class="pre">
+              [source]
+             </span>
+            </span>
+           </a>
+           <a class="headerlink" href="#app.core.config.get_option_flags" title="Permalink to this definition">
+            ¶
+           </a>
+          </dt>
+          <dd>
+           <p>
+            Wrapper around parse_option_flags to get from environment.
+           </p>
+           <p>
+            The function can then be shared to parse flags from the UI
+in the same way.
+           </p>
+          </dd>
+         </dl>
+         <dl class="py function">
+          <dt class="sig sig-object py" id="app.core.config.parse_option_flags">
+           <span class="sig-prename descclassname">
+            <span class="pre">
+             app.core.config.
+            </span>
+           </span>
+           <span class="sig-name descname">
+            <span class="pre">
+             parse_option_flags
+            </span>
+           </span>
+           <span class="sig-paren">
+            (
+           </span>
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              flags
+             </span>
+            </span>
+           </em>
+           ,
+           <em class="sig-param">
+            <span class="n">
+             <span class="pre">
+              prefix
+             </span>
+            </span>
+            <span class="o">
+             <span class="pre">
+              =
+             </span>
+            </span>
+            <span class="default_value">
+             <span class="pre">
+              '-o'
+             </span>
+            </span>
+           </em>
+           <span class="sig-paren">
+            )
+           </span>
+           <a class="reference internal" href="../_modules/app/core/config.html#parse_option_flags">
+            <span class="viewcode-link">
+             <span class="pre">
+              [source]
+             </span>
+            </span>
+           </a>
+           <a class="headerlink" href="#app.core.config.parse_option_flags" title="Permalink to this definition">
+            ¶
+           </a>
+          </dt>
+          <dd>
+           <p>
+            Parse key value pairs (optionally with a prefix) from the environment.
+           </p>
+          </dd>
+         </dl>
         </section>
         <section id="module-app.core.logging">
          <span id="app-core-logging-module">
@@ -1580,7 +1791,7 @@
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Dec 12, 2022.
+              Dec 17, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

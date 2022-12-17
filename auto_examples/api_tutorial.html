@@ -407,7 +407,7 @@ environment.
           <pre><span></span>Listing nodes
 {
     "nodes": [
-        "91f9e9f0e687"
+        "a8ffa959805c"
     ]
 }
 </pre>
@@ -431,6 +431,7 @@ environment.
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>😴 Submitting job sleep 60
+{'command': 'sleep 60'}
 </pre>
          </div>
         </div>
@@ -458,26 +459,23 @@ FLUX_REQUIRE_AUTH=true
          <div class="highlight">
           <pre><span></span>🍓 Getting job info...
 {
-    "id": 858876018688,
+    "id": 785408589824,
     "userid": 0,
     "urgency": 16,
     "priority": 16,
-    "t_submit": 1670876517.3867252,
-    "t_depend": 1670876517.3867252,
-    "t_run": 1670876517.4075696,
-    "state": "RUN",
+    "t_submit": 1671240372.6719782,
+    "t_depend": 1671240372.6719782,
+    "state": "SCHED",
     "name": "sleep",
     "ntasks": 1,
     "ncores": 1,
     "duration": 0.0,
-    "nnodes": 1,
-    "ranks": "0",
-    "nodelist": "91f9e9f0e687",
-    "expiration": 4824476517.0,
+    "nnodes": "",
     "result": "",
     "returncode": "",
-    "runtime": 0.011110305786132812,
+    "runtime": 0.0,
     "waitstatus": "",
+    "nodelist": "",
     "exception": {
         "occurred": "",
         "severity": "",
@@ -506,6 +504,7 @@ This will be added to the client
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>😴 Submitting job to echo pancakes 🥞🥞🥞
+{'command': 'echo pancakes are really just morning cakes.'}
 {
     "Output": [
         "pancakes are really just morning cakes.\n"
@@ -532,15 +531,18 @@ Submit the job to flux
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>Submitting 3 jobs to sleep!
+{'command': 'sleep 10'}
+{'command': 'sleep 20'}
+{'command': 'sleep 30'}
 {
     "jobs": [
         {
-            "id": 947963035648,
+            "id": 874411720704,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1670876522.6973193,
-            "t_depend": 1670876522.6973193,
+            "t_submit": 1671240377.9777832,
+            "t_depend": 1671240377.9777832,
             "state": 8,
             "name": "sleep",
             "ntasks": 1,
@@ -548,12 +550,12 @@ Submit the job to flux
             "duration": 0.0
         },
         {
-            "id": 948516683776,
+            "id": 874998923264,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1670876522.731287,
-            "t_depend": 1670876522.731287,
+            "t_submit": 1671240378.01148,
+            "t_depend": 1671240378.01148,
             "state": 8,
             "name": "sleep",
             "ntasks": 1,
@@ -561,13 +563,13 @@ Submit the job to flux
             "duration": 0.0
         },
         {
-            "id": 947409387520,
+            "id": 873841295360,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1670876522.6641228,
-            "t_depend": 1670876522.6641228,
-            "t_run": 1670876522.6806996,
+            "t_submit": 1671240377.9422793,
+            "t_depend": 1671240377.9422793,
+            "t_run": 1671240377.9577217,
             "state": 16,
             "name": "sleep",
             "ntasks": 1,
@@ -575,17 +577,17 @@ Submit the job to flux
             "duration": 0.0,
             "nnodes": 1,
             "ranks": "0",
-            "nodelist": "91f9e9f0e687",
-            "expiration": 4824476522.0
+            "nodelist": "a8ffa959805c",
+            "expiration": 4824840377.0
         },
         {
-            "id": 858876018688,
+            "id": 785408589824,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1670876517.3867252,
-            "t_depend": 1670876517.3867252,
-            "t_run": 1670876517.4075696,
+            "t_submit": 1671240372.6719782,
+            "t_depend": 1671240372.6719782,
+            "t_run": 1671240372.687878,
             "state": 16,
             "name": "sleep",
             "ntasks": 1,
@@ -593,19 +595,19 @@ Submit the job to flux
             "duration": 0.0,
             "nnodes": 1,
             "ranks": "0",
-            "nodelist": "91f9e9f0e687",
-            "expiration": 4824476517.0
+            "nodelist": "a8ffa959805c",
+            "expiration": 4824840372.0
         },
         {
-            "id": 859815542784,
+            "id": 786113232896,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1670876517.443309,
-            "t_depend": 1670876517.443309,
-            "t_run": 1670876517.459268,
-            "t_cleanup": 1670876517.4918206,
-            "t_inactive": 1670876517.494473,
+            "t_submit": 1671240372.7134576,
+            "t_depend": 1671240372.7134576,
+            "t_run": 1671240372.7281377,
+            "t_cleanup": 1671240372.7501955,
+            "t_inactive": 1671240372.7533019,
             "state": 64,
             "name": "echo",
             "ntasks": 1,
@@ -613,11 +615,11 @@ Submit the job to flux
             "duration": 0.0,
             "nnodes": 1,
             "ranks": "0",
-            "nodelist": "91f9e9f0e687",
+            "nodelist": "a8ffa959805c",
             "success": true,
             "exception_occurred": false,
             "result": 1,
-            "expiration": 4824476517.0,
+            "expiration": 4824840372.0,
             "waitstatus": 0
         }
     ]
@@ -643,12 +645,12 @@ Submit the job to flux
 {
     "data": [
         {
-            "id": 948516683776,
+            "id": 874998923264,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1670876522.731287,
-            "t_depend": 1670876522.731287,
+            "t_submit": 1671240378.01148,
+            "t_depend": 1671240378.01148,
             "state": "SCHED",
             "name": "sleep",
             "ntasks": 1,
@@ -668,13 +670,13 @@ Submit the job to flux
             }
         },
         {
-            "id": 947409387520,
+            "id": 873841295360,
             "userid": 0,
             "urgency": 16,
             "priority": 16,
-            "t_submit": 1670876522.6641228,
-            "t_depend": 1670876522.6641228,
-            "t_run": 1670876522.6806996,
+            "t_submit": 1671240377.9422793,
+            "t_depend": 1671240377.9422793,
+            "t_run": 1671240377.9577217,
             "state": "RUN",
             "name": "sleep",
             "ntasks": 1,
@@ -682,11 +684,11 @@ Submit the job to flux
             "duration": 0.0,
             "nnodes": 1,
             "ranks": "0",
-            "nodelist": "91f9e9f0e687",
-            "expiration": 4824476522.0,
+            "nodelist": "a8ffa959805c",
+            "expiration": 4824840377.0,
             "result": "",
             "returncode": "",
-            "runtime": 0.07676506042480469,
+            "runtime": 0.08027863502502441,
             "waitstatus": "",
             "exception": {
                 "occurred": "",
@@ -721,9 +723,10 @@ Submit the job to flux
         <div class="sphx-glr-script-out highlight-none notranslate">
          <div class="highlight">
           <pre><span></span>Submitting job sleep 60 intending to cancel..
+{'command': 'sleep 60'}
 {
     "Message": "Job submit.",
-    "id": 949355544576
+    "id": 875821006848
 }
 Requesting job cancel..
 {
@@ -752,7 +755,7 @@ Requesting job cancel..
          <strong>
           Total running time of the script:
          </strong>
-         ( 0 minutes  5.762 seconds)
+         ( 0 minutes  5.699 seconds)
         </p>
         <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-api-tutorial-py">
          <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -850,7 +853,7 @@ Requesting job cancel..
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Dec 12, 2022.
+              Dec 17, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">

@@ -338,6 +338,15 @@
                    <a class="md-nav__link" href="#environment">
                     Environment
                    </a>
+                   <nav class="md-nav">
+                    <ul class="md-nav__list">
+                     <li class="md-nav__item">
+                      <a class="md-nav__link" href="#flux-option-flags">
+                       Flux Option Flags
+                      </a>
+                     </li>
+                    </ul>
+                   </nav>
                   </li>
                   <li class="md-nav__item">
                    <a class="md-nav__link" href="#code-linting">
@@ -485,6 +494,15 @@
               <a class="md-nav__link" href="#environment">
                Environment
               </a>
+              <nav class="md-nav">
+               <ul class="md-nav__list">
+                <li class="md-nav__item">
+                 <a class="md-nav__link" href="#flux-option-flags">
+                  Flux Option Flags
+                 </a>
+                </li>
+               </ul>
+              </nav>
              </li>
              <li class="md-nav__item">
               <a class="md-nav__link" href="#code-linting">
@@ -955,8 +973,57 @@ The following variables are available (with their defaults):
              1
             </td>
            </tr>
+           <tr>
+            <td>
+             FLUX_OPTION_FLAGS
+            </td>
+            <td>
+             Option flags to give to flux, in the same format you'd give on the command line
+            </td>
+            <td>
+             unset
+            </td>
+           </tr>
           </tbody>
          </table>
+         <section id="flux-option-flags">
+          <h3 id="flux-option-flags">
+           Flux Option Flags
+           <a class="headerlink" href="#flux-option-flags" title="Permalink to this heading">
+            ¶
+           </a>
+          </h3>
+          <p>
+           Option flags can be set server-wide or on the fly by a user in the interface
+(or restful API). An option set by a user will over-ride the server setting.
+An example setting a server-level option flags is below:
+          </p>
+          <div class="highlight-bash notranslate">
+           <div class="highlight">
+            <pre><span></span><span class="nb">export</span> <span class="nv">FLUX_OPTION_FLAGS</span><span class="o">=</span><span class="s2">"-ompi=openmpi@5"</span>
+</pre>
+           </div>
+          </div>
+          <p>
+           This would be translated to:
+          </p>
+          <div class="highlight-python notranslate">
+           <div class="highlight">
+            <pre><span></span><span class="n">fluxjob</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">JobspecV1</span><span class="o">.</span><span class="n">from_command</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="n">fluxjob</span><span class="o">.</span><span class="n">setattr_shell_option</span><span class="p">(</span><span class="s2">"mpi"</span><span class="p">,</span> <span class="s2">"openmpi@5"</span><span class="p">)</span>
+</pre>
+           </div>
+          </div>
+          <p>
+           And note that you can easily set more than one:
+          </p>
+          <div class="highlight-bash notranslate">
+           <div class="highlight">
+            <pre><span></span><span class="nb">export</span> <span class="nv">FLUX_OPTION_FLAGS</span><span class="o">=</span><span class="s2">"-ompi=openmpi@5 -okey=value"</span>
+</pre>
+           </div>
+          </div>
+         </section>
         </section>
         <section id="code-linting">
          <h2 id="code-linting">
@@ -1231,7 +1298,7 @@ functions from oras-py source code.
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Dec 12, 2022.
+              Dec 17, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
