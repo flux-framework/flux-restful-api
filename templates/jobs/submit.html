@@ -58,6 +58,11 @@
                     <input type="number" min="1" max="{{num_nodes}}" name="num_nodes" class="form-control" id="num_nodes" aria-describedby="num_nodesHelp">
                     <div id="num_nodesHelp" class="form-text">Number of nodes to request for the job, defaults to 1 (optional).</div>
                 </div>
+                <div class="mb-3">
+                    <label for="workdir" class="form-label">Option Flags</label>
+                    <input class="form-control" {% if form.option_flags %}value="{{ form.option_flags }}"{% endif %} name="option_fags" id="option_flags" aria-describedby="optionFlagsHelp">
+                    <div id="optionFlagsHelp" class="form-text">One off option flags, space separated (e.g.,) -ompi=openmpi@5 (optional).</div>
+                </div>
                 <div class="mb-3 form-check">
                   <input type="checkbox" class="form-check-input" name="exclusive" {% if form.exclusive %}checked{% endif %} id="exclusive" aria-describedby="exclusiveHelp">
                   <label class="form-check-label" for="exclusive">Exclusive</label>

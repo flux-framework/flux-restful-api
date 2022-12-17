@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from fastapi import Request
 
+import app.core.config as config
 import app.library.flux as flux_cli
 
 
@@ -17,6 +18,7 @@ class SubmitForm:
         self.cores_per_task: Optional[int] = None
         self.gpus_per_task: Optional[int] = None
         self.exclusive: Optional[bool] = False
+        self.option_flags: Optional[str] = None
         self.is_launcher: Optional[bool] = False
         self.exclusive: Optional[bool] = False
 
@@ -28,6 +30,7 @@ class SubmitForm:
         self.num_nodes = form.get("num_nodes")
         self.runtime = form.get("runtime") or 0
         self.cores_per_task = form.get("cores_per_task")
+        self.option_flags = form.get("option_flags")
         self.gpus_per_task = form.get("gpus_per_task")
         self.exclusive = True if form.get("exclusive") == "on" else False
         self.is_launcher = True if form.get("is_launcher") == "on" else False
@@ -40,7 +43,8 @@ class SubmitForm:
         kwargs = {}
         as_int = ["num_tasks", "num_nodes", "cores_per_task", "gpus_per_task"]
         as_bool = ["exclusive", "is_launcher"]
-        for key in as_int + as_bool + ["command"]:
+        as_str = ["command"]
+        for key in as_int + as_bool + as_str:
             if getattr(self, key, None) is not None:
                 value = getattr(self, key)
 
@@ -55,7 +59,22 @@ class SubmitForm:
                     kwargs[key] = value
                 else:
                     kwargs[key] = value
+
+        # Custom parsing (or just addition) of settings
+        kwargs["option_flags"] = self.get_option_flags()
         return kwargs
+
+    def get_option_flags(self):
+        """
+        Get option flags from the form, add on to server defaults.
+        """
+        flags = config.settings.option_flags
+        option_flags = getattr(self, "option_flags", None)
+
+        # The user setting in the UI takes precedence over the server!
+        if option_flags not in [None, ""]:
+            flags.update(config.parse_option_flags(option_flags))
+        return flags
 
     def is_valid(self):
         """
