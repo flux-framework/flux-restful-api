@@ -77,6 +77,7 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
             del kwargs[key]
 
     # Assemble the flux job!
+    print(f"⭐️ Keyword arguments for flux jobspec: {kwargs}")
     fluxjob = flux.job.JobspecV1.from_command(command, **kwargs)
     for option, value in option_flags.items():
         print(f"⭐️ Setting shell option: {option}={value}")

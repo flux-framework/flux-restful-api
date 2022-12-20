@@ -139,14 +139,12 @@ def submit_job_helper(request, app, form):
     """
     A helper to submit a flux job (not a launcher)
     """
-
-    # Prepare the flux job! We don't support envars here yet
-    fluxjob = flux_cli.prepare_job(
-        form.kwargs, runtime=form.runtime, workdir=form.workdir
-    )
-
     # Submit the job and return the ID, but allow for error
     try:
+        # Prepare the flux job! We don't support envars here yet
+        fluxjob = flux_cli.prepare_job(
+            form.kwargs, runtime=form.runtime, workdir=form.workdir
+        )
         flux_future = flux.job.submit_async(app.handle, fluxjob)
         jobid = flux_future.get_id()
         intid = int(jobid)
