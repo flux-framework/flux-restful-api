@@ -187,12 +187,11 @@ async def submit_job(request: Request):
         message = launcher.launch(kwargs, workdir=workdir, envars=envars)
         result = jsonable_encoder({"Message": message, "id": "MANY"})
     else:
-        # Prepare the flux job!
-        fluxjob = flux_cli.prepare_job(
-            kwargs, runtime=runtime, workdir=workdir, envars=envars
-        )
-        # Submit the job and return the ID, but allow for error
+        # Prepare and submit the job and return the ID, but allow for error
         try:
+            fluxjob = flux_cli.prepare_job(
+                kwargs, runtime=runtime, workdir=workdir, envars=envars
+            )
             flux_future = flux.job.submit_async(app.handle, fluxjob)
         except Exception as e:
             result = jsonable_encoder(
