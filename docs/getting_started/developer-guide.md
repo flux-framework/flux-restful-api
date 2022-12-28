@@ -35,6 +35,7 @@ Build arguments supported are:
 | use_auth | Turn on authentication | unset (meaning false) |
 | port | Port to run service on (and expose) | 5000 |
 | host | Host to run service on (you probably shouldn't change this) |0.0.0.0 |
+| workers | Number of workers to run uvicorn with (required for Flux jobs with >1 process) | 1 |
 
 And run it ensuring you expose port 5000. The container should show you if you've
 correctly provided auth (or not):
@@ -65,7 +66,7 @@ needing to push a container to a registry. Here is how to specify a branch (and 
 or your own repository base:
 
 ```bash
-$ docker run  --env INSTALL_BRANCH=add/feature --env INSTALL_REPO=user/flux-restful-api -d --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
+$ docker run --env INSTALL_BRANCH=add/feature --env INSTALL_REPO=user/flux-restful-api -d --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
 ```
 
 
