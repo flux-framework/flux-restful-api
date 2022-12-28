@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+ - Add support uvicorn workers (>1 needed to run >1 process with Flux) (0.0.11)
  - Fixing bug with launcher always being specified (0.0.1)
   - catching any errors on creation of fluxjob
  - Project (faux) skeleton release (0.0.0)
