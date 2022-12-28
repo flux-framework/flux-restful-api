@@ -706,6 +706,17 @@ Build arguments supported are:
              0.0.0.0
             </td>
            </tr>
+           <tr>
+            <td>
+             workers
+            </td>
+            <td>
+             Number of workers to run uvicorn with (required for Flux jobs with &gt;1 process)
+            </td>
+            <td>
+             1
+            </td>
+           </tr>
           </tbody>
          </table>
          <p>
@@ -748,7 +759,7 @@ or your own repository base:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ docker run  --env <span class="nv">INSTALL_BRANCH</span><span class="o">=</span>add/feature --env <span class="nv">INSTALL_REPO</span><span class="o">=</span>user/flux-restful-api -d --rm -it -p <span class="m">5000</span>:5000 ghcr.io/flux-framework/flux-restful-api
+           <pre><span></span>$ docker run --env <span class="nv">INSTALL_BRANCH</span><span class="o">=</span>add/feature --env <span class="nv">INSTALL_REPO</span><span class="o">=</span>user/flux-restful-api -d --rm -it -p <span class="m">5000</span>:5000 ghcr.io/flux-framework/flux-restful-api
 </pre>
           </div>
          </div>
@@ -1298,7 +1309,7 @@ functions from oras-py source code.
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Dec 21, 2022.
+              Dec 28, 2022.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
