@@ -604,7 +604,7 @@ run the server and interact with it. To optionally build the container:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ docker build -t ghcr.io/flux-framework/flux-restful-api .
+           <pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>ghcr.io/flux-framework/flux-restful-api<span class="w"> </span>.
 </pre>
           </div>
          </div>
@@ -613,7 +613,7 @@ run the server and interact with it. To optionally build the container:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ docker build --build-arg <span class="nv">use_auth</span><span class="o">=</span><span class="nb">true</span> -t ghcr.io/flux-framework/flux-restful-api .
+           <pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>--build-arg<span class="w"> </span><span class="nv">use_auth</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span>-t<span class="w"> </span>ghcr.io/flux-framework/flux-restful-api<span class="w"> </span>.
 </pre>
           </div>
          </div>
@@ -725,7 +725,7 @@ correctly provided auth (or not):
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ docker run --rm -it -p <span class="m">5000</span>:5000 ghcr.io/flux-framework/flux-restful-api
+           <pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>ghcr.io/flux-framework/flux-restful-api
 </pre>
           </div>
          </div>
@@ -746,8 +746,8 @@ correctly provided auth (or not):
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ docker run --name flux-restful -d --rm -it -p <span class="m">5000</span>:5000 ghcr.io/flux-framework/flux-restful-api
-$ docker stop flux-restful
+           <pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>flux-restful<span class="w"> </span>-d<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>ghcr.io/flux-framework/flux-restful-api
+$<span class="w"> </span>docker<span class="w"> </span>stop<span class="w"> </span>flux-restful
 </pre>
           </div>
          </div>
@@ -759,7 +759,7 @@ or your own repository base:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ docker run --env <span class="nv">INSTALL_BRANCH</span><span class="o">=</span>add/feature --env <span class="nv">INSTALL_REPO</span><span class="o">=</span>user/flux-restful-api -d --rm -it -p <span class="m">5000</span>:5000 ghcr.io/flux-framework/flux-restful-api
+           <pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>--env<span class="w"> </span><span class="nv">INSTALL_BRANCH</span><span class="o">=</span>add/feature<span class="w"> </span>--env<span class="w"> </span><span class="nv">INSTALL_REPO</span><span class="o">=</span>user/flux-restful-api<span class="w"> </span>-d<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>ghcr.io/flux-framework/flux-restful-api
 </pre>
           </div>
          </div>
@@ -787,9 +787,9 @@ in a VSCode environment.
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span>$ python -m venv env
-$ <span class="nb">source</span> env/bin/activate
-$ pip install -r requirements.txt
+            <pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>env
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>env/bin/activate
+$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </pre>
            </div>
           </div>
@@ -798,7 +798,7 @@ $ pip install -r requirements.txt
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span>$ pip install -r app-requirements.txt
+            <pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>app-requirements.txt
 </pre>
            </div>
           </div>
@@ -815,7 +815,7 @@ $ pip install -r requirements.txt
           </p>
           <div class="highlight-console notranslate">
            <div class="highlight">
-            <pre><span></span><span class="gp">$ </span>flux start uvicorn app.main:app --host<span class="o">=</span><span class="m">0</span>.0.0.0 --port<span class="o">=</span><span class="m">5000</span>
+            <pre><span></span><span class="gp">$ </span>flux<span class="w"> </span>start<span class="w"> </span>uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
 </pre>
            </div>
           </div>
@@ -824,8 +824,8 @@ $ pip install -r requirements.txt
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span>$ flux start --test-size<span class="o">=</span><span class="m">4</span>
-$ uvicorn app.main:app --host<span class="o">=</span><span class="m">0</span>.0.0.0 --port<span class="o">=</span><span class="m">5000</span>
+            <pre><span></span>$<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>--test-size<span class="o">=</span><span class="m">4</span>
+$<span class="w"> </span>uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
 </pre>
            </div>
           </div>
@@ -834,7 +834,7 @@ $ uvicorn app.main:app --host<span class="o">=</span><span class="m">0</span>.0.
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span>$ make
+            <pre><span></span>$<span class="w"> </span>make
 </pre>
            </div>
           </div>
@@ -856,9 +856,9 @@ a variable that tells the server to use auth:
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span><span class="nb">export</span> <span class="nv">FLUX_USER</span><span class="o">=</span><span class="nv">$USER</span>
-<span class="nb">export</span> <span class="nv">FLUX_TOKEN</span><span class="o">=</span><span class="m">123456</span>
-<span class="nb">export</span> <span class="nv">FLUX_USER_AUTH</span><span class="o">=</span><span class="nb">true</span>
+            <pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_USER</span><span class="o">=</span><span class="nv">$USER</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_TOKEN</span><span class="o">=</span><span class="m">123456</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_USER_AUTH</span><span class="o">=</span><span class="nb">true</span>
 </pre>
            </div>
           </div>
@@ -1011,7 +1011,7 @@ An example setting a server-level option flags is below:
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span><span class="nb">export</span> <span class="nv">FLUX_OPTION_FLAGS</span><span class="o">=</span><span class="s2">"-ompi=openmpi@5"</span>
+            <pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_OPTION_FLAGS</span><span class="o">=</span><span class="s2">"-ompi=openmpi@5"</span>
 </pre>
            </div>
           </div>
@@ -1030,7 +1030,7 @@ An example setting a server-level option flags is below:
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span><span class="nb">export</span> <span class="nv">FLUX_OPTION_FLAGS</span><span class="o">=</span><span class="s2">"-ompi=openmpi@5 -okey=value"</span>
+            <pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_OPTION_FLAGS</span><span class="o">=</span><span class="s2">"-ompi=openmpi@5 -okey=value"</span>
 </pre>
            </div>
           </div>
@@ -1076,7 +1076,7 @@ you can use pre-commit as follows. Here is a manual run:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ pre-commit run --all-files
+           <pre><span></span>$<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
 </pre>
           </div>
          </div>
@@ -1099,7 +1099,7 @@ you can use pre-commit as follows. Here is a manual run:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ pre-commit install
+           <pre><span></span>$<span class="w"> </span>pre-commit<span class="w"> </span>install
 </pre>
           </div>
          </div>
@@ -1148,7 +1148,7 @@ running. E.g., in another terminal:
          </p>
          <div class="highlight-bash notranslate">
           <div class="highlight">
-           <pre><span></span>$ flux start uvicorn app.main:app --host<span class="o">=</span><span class="m">0</span>.0.0.0 --port<span class="o">=</span><span class="m">5000</span>
+           <pre><span></span>$<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
 </pre>
           </div>
          </div>
@@ -1168,7 +1168,7 @@ dependencies (done in devcontainer):
             <pre><span></span><span class="go">cd docs</span>
 <span class="go">pip install -r requirements.txt</span>
 
-<span class="gp"># </span>Build the docs into _build/html
+<span class="gp"># </span>Build<span class="w"> </span>the<span class="w"> </span>docs<span class="w"> </span>into<span class="w"> </span>_build/html
 <span class="go">make html</span>
 </pre>
            </div>
@@ -1202,7 +1202,7 @@ server to preview:
           </p>
           <div class="highlight-console notranslate">
            <div class="highlight">
-            <pre><span></span><span class="gp">$ </span>python -m http.server <span class="m">9999</span>
+            <pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>http.server<span class="w"> </span><span class="m">9999</span>
 </pre>
            </div>
           </div>
@@ -1228,7 +1228,7 @@ of Flux alongside the app) you can do:
           </p>
           <div class="highlight-bash notranslate">
            <div class="highlight">
-            <pre><span></span>$ flux start pytest -xs tests/test_api.py
+            <pre><span></span>$<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>pytest<span class="w"> </span>-xs<span class="w"> </span>tests/test_api.py
 </pre>
            </div>
           </div>
@@ -1309,7 +1309,7 @@ functions from oras-py source code.
        © Copyright 2022, Flux RESTful API Developers.
       </div>
       Last updated on
-              Dec 28, 2022.
+              Jan 21, 2023.
       <br/>
       Created using
       <a href="http://www.sphinx-doc.org/">
