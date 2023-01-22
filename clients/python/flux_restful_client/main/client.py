@@ -1,4 +1,5 @@
 import os
+import time
 from copy import deepcopy
 
 import flux_restful_client.main.schemas as schemas
@@ -6,6 +7,7 @@ import flux_restful_client.utils as utils
 import jsonschema
 import requests
 from flux_restful_client.logger import logger
+from requests.auth import HTTPBasicAuth
 
 from .settings import Settings
 
@@ -36,12 +38,16 @@ class FluxRestfulClient:
         self.headers = {}
         self.quiet = quiet
         self.prefix = prefix
-        if self.user and self.token:
-            self.set_basic_auth(self.user, self.token)
         self.session = requests.Session()
 
     def set_header(self, name, value):
         self.headers.update({name: value})
+
+    def set_bearer_auth(self, token):
+        """
+        Add a token directly to a request
+        """
+        self.set_header("Authorization", "Bearer %s" % token)
 
     def set_basic_auth(self, username, password):
         """
@@ -62,7 +68,15 @@ class FluxRestfulClient:
             self.headers = {}
 
     def do_request(
-        self, endpoint, method="GET", data=None, headers=None, params=None, stream=False
+        self,
+        endpoint,
+        method="GET",
+        data=None,
+        headers=None,
+        params=None,
+        stream=False,
+        timeout=2,
+        attempts=3,
     ):
         """
         Do a request. This is a wrapper around requests.
@@ -70,13 +84,38 @@ class FluxRestfulClient:
         # Always reset headers for new request.
         self.reset()
 
+        basic = None
+        if self.user and self.token:
+            basic = HTTPBasicAuth(self.user, self.token)
+
         headers = headers or self.headers
         url = "%s/%s/%s" % (self.host, self.prefix, endpoint)
 
         # Make the request and return to calling function, unless requires auth
-        response = self.session.request(
-            method, url, params=params, json=data, headers=headers, stream=stream
-        )
+        try:
+            response = self.session.request(
+                method,
+                url,
+                params=params,
+                json=data,
+                headers=headers,
+                stream=stream,
+                auth=basic,
+            )
+        except Exception as e:
+            if attempts > 0:
+                time.sleep(timeout)
+                return self.do_request(
+                    endpoint,
+                    method,
+                    data,
+                    headers,
+                    params,
+                    stream,
+                    timeout=timeout * 2,
+                    attempts=attempts - 1,
+                )
+            raise e
 
         # A 401 response is a request for authentication
         if response.status_code != 401:
@@ -99,8 +138,8 @@ class FluxRestfulClient:
             return False
 
         # If we have a username and password, set basic auth automatically
-        if self.token and self.username:
-            self.set_basic_auth(self.username, self.token)
+        if self.token and self.user:
+            self.set_basic_auth(self.user, self.token)
 
         headers = deepcopy(self.headers)
         if "Authorization" not in headers:
@@ -112,6 +151,7 @@ class FluxRestfulClient:
             return False
 
         # Prepare request to retry
+
         h = utils.parse_auth_header(authHeaderRaw)
         headers.update(
             {
@@ -239,7 +279,6 @@ class FluxRestfulClient:
                 data[optional] = kwargs[optional]
 
         # Validate the data first.
-        print(data)
         jsonschema.validate(data, schema=schemas.job_submit_schema)
         result = self.do_request("jobs/submit", "POST", data=data)
         if result.status_code == 404:
