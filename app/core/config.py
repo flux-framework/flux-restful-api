@@ -70,7 +70,6 @@ class Settings(BaseSettings):
 
     # Assume there is at least one node!
     flux_nodes: int = get_int_envar("FLUX_NUMBER_NODES", 1)
-    # flux_uri: str = os.environ.get("FLUX_URI")
 
     flux_user: str = os.environ.get("FLUX_USER")
     flux_token: str = os.environ.get("FLUX_TOKEN")

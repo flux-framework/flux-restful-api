@@ -40,13 +40,11 @@ def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
     if not settings.flux_user or not settings.flux_token:
         return not_authenticated("Missing FLUX_USER and/or FLUX_TOKEN")
     current_username_bytes = credentials.username.encode("utf8")
-    print(current_username_bytes)
     correct_username_bytes = bytes(settings.flux_user.encode("utf8"))
     is_correct_username = secrets.compare_digest(
         current_username_bytes, correct_username_bytes
     )
     current_password_bytes = credentials.password.encode("utf8")
-    print(current_password_bytes)
 
     correct_password_bytes = bytes(settings.flux_token.encode("utf8"))
     is_correct_password = secrets.compare_digest(
