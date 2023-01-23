@@ -104,7 +104,7 @@ Let's list the nodes in our cluster!
     Listing nodes
     {
         "nodes": [
-            "68d005228015"
+            "57d0f60fce2e"
         ]
     }
 
@@ -137,7 +137,6 @@ Now let's submit a job to Flux.
  .. code-block:: none
 
     😴 Submitting job sleep 60
-    {'command': 'sleep 60'}
 
 
 
@@ -175,23 +174,26 @@ And finally, let's get job info.
 
     🍓 Getting job info...
     {
-        "id": 731352399872,
+        "id": 361295786278912,
         "userid": 0,
         "urgency": 16,
         "priority": 16,
-        "t_submit": 1674331610.0085645,
-        "t_depend": 1674331610.020076,
-        "state": "SCHED",
+        "t_submit": 1668305924.5898263,
+        "t_depend": 1668305924.5898263,
+        "t_run": 1668305924.6036532,
+        "state": "RUN",
         "name": "sleep",
         "ntasks": 1,
         "ncores": 1,
         "duration": 0.0,
-        "nnodes": "",
+        "nnodes": 1,
+        "ranks": "3",
+        "nodelist": "57d0f60fce2e",
+        "expiration": 4821905924.0,
         "result": "",
         "returncode": "",
-        "runtime": 0.0,
+        "runtime": 0.4636096954345703,
         "waitstatus": "",
-        "nodelist": "",
         "exception": {
             "occurred": "",
             "severity": "",
@@ -229,7 +231,6 @@ This will be added to the client
  .. code-block:: none
 
     😴 Submitting job to echo pancakes 🥞🥞🥞
-    {'command': 'echo pancakes are really just morning cakes.'}
     {
         "Output": [
             "pancakes are really just morning cakes.\n"
@@ -264,96 +265,166 @@ Submit the job to flux
  .. code-block:: none
 
     Submitting 3 jobs to sleep!
-    {'command': 'sleep 10'}
-    {'command': 'sleep 20'}
-    {'command': 'sleep 30'}
     {
         "jobs": [
             {
-                "id": 819483115520,
-                "userid": 0,
-                "urgency": 16,
-                "priority": 16,
-                "t_submit": 1674331615.2620142,
-                "t_depend": 1674331615.273345,
-                "state": 8,
-                "name": "sleep",
-                "ntasks": 1,
-                "ncores": 1,
-                "duration": 0.0
+                "id": 361393211572224
             },
             {
-                "id": 819986432000,
-                "userid": 0,
-                "urgency": 16,
-                "priority": 16,
-                "t_submit": 1674331615.291258,
-                "t_depend": 1674331615.3026,
-                "state": 8,
-                "name": "sleep",
-                "ntasks": 1,
-                "ncores": 1,
-                "duration": 0.0
+                "id": 361392691478528
             },
             {
-                "id": 818979799040,
-                "userid": 0,
-                "urgency": 16,
-                "priority": 16,
-                "t_submit": 1674331615.231217,
-                "t_depend": 1674331615.2426803,
-                "t_run": 1674331615.256992,
-                "state": 16,
-                "name": "sleep",
-                "ntasks": 1,
-                "ncores": 1,
-                "duration": 0.0,
-                "nnodes": 1,
-                "ranks": "0",
-                "nodelist": "68d005228015",
-                "expiration": 4827931615.0
+                "id": 361392037167104
             },
             {
-                "id": 731352399872,
-                "userid": 0,
-                "urgency": 16,
-                "priority": 16,
-                "t_submit": 1674331610.0085645,
-                "t_depend": 1674331610.020076,
-                "t_run": 1674331610.0350156,
-                "state": 16,
-                "name": "sleep",
-                "ntasks": 1,
-                "ncores": 1,
-                "duration": 0.0,
-                "nnodes": 1,
-                "ranks": "0",
-                "nodelist": "68d005228015",
-                "expiration": 4827931610.0
+                "id": 361295786278912
             },
             {
-                "id": 731956379648,
-                "userid": 0,
-                "urgency": 16,
-                "priority": 16,
-                "t_submit": 1674331610.0448632,
-                "t_depend": 1674331610.0565822,
-                "t_run": 1674331610.0713265,
-                "t_cleanup": 1674331610.0932524,
-                "t_inactive": 1674331610.0953186,
-                "state": 64,
-                "name": "echo",
-                "ntasks": 1,
-                "ncores": 1,
-                "duration": 0.0,
-                "nnodes": 1,
-                "ranks": "0",
-                "nodelist": "68d005228015",
-                "success": true,
-                "exception_occurred": false,
-                "result": 1,
-                "expiration": 4827931610.0,
-                "waitstatus": 0
+                "id": 360411408891904
+            },
+            {
+                "id": 361304158109696
+            },
+            {
+                "id": 360500059701248
+            },
+            {
+                "id": 360499539607552
+            },
+            {
+                "id": 360499053068288
+            },
+            {
+                "id": 360502072967168
+            },
+            {
+                "id": 360412012871680
+            },
+            {
+                "id": 356049030742016
+            },
+            {
+                "id": 356053023719424
+            },
+            {
+                "id": 356051731873792
+            },
+            {
+                "id": 356051111116800
+            },
+            {
+                "id": 356054131015680
+            },
+            {
+                "id": 356049668276224
+            },
+            {
+                "id": 323743595364352
+            },
+            {
+                "id": 323754819321856
+            },
+            {
+                "id": 323754148233216
+            },
+            {
+                "id": 323752906719232
+            },
+            {
+                "id": 323756681592832
+            },
+            {
+                "id": 323752151744512
+            },
+            {
+                "id": 322373450465280
+            },
+            {
+                "id": 322377242116096
+            },
+            {
+                "id": 322376034156544
+            },
+            {
+                "id": 322375480508416
+            },
+            {
+                "id": 322379221827584
+            },
+            {
+                "id": 322374071222272
+            },
+            {
+                "id": 314610330632192
+            },
+            {
+                "id": 314609810538496
+            },
+            {
+                "id": 313911777689600
+            },
+            {
+                "id": 314609307222016
+            },
+            {
+                "id": 314380113674240
+            },
+            {
+                "id": 310431579111424
+            },
+            {
+                "id": 310434615787520
+            },
+            {
+                "id": 310434011807744
+            },
+            {
+                "id": 310433458159616
+            },
+            {
+                "id": 310443658706944
+            },
+            {
+                "id": 310432183091200
+            },
+            {
+                "id": 306433887305728
+            },
+            {
+                "id": 306436286447616
+            },
+            {
+                "id": 305828548575232
+            },
+            {
+                "id": 306435061710848
+            },
+            {
+                "id": 306434508062720
+            },
+            {
+                "id": 306436873650176
+            },
+            {
+                "id": 244509770252288
+            },
+            {
+                "id": 116794505297920
+            },
+            {
+                "id": 39064489164800
+            },
+            {
+                "id": 38133571780608
+            },
+            {
+                "id": 36512691388416
+            },
+            {
+                "id": 30820953751552
+            },
+            {
+                "id": 26132493631488
             }
         ]
     }
@@ -387,23 +458,26 @@ And this is how to search (with a start, length, or query)
     {
         "data": [
             {
-                "id": 819986432000,
+                "id": 361392691478528,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1674331615.291258,
-                "t_depend": 1674331615.3026,
-                "state": "SCHED",
+                "t_submit": 1668305930.3657866,
+                "t_depend": 1668305930.3657866,
+                "t_run": 1668305930.3788106,
+                "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
                 "ncores": 1,
                 "duration": 0.0,
-                "nnodes": "",
+                "nnodes": 1,
+                "ranks": "3",
+                "nodelist": "57d0f60fce2e",
+                "expiration": 4821905930.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.0,
+                "runtime": 0.09533405303955078,
                 "waitstatus": "",
-                "nodelist": "",
                 "exception": {
                     "occurred": "",
                     "severity": "",
@@ -412,25 +486,25 @@ And this is how to search (with a start, length, or query)
                 }
             },
             {
-                "id": 818979799040,
+                "id": 361392037167104,
                 "userid": 0,
                 "urgency": 16,
                 "priority": 16,
-                "t_submit": 1674331615.231217,
-                "t_depend": 1674331615.2426803,
-                "t_run": 1674331615.256992,
+                "t_submit": 1668305930.331216,
+                "t_depend": 1668305930.331216,
+                "t_run": 1668305930.3446293,
                 "state": "RUN",
                 "name": "sleep",
                 "ntasks": 1,
                 "ncores": 1,
                 "duration": 0.0,
                 "nnodes": 1,
-                "ranks": "0",
-                "nodelist": "68d005228015",
-                "expiration": 4827931615.0,
+                "ranks": "3",
+                "nodelist": "57d0f60fce2e",
+                "expiration": 4821905930.0,
                 "result": "",
                 "returncode": "",
-                "runtime": 0.07028341293334961,
+                "runtime": 0.13027596473693848,
                 "waitstatus": "",
                 "exception": {
                     "occurred": "",
@@ -441,7 +515,7 @@ And this is how to search (with a start, length, or query)
             }
         ],
         "draw": 1,
-        "recordsTotal": 5,
+        "recordsTotal": 53,
         "recordsFiltered": 2
     }
 
@@ -473,10 +547,9 @@ Finally, let's submit and cancel a job
  .. code-block:: none
 
     Submitting job sleep 60 intending to cancel..
-    {'command': 'sleep 60'}
     {
         "Message": "Job submit.",
-        "id": 820724629504
+        "id": 361395661045760
     }
     Requesting job cancel..
     {
@@ -512,7 +585,7 @@ And this would be how you stop your cluster service
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.601 seconds)
+   **Total running time of the script:** ( 0 minutes  6.262 seconds)
 
 
 .. _sphx_glr_download_auto_examples_api_tutorial.py:
