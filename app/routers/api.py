@@ -113,7 +113,7 @@ async def list_nodes():
     rpc = flux.resource.list.resource_list(app.handle)
     listing = rpc.get()
     nodes = jsonable_encoder(
-        {"nodes": list({str(node) for node in listing.free.nodelist})}
+        {"nodes": list({str(node) for node in listing.up.nodelist})}
     )
     return JSONResponse(content=nodes, status_code=200)
 
