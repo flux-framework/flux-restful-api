@@ -25,6 +25,8 @@ class FluxRestfulClient:
         quiet=False,
         settings_file=None,
         prefix="v1",
+        attempts=5,
+        timeout=2,
         **kwargs,
     ):
 
@@ -38,6 +40,8 @@ class FluxRestfulClient:
         self.headers = {}
         self.quiet = quiet
         self.prefix = prefix
+        self.attempts = attempts
+        self.timeout = timeout
         self.session = requests.Session()
 
     def set_header(self, name, value):
@@ -75,12 +79,15 @@ class FluxRestfulClient:
         headers=None,
         params=None,
         stream=False,
-        timeout=2,
-        attempts=3,
+        timeout=None,
+        attempts=None,
     ):
         """
         Do a request. This is a wrapper around requests.
         """
+        attempts = self.attempts if attempts is None else attempts
+        timeout = self.timeout if timeout is None else timeout
+
         # Always reset headers for new request.
         self.reset()
 
