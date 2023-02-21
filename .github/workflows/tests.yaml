@@ -38,7 +38,7 @@ jobs:
         export FLUX_ENABLE_PAM=true
         flux start pytest -xs tests/test_api.py
         # Create the user and pass (should be successful)
-        sudo useradd -m -p $(openssl passwd '12345') "fluxuser"
+        sudo useradd -m -p $(openssl passwd '12345') "fluxuser" || echo "Already exists."
         export TEST_PAM_AUTH=true
         export TEST_PAM_AUTH_FAIL=false
         flux start pytest -xs tests/test_api.py
