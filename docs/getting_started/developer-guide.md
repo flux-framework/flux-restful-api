@@ -45,6 +45,7 @@ $ docker run --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
 ```
 ```console
 🍓 Require auth: True
+🍓     PAM auth: False
 🍓    Flux user: ********
 🍓   Flux token: *****
 INFO:     Started server process [72]
@@ -88,7 +89,7 @@ $ pip install -r requirements.txt
 Install requirements (note that you also need Flux Python available, which isn't in these requirements as you cannot install from pip).
 
 ```bash
-$ pip install -r app-requirements.txt
+$ pip install -r requirements.txt
 ```
 
 #### 2. Start Service
@@ -122,8 +123,17 @@ a variable that tells the server to use auth:
 ```bash
 export FLUX_USER=$USER
 export FLUX_TOKEN=123456
-export FLUX_USER_AUTH=true
+export FLUX_REQUIRE_AUTH=true
 ```
+
+As an alternative, you can enable PAM authentication to use user accounts on the running server:
+
+```bash
+export FLUX_ENABLE_PAM=true
+export FLUX_REQUIRE_AUTH=true
+```
+
+Authentication must be enabled for PAM to work too - you can't just enable the first.
 
 ### Interactions
 
@@ -149,7 +159,7 @@ The following variables are available (with their defaults):
 |FLUX_HAS_GPU | GPUs are available for the user to request | unset |
 |FLUX_NUMBER_NODES| The number of nodes available in the cluster | 1 |
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
-
+|FLUX_ENABLE_PAM | Enable PAM authentication (e.g., username and password must be users on the running server) | unset |
 ### Flux Option Flags
 
 Option flags can be set server-wide or on the fly by a user in the interface

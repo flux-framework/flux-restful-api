@@ -21,6 +21,7 @@ def not_authenticated(detail="Incorrect user or token."):
 
 def alert_auth():
     print("🍓 Require auth: %s" % settings.require_auth)
+    print("🍓     PAM auth: %s" % settings.enable_pam)
     print(
         "🍓    Flux user: %s" % ("*" * len(settings.flux_user))
         if settings.flux_user
@@ -33,19 +34,44 @@ def alert_auth():
     )
 
 
+def check_pam_auth(credentials: HTTPBasicCredentials = Depends(security)):
+    """
+    Check base64 encoded auth (this is HTTP Basic auth.)
+    """
+    # Ensure we have pam installed
+    try:
+        import pam
+    except ImportError:
+        logger.error("python-pam is required for PAM.")
+        return
+
+    username = credentials.username.encode("utf8")
+    password = credentials.password.encode("utf8")
+    if pam.authenticate(username, password) is True:
+        return credentials.username
+
+
 def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
     """
     Check base64 encoded auth (this is HTTP Basic auth.)
     """
+    # First try to authenticate with PAM, if allowed.
+    if settings.enable_pam:
+        # Return the username if PAM authentication is successful
+        username = check_pam_auth(credentials)
+        if username:
+            return username
+
+    # If we get here, we require the flux user and token
     if not settings.flux_user or not settings.flux_token:
         return not_authenticated("Missing FLUX_USER and/or FLUX_TOKEN")
+
     current_username_bytes = credentials.username.encode("utf8")
     correct_username_bytes = bytes(settings.flux_user.encode("utf8"))
     is_correct_username = secrets.compare_digest(
         current_username_bytes, correct_username_bytes
     )
     current_password_bytes = credentials.password.encode("utf8")
-
     correct_password_bytes = bytes(settings.flux_token.encode("utf8"))
     is_correct_password = secrets.compare_digest(
         current_password_bytes, correct_password_bytes

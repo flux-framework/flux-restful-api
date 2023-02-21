@@ -179,7 +179,6 @@ def list_jobs_detailed(limit=None, query=None):
     ids = listing.get()["jobs"]
     jobs = {}
     for job in ids:
-
         # Stop if a limit is defined and we have hit it!
         if limit is not None and len(jobs) >= limit:
             break

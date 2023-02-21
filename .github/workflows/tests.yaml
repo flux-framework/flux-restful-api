@@ -30,5 +30,15 @@ jobs:
     - name: Run tests
       run: |
         flux start pytest -xs tests/test_api.py
+        export FLUX_REQUIRE_AUTH=true
         export TEST_AUTH=true
+        flux start pytest -xs tests/test_api.py
+        export TEST_PAM_AUTH=true
+        export TEST_PAM_AUTH_FAIL=true
+        export FLUX_ENABLE_PAM=true
+        flux start pytest -xs tests/test_api.py
+        # Create the user and pass (should be successful)
+        sudo useradd -m -p $(openssl passwd '12345') "fluxuser"
+        export TEST_PAM_AUTH=true
+        export TEST_PAM_AUTH_FAIL=false
         flux start pytest -xs tests/test_api.py

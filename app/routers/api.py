@@ -90,7 +90,6 @@ async def list_jobs(request: Request):
 
     # Does the requester want details - in dict or listing form?
     if helpers.has_boolean_arg(payload, "details"):
-
         # Job limit (only relevant for details)
         limit = helpers.get_int_arg(payload, "limit")
 

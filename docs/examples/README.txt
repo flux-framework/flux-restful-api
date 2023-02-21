@@ -1,9 +1,9 @@
 .. _examples-index:
 
-Tutorials
-=========
+Examples
+========
 
-This is the Flux RESTFul API tutorials gallery that renders from our Python
+This is the Flux RESTFul API examples gallery that renders from our Python
 script examples!
 
 .. _api_examples:

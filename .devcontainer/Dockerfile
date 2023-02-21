@@ -23,6 +23,8 @@ RUN python3 -m venv /env && \
     . /env/bin/activate && \
     pip install -r /requirements.txt && \
     pip install -r /dev-requirements.txt && \
-    pip install -r /docs-requirements.txt
+    pip install -r /docs-requirements.txt && \
+    # Only for development - don't add this to a production container
+    sudo useradd -m -p $(openssl passwd '12345') "flux"
 
 ENV PATH=/env/bin:${PATH}

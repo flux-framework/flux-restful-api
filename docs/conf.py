@@ -54,8 +54,6 @@ extensions = [
     "sphinx_immaterial.graphviz",
     "nbsphinx",
     "sphinx_markdown_tables",
-    "sphinx_copybutton",
-    "sphinx_search.extension",
 ]
 
 autosummary_generate = True
@@ -110,7 +108,6 @@ html_css_files = ["custom.css"]
 
 # Custom sphinx material variables
 theme_logo_icon = "images/oras.png"
-
 
 # material theme options (see theme.conf for more information)
 html_theme_options = {

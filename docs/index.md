@@ -27,7 +27,7 @@ Would you like to request a feature or contribute?
 ```{toctree}
 :maxdepth: 1
 getting_started/index.md
-auto_examples/index
+tutorials/index
 contributing.md
 about/license
 ```
