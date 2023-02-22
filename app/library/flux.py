@@ -7,7 +7,18 @@ import time
 import flux
 import flux.job
 
+import app.library.terminal as terminal
 from app.core.config import settings
+
+
+def submit_job(handle, jobspec, user):
+    """
+    Handle to submit a job, either with flux job submit or on behalf of user.
+    """
+    # We've enabled PAM auth
+    if settings.enable_pam:
+        return terminal.submit_job(jobspec, user)
+    return flux.job.submit_async(handle, jobspec)
 
 
 def validate_submit_kwargs(kwargs, envars=None, runtime=None):
@@ -90,8 +101,13 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     # A duration of zero (the default) means unlimited
     fluxjob.duration = runtime
 
+    # If we are running as the user, we don't want the current (root) environment
+    if settings.enable_pam:
+        environment = {}
+    else:
+        environment = dict(os.environ)
+
     # Additional envars in the payload?
-    environment = dict(os.environ)
     environment.update(envars)
     fluxjob.environment = environment
     return fluxjob
@@ -147,12 +163,16 @@ def cancel_job(jobid):
     return "Job is requested to cancel.", 200
 
 
-def get_job_output(jobid, delay=None):
+def get_job_output(jobid, user, delay=None):
     """
     Given a jobid, get the output.
 
     If there is a delay, we are requesting on demand, so we want to return early.
     """
+    # We've enabled PAM auth
+    if settings.enable_pam:
+        return terminal.get_job_output(jobid, user, delay=delay)
+
     lines = []
     start = time.time()
     from app.main import app
@@ -214,10 +234,14 @@ def get_simple_job(jobid):
     return json.loads(info.get_str())["job"]
 
 
-def get_job(jobid):
+def get_job(jobid, user):
     """
     Get details for a job
     """
+    # We've enabled PAM auth
+    if settings.enable_pam:
+        return terminal.get_job(jobid, user)
+
     from app.main import app
 
     payload = {"id": int(jobid), "attrs": ["all"]}

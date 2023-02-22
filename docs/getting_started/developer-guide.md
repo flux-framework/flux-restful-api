@@ -112,8 +112,50 @@ For the latter, you can also use the Makefile:
 ```bash
 $ make
 ```
+
 If you are developing, you must do the second approach as the server won't live-update
-with the first.
+with the first. If you want to start flux running with systemd:
+
+(note this isn't currently working):
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable flux.service
+sudo systemctl start flux.service
+```
+Make sure it is running:
+```bash
+$ sudo systemctl status flux
+```
+
+Instead I did:
+
+```bash
+/usr/bin/bash -c '\
+  XDG_RUNTIME_DIR=/run/user/$UID \
+  DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$UID/bus \
+  /usr/bin/flux broker \
+  --config-path=/etc/flux/system/conf.d \
+  -Scron.directory=/etc/flux/system/cron.d \
+  -Srundir=/run/flux \
+  -Sstatedir=${STATE_DIRECTORY:-/var/lib/flux} \
+  -Slocal-uri=local:///run/flux/local \
+  -Slog-stderr-level=6 \
+  -Slog-stderr-mode=local \
+  -Sbroker.rc2_none \
+  -Sbroker.quorum=0 \
+  -Sbroker.quorum-timeout=none \
+  -Sbroker.exit-norestart=42 \
+  -Scontent.restore=auto \
+' &
+```
+
+And then:
+
+```bash
+export FLUX_URI=local:///run/flux/local
+$ sudo make
+```
 
 #### 3. Authentication
 
@@ -133,7 +175,8 @@ export FLUX_ENABLE_PAM=true
 export FLUX_REQUIRE_AUTH=true
 ```
 
-Authentication must be enabled for PAM to work too - you can't just enable the first.
+Authentication must be enabled for PAM to work too - you can't just enable the first. For the latter (multi-user)
+flux needs to be started first (e.g., the instance or broker) and then the actual server needs to be started by root.
 
 ### Interactions
 
@@ -160,6 +203,7 @@ The following variables are available (with their defaults):
 |FLUX_NUMBER_NODES| The number of nodes available in the cluster | 1 |
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
 |FLUX_ENABLE_PAM | Enable PAM authentication (e.g., username and password must be users on the running server) | unset |
+
 ### Flux Option Flags
 
 Option flags can be set server-wide or on the fly by a user in the interface

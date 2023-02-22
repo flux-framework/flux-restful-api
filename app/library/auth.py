@@ -42,7 +42,7 @@ def check_pam_auth(credentials: HTTPBasicCredentials = Depends(security)):
     try:
         import pam
     except ImportError:
-        logger.error("python-pam is required for PAM.")
+        print("python-pam is required for PAM.")
         return
 
     username = credentials.username.encode("utf8")
@@ -57,14 +57,16 @@ def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
     """
     # First try to authenticate with PAM, if allowed.
     if settings.enable_pam:
+        print("🧾️ Checking PAM auth...")
         # Return the username if PAM authentication is successful
         username = check_pam_auth(credentials)
         if username:
+            print("🧾️ Success!")
             return username
 
     # If we get here, we require the flux user and token
     if not settings.flux_user or not settings.flux_token:
-        return not_authenticated("Missing FLUX_USER and/or FLUX_TOKEN")
+        return not_authenticated("Missing FLUX_USER and/or FLUX_TOKEN or pam headers")
 
     current_username_bytes = credentials.username.encode("utf8")
     correct_username_bytes = bytes(settings.flux_user.encode("utf8"))

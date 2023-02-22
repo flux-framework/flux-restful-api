@@ -127,7 +127,7 @@ async def cancel_job(jobid):
 
 
 @router.post("/jobs/submit")
-async def submit_job(request: Request):
+async def submit_job(request: Request, user=Depends(check_auth)):
     """
     Submit a job to our running cluster.
 
@@ -183,6 +183,7 @@ async def submit_job(request: Request):
     # Are we using a launcher instead?
     is_launcher = payload.get("is_launcher", False)
     if is_launcher:
+        print("TODO need to test multi-user")
         message = launcher.launch(kwargs, workdir=workdir, envars=envars)
         result = jsonable_encoder({"Message": message, "id": "MANY"})
     else:
@@ -191,7 +192,8 @@ async def submit_job(request: Request):
             fluxjob = flux_cli.prepare_job(
                 kwargs, runtime=runtime, workdir=workdir, envars=envars
             )
-            flux_future = flux.job.submit_async(app.handle, fluxjob)
+            # This handles either a single/multi user case
+            flux_future = flux_cli.submit_job(app.handle, fluxjob, user)
         except Exception as e:
             result = jsonable_encoder(
                 {"Message": "There was an issue submitting that job.", "Error": str(e)}
@@ -205,21 +207,21 @@ async def submit_job(request: Request):
 
 
 @router.get("/jobs/{jobid}")
-async def get_job(jobid):
+async def get_job(jobid, user=Depends(check_auth)):
     """
     Get job info based on id.
     """
-    info = flux_cli.get_job(jobid)
+    info = flux_cli.get_job(jobid, user)
     info = jsonable_encoder(info)
     return JSONResponse(content=info, status_code=200)
 
 
 @router.get("/jobs/{jobid}/output")
-async def get_job_output(jobid):
+async def get_job_output(jobid, user=Depends(check_auth)):
     """
     Get job output based on id.
     """
-    lines = flux_cli.get_job_output(jobid)
+    lines = flux_cli.get_job_output(jobid, user=user)
 
     # We have output
     if lines:
