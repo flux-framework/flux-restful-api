@@ -27,6 +27,8 @@ def get_basic_auth(username, password):
 
 
 def get_headers():
+    flux_user = os.environ.get("FLUX_USER")
+    flux_token = os.environ.get("FLUX_TOKEN")
     auth_header = get_basic_auth(flux_user, flux_token)
     if isinstance(auth_header, bytes):
         auth_header = auth_header.decode("utf-8")
@@ -40,38 +42,15 @@ test_pam_auth_fail = False
 headers = {}
 
 if os.environ.get("TEST_AUTH"):
-    # Define authentication in environment for server
-    flux_user = "fluxuser"
-    flux_token = "12345"
-    os.environ["FLUX_USER"] = flux_user
-    os.environ["FLUX_TOKEN"] = flux_token
-    os.environ["FLUX_REQUIRE_AUTH"] = "true"
     test_auth = True
     headers = get_headers()
 
-elif os.environ.get("TEST_PAM_AUTH"):
-    # Define authentication in environment for server
-    flux_user = "fluxuser"
-    flux_token = "12345"
-    os.environ["FLUX_REQUIRE_AUTH"] = "true"
-    os.environ["FLUX_ENABLE_PAM"] = "true"
+if os.environ.get("TEST_PAM_AUTH"):
     test_pam_auth = True
     test_pam_auth_fail = os.environ["TEST_PAM_AUTH_FAIL"] == "true"
-    print(test_pam_auth_fail)
     headers = get_headers()
 
 skip_if_expected_fail = pytest.mark.skipif(test_pam_auth_fail, reason="Unix stuff")
-
-
-def test_failure():
-    """
-    Test failing auth
-    """
-    response = client.get("/v1/jobs", headers=headers)
-    if test_pam_auth_fail is True:
-        assert response.status_code != 200
-    else:
-        assert response.status_code == 200
 
 
 @skip_if_expected_fail

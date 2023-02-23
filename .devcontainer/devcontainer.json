@@ -25,5 +25,5 @@
       },
     },
     // Needed for git security feature, and flux config
-    "postStartCommand": "git config --global --add safe.directory /workspaces/flux-python-api && flux R encode --hosts=$(hostname) > /etc/flux/system/R && sed -i 's@HOSTNAME@'$(hostname)'@' /etc/flux/system/conf.d/broker.toml"
+    "postStartCommand": "git config --global --add safe.directory /workspaces/flux-python-api && flux R encode --hosts=$(hostname) > /etc/flux/system/R && sed -i 's@HOSTNAME@'$(hostname)'@' /etc/flux/system/conf.d/broker.toml && sudo service munge start"
   }

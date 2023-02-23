@@ -12,12 +12,12 @@
     <div class="row">
         <div class="col">
             <h3>Submit a Job</h3>
+            {% if form.errors %}<div class="row"><div class="mb-3">{% for error in form.errors %}
+                <p class="alert alert-danger alert-dismissible">{{ error }}</p>{% endfor %}
+            </div></div>{% endif %}
             <form id="submitform" method="POST">
                 <button type="submit" class="btn btn-info" style="float:right; margin-bottom:5px">Submit</button>
                 <a href="/jobs" type="button" class="btn btn-info" style="float:right; margin-bottom:5px; margin-right:5px">View Jobs</a>
-                {% if form.errors %}<div class="mb-3">{% for error in form.errors %}
-                    <p class="alert alert-danger alert-dismissible">{{ error }}</p>{% endfor %}
-                </div>{% endif %}
                 <div class="mb-3">
                   <label for="command" class="form-label">Command</label>
                   <input class="form-control" name="command" id="command" aria-describedby="commandHelp" {% if form.command %}value="{{ form.command }}"{% endif %} required>

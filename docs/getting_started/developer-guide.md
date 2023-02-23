@@ -114,27 +114,10 @@ $ make
 ```
 
 If you are developing, you must do the second approach as the server won't live-update
-with the first. If you want to start flux running with systemd:
-
-(note this isn't currently working):
+with the first. If you want to start flux running as a separate process:
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable flux.service
-sudo systemctl start flux.service
-```
-Make sure it is running:
-```bash
-$ sudo systemctl status flux
-```
-
-Instead I did:
-
-```bash
-/usr/bin/bash -c '\
-  XDG_RUNTIME_DIR=/run/user/$UID \
-  DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$UID/bus \
-  /usr/bin/flux broker \
+sudo -u flux /usr/bin/flux broker \
   --config-path=/etc/flux/system/conf.d \
   -Scron.directory=/etc/flux/system/cron.d \
   -Srundir=/run/flux \
@@ -146,15 +129,20 @@ Instead I did:
   -Sbroker.quorum=0 \
   -Sbroker.quorum-timeout=none \
   -Sbroker.exit-norestart=42 \
-  -Scontent.restore=auto \
-' &
+  -Scontent.restore=auto &
 ```
 
-And then:
+And then we need munge to be started (this should be done by the devcontainer):
+
+```bash
+$ sudo service munge start
+```
+
+And export any authentication envars you need before running make.
 
 ```bash
 export FLUX_URI=local:///run/flux/local
-$ sudo make
+$ sudo -E make
 ```
 
 #### 3. Authentication

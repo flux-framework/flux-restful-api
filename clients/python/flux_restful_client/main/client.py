@@ -160,7 +160,6 @@ class FluxRestfulClient:
         h = utils.parse_auth_header(authHeaderRaw)
         headers.update(
             {
-                "service": h.Service,
                 "Accept": "application/json",
                 "User-Agent": "flux-restful-client",
             }
