@@ -58,5 +58,5 @@ jobs:
         export TEST_PAM_AUTH=true
         export FLUX_REQUIRE_AUTH=true
         export TEST_PAM_AUTH_FAIL=false
-        sudo -E -u fluxuser pytest -xs tests/test_api.py
+        sudo -E PATH=PATH -E PYTHONPATH=PYTHONPATH -u fluxuser pytest -xs tests/test_api.py
         kill -9 $pid
