@@ -82,4 +82,4 @@ jobs:
         sudo useradd -m -p $(openssl passwd '12345') "fluxuser" || echo "Already exists."
         flux start sleep infinity &
         pid=$!
-        sudo -E -u fluxuser  pytest -xs flux_restful_client/tests/test_api.py
+        sudo -E PATH=PATH -E PYTHONPATH=PYTHONPATH -u fluxuser pytest -xs flux_restful_client/tests/test_api.py
