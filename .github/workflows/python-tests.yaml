@@ -59,27 +59,3 @@ jobs:
         export FLUX_USER=fluxuser
         export FLUX_TOKEN=12345
         pytest -xs flux_restful_client/tests/test_api.py
-
-  test-pam-auth:
-    needs: [prepare-container]
-    runs-on: ubuntu-latest
-    services:
-      api:
-        env:
-          INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
-          INSTALL_REPO: ${{ github.repository }}
-          FLUX_ENABLE_PAM: true
-          FLUX_REQUIRE_AUTH: true
-        image: ghcr.io/flux-framework/flux-restful-api:latest
-        ports:
-          - 5000:5000
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run tests with auth
-      run: |
-        cd clients/python
-        pip install -e .[all]
-        sudo useradd -m -p $(openssl passwd '12345') "fluxuser" || echo "Already exists."
-        flux start sleep infinity &
-        pid=$!
-        sudo -E PATH=PATH -E PYTHONPATH=PYTHONPATH -u fluxuser pytest -xs flux_restful_client/tests/test_api.py

@@ -52,11 +52,5 @@ jobs:
         flux start sleep infinity &
         pid=$!
 
-        sudo useradd -m -p $(openssl passwd '12345') "fluxuser" || echo "Already exists."
-        unset FLUX_USER
-        unset FLUX_TOKEN
-        export TEST_PAM_AUTH=true
-        export FLUX_REQUIRE_AUTH=true
-        export TEST_PAM_AUTH_FAIL=false
-        sudo -E PATH=PATH -E PYTHONPATH=PYTHONPATH -u fluxuser pytest -xs tests/test_api.py
-        kill -9 $pid
+        # TODO how to test pam in this mode?
+        # We would need to start flux as flux and run tests as a user
