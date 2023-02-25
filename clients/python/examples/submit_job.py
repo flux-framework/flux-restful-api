@@ -8,6 +8,8 @@ from flux_restful_client.main import get_client
 def main():
     cli = get_client()
 
+    # To set basic auth for token/user
+    cli.set_basic_auth("flux", "12345")
     # Submit the job to flux
     print("😴 Submitting job sleep 60")
     res = cli.submit(command=["sleep", 60])

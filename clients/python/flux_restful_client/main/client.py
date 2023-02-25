@@ -29,7 +29,6 @@ class FluxRestfulClient:
         timeout=2,
         **kwargs,
     ):
-
         # If we don't have default settings, load
         if not hasattr(self, "settings"):
             self.settings = Settings(settings_file)
@@ -141,7 +140,6 @@ class FluxRestfulClient:
         """
         authHeaderRaw = originalResponse.headers.get("Www-Authenticate")
         if not authHeaderRaw:
-
             return False
 
         # If we have a username and password, set basic auth automatically
@@ -162,7 +160,6 @@ class FluxRestfulClient:
         h = utils.parse_auth_header(authHeaderRaw)
         headers.update(
             {
-                "service": h.Service,
                 "Accept": "application/json",
                 "User-Agent": "flux-restful-client",
             }
@@ -280,7 +277,6 @@ class FluxRestfulClient:
             "workdir",
             "envars",
         ]:
-
             # Assume if it's provided, period, the user wants to set it!
             if optional in kwargs:
                 data[optional] = kwargs[optional]

@@ -12,6 +12,7 @@ any questions or issues, please [let us know](https://github.com/flux-framework/
 :maxdepth: 3
 user-guide
 developer-guide
+tutorials
 interface
 api
 ```

@@ -1,0 +1,48 @@
+[Unit]
+Description=Flux message broker
+Wants=munge.service
+
+[Service]
+TimeoutStopSec=90
+KillMode=mixed
+ExecStart=/usr/bin/bash -c '\
+  XDG_RUNTIME_DIR=/run/user/$UID \
+  DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$UID/bus \
+  /usr/bin/flux broker \
+  --config-path=/etc/flux/system/conf.d \
+  -Scron.directory=/etc/flux/system/cron.d \
+  -Srundir=/run/flux \
+  -Sstatedir=${STATE_DIRECTORY:-/var/lib/flux} \
+  -Slocal-uri=local:///run/flux/local \
+  -Slog-stderr-level=6 \
+  -Slog-stderr-mode=local \
+  -Sbroker.rc2_none \
+  -Sbroker.quorum=0 \
+  -Sbroker.quorum-timeout=none \
+  -Sbroker.exit-norestart=42 \
+  -Scontent.restore=auto \
+'
+SyslogIdentifier=flux
+ExecReload=/usr/bin/flux config reload
+Restart=always
+RestartSec=5s
+RestartPreventExitStatus=42
+User=flux
+Group=flux
+RuntimeDirectory=flux
+RuntimeDirectoryMode=0755
+StateDirectory=flux
+StateDirectoryMode=0700
+PermissionsStartOnly=true
+# ExecStartPre=/usr/bin/loginctl enable-linger flux
+# ExecStartPre=/usr/bin/bash -c 'systemctl start user@$(id -u flux).service'
+
+#
+# Delegate cgroup control to user flux, so that systemd doesn't reset
+#  cgroups for flux initiated processes, and to allow (some) cgroup
+#  manipulation as user flux.
+#
+Delegate=yes
+
+[Install]
+WantedBy=multi-user.target

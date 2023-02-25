@@ -29,6 +29,23 @@ jobs:
       run: pip install -r requirements.txt
     - name: Run tests
       run: |
+        # Tests for the API with auth disabled
         flux start pytest -xs tests/test_api.py
+
+        # Tests for the API with single user auth
+        export FLUX_REQUIRE_AUTH=true
         export TEST_AUTH=true
+        export FLUX_USER=fluxuser
+        export FLUX_TOKEN=12345
         flux start pytest -xs tests/test_api.py
+
+        # Tests for the API with multi-user auth, but fail because user not created
+        unset FLUX_USER
+        unset FLUX_TOKEN
+        export TEST_PAM_AUTH=true
+        export TEST_PAM_AUTH_FAIL=true
+        export FLUX_ENABLE_PAM=true
+        flux start pytest -xs tests/test_api.py
+
+        # TODO how to test pam in this mode?
+        # We would need to start flux as flux and run tests as a user

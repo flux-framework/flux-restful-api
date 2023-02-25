@@ -6,7 +6,6 @@ from flux_restful_client.main import get_client
 
 
 def main(args, parser, extra, subparser):
-
     # If nothing provided, show help
     if not args.params:
         print(subparser.format_help())

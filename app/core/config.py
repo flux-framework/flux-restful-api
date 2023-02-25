@@ -67,6 +67,7 @@ class Settings(BaseSettings):
 
     # These map to envars, e.g., FLUX_USER
     has_gpus: bool = get_bool_envar("FLUX_HAS_GPUS")
+    enable_pam: bool = get_bool_envar("FLUX_ENABLE_PAM")
 
     # Assume there is at least one node!
     flux_nodes: int = get_int_envar("FLUX_NUMBER_NODES", 1)

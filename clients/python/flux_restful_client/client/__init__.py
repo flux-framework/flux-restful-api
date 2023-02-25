@@ -208,7 +208,6 @@ flux-restful-cli config inituser""",
 
 
 def run_flux_restful_client():
-
     parser = get_parser()
 
     def help(return_code=0):

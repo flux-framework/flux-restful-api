@@ -1,5 +1,4 @@
 def main(args, parser, extra, subparser):
-
     lookup = {"ipython": ipython, "python": python, "bpython": bpython}
     shells = ["ipython", "python", "bpython"]
 

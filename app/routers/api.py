@@ -24,6 +24,9 @@ router = APIRouter(
 )
 no_auth_router = APIRouter(prefix="/v1", tags=["jobs"])
 
+# Require auth (and the user in the view)
+user_auth = Depends(check_auth) if config.settings.require_auth else None
+
 templates = Jinja2Templates(directory="templates/")
 
 
@@ -39,7 +42,7 @@ async def service_stop():
 
 
 @router.get("/jobs/search")
-async def jobs_listing(request: Request):
+async def jobs_listing(request: Request, user=user_auth):
     """
     Jobslist is intended to be used by the server to render data tables
 
@@ -53,7 +56,7 @@ async def jobs_listing(request: Request):
     )
 
     # If we have a query, filter to those that have in the name
-    jobs = list(flux_cli.list_jobs_detailed().values())
+    jobs = list(flux_cli.list_jobs_detailed(user=user).values())
     total = len(jobs)
 
     # Now filter
@@ -79,7 +82,7 @@ async def jobs_listing(request: Request):
 
 
 @router.get("/jobs")
-async def list_jobs(request: Request):
+async def list_jobs(request: Request, user=user_auth):
     """
     List flux jobs associated with the handle.
     """
@@ -90,15 +93,14 @@ async def list_jobs(request: Request):
 
     # Does the requester want details - in dict or listing form?
     if helpers.has_boolean_arg(payload, "details"):
-
         # Job limit (only relevant for details)
         limit = helpers.get_int_arg(payload, "limit")
 
-        jobs = flux_cli.list_jobs_detailed(limit)
+        jobs = flux_cli.list_jobs_detailed(limit=limit, user=user)
         if helpers.has_boolean_arg(payload, "listing"):
             jobs = list(jobs.values())
     else:
-        listing = flux_cli.list_jobs()
+        listing = flux_cli.list_jobs(user=user)
         jobs = jsonable_encoder({"jobs": listing.get_jobs()})
     return JSONResponse(content=jobs, status_code=200)
 
@@ -119,16 +121,18 @@ async def list_nodes():
 
 
 @router.post("/jobs/{jobid}/cancel")
-async def cancel_job(jobid):
+async def cancel_job(jobid, user=user_auth):
     """
     Cancel a running flux job
     """
-    message, return_code = flux_cli.cancel_job(jobid)
-    return JSONResponse(content={"Message": message}, status_code=return_code)
+    message, return_code = flux_cli.cancel_job(jobid, user)
+    return JSONResponse(
+        content={"Message": message, "id": jobid}, status_code=return_code
+    )
 
 
 @router.post("/jobs/submit")
-async def submit_job(request: Request):
+async def submit_job(request: Request, user=user_auth):
     """
     Submit a job to our running cluster.
 
@@ -184,6 +188,7 @@ async def submit_job(request: Request):
     # Are we using a launcher instead?
     is_launcher = payload.get("is_launcher", False)
     if is_launcher:
+        print("TODO need to test multi-user")
         message = launcher.launch(kwargs, workdir=workdir, envars=envars)
         result = jsonable_encoder({"Message": message, "id": "MANY"})
     else:
@@ -192,7 +197,8 @@ async def submit_job(request: Request):
             fluxjob = flux_cli.prepare_job(
                 kwargs, runtime=runtime, workdir=workdir, envars=envars
             )
-            flux_future = flux.job.submit_async(app.handle, fluxjob)
+            # This handles either a single/multi user case
+            flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         except Exception as e:
             result = jsonable_encoder(
                 {"Message": "There was an issue submitting that job.", "Error": str(e)}
@@ -206,21 +212,21 @@ async def submit_job(request: Request):
 
 
 @router.get("/jobs/{jobid}")
-async def get_job(jobid):
+async def get_job(jobid, user=user_auth):
     """
     Get job info based on id.
     """
-    info = flux_cli.get_job(jobid)
+    info = flux_cli.get_job(jobid, user=user)
     info = jsonable_encoder(info)
     return JSONResponse(content=info, status_code=200)
 
 
 @router.get("/jobs/{jobid}/output")
-async def get_job_output(jobid):
+async def get_job_output(jobid, user=user_auth):
     """
     Get job output based on id.
     """
-    lines = flux_cli.get_job_output(jobid)
+    lines = flux_cli.get_job_output(jobid, user=user)
 
     # We have output
     if lines:

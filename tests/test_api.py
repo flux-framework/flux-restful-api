@@ -3,6 +3,7 @@ import os
 import sys
 import time
 
+import pytest
 from fastapi.testclient import TestClient
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -26,6 +27,8 @@ def get_basic_auth(username, password):
 
 
 def get_headers():
+    flux_user = os.environ.get("FLUX_USER")
+    flux_token = os.environ.get("FLUX_TOKEN")
     auth_header = get_basic_auth(flux_user, flux_token)
     if isinstance(auth_header, bytes):
         auth_header = auth_header.decode("utf-8")
@@ -34,19 +37,23 @@ def get_headers():
 
 # Do we want auth?
 test_auth = False
+test_pam_auth = False
+test_pam_auth_fail = False
 headers = {}
-if os.environ.get("TEST_AUTH"):
 
-    # Define authentication in environment for server
-    flux_user = "fluxuser"
-    flux_token = "12345"
-    os.environ["FLUX_USER"] = flux_user
-    os.environ["FLUX_TOKEN"] = flux_token
-    os.environ["FLUX_REQUIRE_AUTH"] = "true"
+if os.environ.get("TEST_AUTH"):
     test_auth = True
     headers = get_headers()
 
+if os.environ.get("TEST_PAM_AUTH"):
+    test_pam_auth = True
+    test_pam_auth_fail = os.environ["TEST_PAM_AUTH_FAIL"] == "true"
+    headers = get_headers()
 
+skip_if_expected_fail = pytest.mark.skipif(test_pam_auth_fail, reason="Unix stuff")
+
+
+@skip_if_expected_fail
 def test_submit_list_job():
     """
     Test a manual submission
@@ -102,8 +109,8 @@ def test_submit_list_job():
     assert not result
 
 
+@skip_if_expected_fail
 def test_cancel_job():
-
     # Now submit a job, ensure we get one job back
     response = client.post(
         "/v1/jobs/submit", json={"command": "sleep 10"}, headers=headers
@@ -116,6 +123,7 @@ def test_cancel_job():
     # TODO we don't have way to actually verify that cancel happened
 
 
+@skip_if_expected_fail
 def test_submit_option_flags():
     """
     Test that option flags are parsed.
@@ -155,6 +163,7 @@ def test_submit_option_flags():
     assert "id" in result
 
 
+@skip_if_expected_fail
 def test_job_output():
     """
     Test endpoint to retrieve list of job output
@@ -184,6 +193,7 @@ def test_job_output():
     assert "pancakes 🥞️🥞️🥞️\n" in lines["Output"]
 
 
+@skip_if_expected_fail
 def test_job_query():
     """
     Test endpoint to query jobs

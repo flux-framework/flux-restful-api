@@ -11,6 +11,13 @@ ARG host="0.0.0.0"
 ARG workers="1"
 LABEL maintainer="Vanessasaurus <@vsoch>"
 
+ENV FLUX_USER=${user}
+ENV FLUX_TOKEN=${token}
+ENV FLUX_REQUIRE_AUTH=${use_auth}
+ENV PORT=${port}
+ENV HOST=${host}
+ENV WORKERS=${workers}
+
 USER root
 RUN apt-get update
 COPY ./requirements.txt /requirements.txt
@@ -27,10 +34,4 @@ RUN python3 -m pip install -r /requirements.txt && \
 
 WORKDIR /code
 COPY . /code
-ENV FLUX_USER=${user}
-ENV FLUX_TOKEN=${token}
-ENV FLUX_REQUIRE_AUTH=${use_auth}
-ENV PORT=${port}
-ENV HOST=${host}
-ENV WORKERS=${workers}
 ENTRYPOINT ["/code/entrypoint.sh"]

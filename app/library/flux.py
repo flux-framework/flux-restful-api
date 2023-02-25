@@ -1,5 +1,6 @@
 import json
 import os
+import pwd
 import re
 import shlex
 import time
@@ -7,7 +8,33 @@ import time
 import flux
 import flux.job
 
+import app.library.terminal as terminal
 from app.core.config import settings
+
+# Faux user environment (filtered set of application environment)
+# We could likely find a way to better do this, but likely the users won't have customized environments
+user_env = {
+    "SHELL": "/bin/bash",
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "XDG_RUNTIME_DIR": "/tmp/user/0",
+    "DISPLAY": ":0",
+    "COLORTERM": "truecolor",
+    "SHLVL": "2",
+    "DEBIAN_FRONTEND": "noninteractive",
+    "MAKE_TERMERR": "/dev/pts/1",
+    "LANG": "C.UTF-8",
+    "TERM": "xterm-256color",
+}
+
+
+def submit_job(handle, jobspec, user):
+    """
+    Handle to submit a job, either with flux job submit or on behalf of user.
+    """
+    # We've enabled PAM auth
+    if settings.enable_pam:
+        return terminal.submit_job(jobspec, user)
+    return flux.job.submit_async(handle, jobspec)
 
 
 def validate_submit_kwargs(kwargs, envars=None, runtime=None):
@@ -68,6 +95,7 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     command = kwargs["command"]
     if isinstance(command, str):
         command = shlex.split(command)
+
     print(f"⭐️ Command being submit: {command}")
 
     # Delete command from the kwargs (we added because is required and validated that way)
@@ -90,8 +118,14 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     # A duration of zero (the default) means unlimited
     fluxjob.duration = runtime
 
+    # If we are running as the user, we don't want the current (root) environment
+    # This isn't perfect because it's artifically created, but it ensures we have paths
+    if settings.enable_pam:
+        environment = user_env
+    else:
+        environment = dict(os.environ)
+
     # Additional envars in the payload?
-    environment = dict(os.environ)
     environment.update(envars)
     fluxjob.environment = environment
     return fluxjob
@@ -131,12 +165,15 @@ def stream_job_output(jobid):
         pass
 
 
-def cancel_job(jobid):
+def cancel_job(jobid, user):
     """
     Request a job to be cancelled by id.
 
     Returns a message to the user and a return code.
     """
+    if settings.enable_pam:
+        return terminal.cancel_job(jobid, user)
+
     from app.main import app
 
     try:
@@ -147,12 +184,16 @@ def cancel_job(jobid):
     return "Job is requested to cancel.", 200
 
 
-def get_job_output(jobid, delay=None):
+def get_job_output(jobid, user=None, delay=None):
     """
     Given a jobid, get the output.
 
     If there is a delay, we are requesting on demand, so we want to return early.
     """
+    # We've enabled PAM auth
+    if settings.enable_pam:
+        return terminal.get_job_output(jobid, user, delay=delay)
+
     lines = []
     start = time.time()
     from app.main import app
@@ -171,38 +212,48 @@ def get_job_output(jobid, delay=None):
     return lines
 
 
-def list_jobs_detailed(limit=None, query=None):
+def list_jobs_detailed(user=None, limit=None, query=None):
     """
     Get a detailed listing of jobs.
     """
-    listing = list_jobs()
+    listing = list_jobs(user=user)
     ids = listing.get()["jobs"]
     jobs = {}
     for job in ids:
-
         # Stop if a limit is defined and we have hit it!
         if limit is not None and len(jobs) >= limit:
             break
 
         try:
-            jobinfo = get_job(job["id"])
+            jobinfo = get_job(job["id"], user=user)
 
             # Best effort hack to do a query
             if query and not query_job(jobinfo, query):
                 continue
+
+            # This will trigger a data table warning
+            for needed in ["ranks", "expiration"]:
+                if needed not in jobinfo:
+                    jobinfo[needed] = ""
+
             jobs[job["id"]] = jobinfo
+
         except Exception:
             pass
     return jobs
 
 
-def list_jobs():
+def list_jobs(user=None):
     """
     Get a simple listing of jobs (just the ids)
     """
     from app.main import app
 
-    return flux.job.job_list(app.handle)
+    if user is None or not settings.enable_pam:
+        return flux.job.job_list(app.handle)
+    pw_record = pwd.getpwnam(user)
+    user_uid = pw_record.pw_uid
+    return flux.job.job_list(app.handle, userid=user_uid)
 
 
 def get_simple_job(jobid):
@@ -215,13 +266,17 @@ def get_simple_job(jobid):
     return json.loads(info.get_str())["job"]
 
 
-def get_job(jobid):
+def get_job(jobid, user):
     """
     Get details for a job
     """
     from app.main import app
 
-    payload = {"id": int(jobid), "attrs": ["all"]}
+    jobid = flux.job.JobID(jobid)
+
+    payload = {"id": jobid, "attrs": ["all"]}
+    if settings.enable_pam:
+        payload["user"] = user
     rpc = flux.job.list.JobListIdRPC(app.handle, "job-list.list-id", payload)
     try:
         jobinfo = rpc.get()

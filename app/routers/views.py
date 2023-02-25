@@ -1,4 +1,3 @@
-import flux
 import flux.job
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -22,6 +21,9 @@ auth_views_router = APIRouter(
 )
 templates = Jinja2Templates(directory="templates/")
 
+# Require auth (and the user in the view)
+user_auth = Depends(check_auth) if settings.require_auth else None
+
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -40,8 +42,8 @@ async def home(request: Request):
 
 # List jobs
 @auth_views_router.get("/jobs", response_class=HTMLResponse)
-async def jobs_table(request: Request):
-    jobs = list(flux_cli.list_jobs_detailed().values())
+async def jobs_table(request: Request, user=user_auth):
+    jobs = list(flux_cli.list_jobs_detailed(user=user).values())
     return templates.TemplateResponse(
         "jobs/jobs.html",
         {
@@ -58,19 +60,19 @@ async def jobs_table(request: Request):
     name="job_info",
     operation_id="job_info",
 )
-async def job_info(request: Request, jobid, msg=None):
-    job = flux_cli.get_job(jobid)
+async def job_info(request: Request, jobid, msg=None, user=user_auth):
+    job = flux_cli.get_job(jobid, user=user)
 
     # If we have a message, add to messages
     messages = [msg] if msg else []
 
     # If not completed, ask info to return after a second of waiting
     if job["state"] == "INACTIVE":
-        info = flux_cli.get_job_output(jobid)
+        info = flux_cli.get_job_output(jobid, user=user)
 
     # Otherwise ensure we get all the logs!
     else:
-        info = flux_cli.get_job_output(jobid, delay=1)
+        info = flux_cli.get_job_output(jobid, user=user, delay=1)
     return templates.TemplateResponse(
         "jobs/job.html",
         {
@@ -85,7 +87,7 @@ async def job_info(request: Request, jobid, msg=None):
 
 # Submit a job via a form
 @auth_views_router.get("/jobs/submit", response_class=HTMLResponse)
-async def submit_job(request: Request):
+async def submit_job(request: Request, _=user_auth):
     form = SubmitForm(request)
     return templates.TemplateResponse(
         "jobs/submit.html",
@@ -95,19 +97,20 @@ async def submit_job(request: Request):
 
 # Button to cancel a job
 @auth_views_router.get("/job/{jobid}/cancel", response_class=HTMLResponse)
-async def cancel_job(request: Request, jobid):
+async def cancel_job(request: Request, jobid, user=user_auth):
     from app.main import app
 
-    message, _ = flux_cli.cancel_job(jobid)
+    message, _ = flux_cli.cancel_job(jobid, user=user)
     url = app.url_path_for(name="job_info", jobid=jobid) + "?msg=" + message
     return RedirectResponse(url=url)
 
 
 @auth_views_router.post("/jobs/submit")
-async def submit_job_post(request: Request):
+async def submit_job_post(request: Request, user=user_auth):
     """
     Receive data posted (submit) to the form.
     """
+    print(user)
     from app.main import app
 
     messages = []
@@ -120,7 +123,7 @@ async def submit_job_post(request: Request):
         if form.kwargs.get("is_launcher") is True:
             messages.append(launcher.launch(form.kwargs, workdir=form.workdir))
         else:
-            return submit_job_helper(request, app, form)
+            return submit_job_helper(request, app, form, user=user)
     else:
         print("🍒 Submit form is NOT valid!")
     return templates.TemplateResponse(
@@ -135,19 +138,19 @@ async def submit_job_post(request: Request):
     )
 
 
-def submit_job_helper(request, app, form):
+def submit_job_helper(request, app, form, user):
     """
     A helper to submit a flux job (not a launcher)
     """
     # Submit the job and return the ID, but allow for error
-    try:
+    if 1 == 1:
         # Prepare the flux job! We don't support envars here yet
         fluxjob = flux_cli.prepare_job(
             form.kwargs, runtime=form.runtime, workdir=form.workdir
         )
-        flux_future = flux.job.submit_async(app.handle, fluxjob)
+        flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         jobid = flux_future.get_id()
-        intid = int(jobid)
+        intid = flux.job.JobID(jobid)
         message = f"Your job was successfully submit! 🦊 <a target='_blank' style='color:magenta' href='/job/{intid}'>{jobid}</a>"
         return templates.TemplateResponse(
             "jobs/submit.html",
@@ -157,8 +160,8 @@ def submit_job_helper(request, app, form):
                 "messages": [message],
             },
         )
-    except Exception as e:
-        form.errors.append("There was an issue submitting that job: %s" % str(e))
+    # except Exception as e:
+    #    form.errors.append("There was an issue submitting that job: %s" % str(e))
 
     return templates.TemplateResponse(
         "jobs/submit.html",
