@@ -34,8 +34,6 @@
       
     
         <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
         <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -257,8 +255,8 @@
 
 
   <li class="md-tabs__item">
-    <a href="../auto_examples/index.html" class="md-tabs__link">
-      <span title="/auto_examples/index.rst (reference label)" class="md-ellipsis">Tutorials</span>
+    <a href="../tutorials/index.html" class="md-tabs__link">
+      <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
     </a>
   </li>
 
@@ -418,13 +416,6 @@
         <li class="md-nav__item">
   <a href="#environment" class="md-nav__link">
     <span title="/getting_started/user-guide.md#environment (reference label)" class="md-ellipsis">Environment</span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#container-tutorial" class="md-nav__link">
-    <span title="/getting_started/user-guide.md#container-tutorial (reference label)" class="md-ellipsis">Container Tutorial</span>
   </a>
   
 </li>
@@ -609,8 +600,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../auto_examples/index.html" class="md-nav__link">
-        <span title="/auto_examples/index.rst (reference label)" class="md-ellipsis">Tutorials</span>
+      <a href="../tutorials/index.html" class="md-nav__link">
+        <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
       </a>
     </li>
   
@@ -735,36 +726,6 @@ $<span class="w"> </span><span class="nb">export</span><span class="w"> </span><
 <p>You really should only be interacting with a server that doesn’t require authentication if you are a developer.
 From here, continue reading the user guide for different language clients,
 or see our Python <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/tree/main/clients/python/examples">examples</a> folder.</p>
-<h2 id="container-tutorial">Container Tutorial<a class="headerlink" href="#container-tutorial" title="Permalink to this heading">¶</a></h2>
-<p>If you don’t want to use a command line client (or you want to do a quick tutorial just using an interface)
-this one is for you! You can run our demo container as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>ghcr.io/flux-framework/flux-restful-api:latest
-</code></pre></div>
-</div>
-<p>To start the image. Then open your browser to <a class="reference external" href="http://0.0.0.0:5000">http://0.0.0.0:5000</a>.
-Note for those adventurous - you <em>can</em> in fact use this server to test the clients below! But
-this is not required.</p>
-<ol class="arabic simple">
-<li><p>Go to the “Submit” interface in the navigation to ask to submit a job.</p></li>
-<li><p>We recommend something with output like <code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">pancakes</span> <span class="pre">🥞🥞🥞🥞🥞</span></code></p></li>
-<li><p>Then click on “View Jobs” to see your job.</p></li>
-</ol>
-<p><img alt="img/pancakes-job.png" src="../_images/pancakes-job.png" /></p>
-<p>And then explore other API endpoints by clicking “Docs.” And that’s it!
-If you want to build a similar container with your own software, we recommend you
-use this as a base container, ensure your needed executables are on the path,
-and then you can submit jobs to your heart’s content. Here is an example:</p>
-<div class="highlight-dockerfile notranslate"><div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">ghcr.io/flux-framework/flux-restful-api:latest</span>
-<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pokemon
-</code></pre></div>
-</div>
-<p>To build locally:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>flux-pokemon<span class="w"> </span>.
-</code></pre></div>
-</div>
-<p>And run the same as before to submit a job. But this time… we have access to generate ascii-art pokemon!</p>
-<p><img alt="img/pokemon-output.png" src="../_images/pokemon-output.png" /></p>
-<p>Yay! But seriously, you should like, do real science work. Only dinosaurs generate pokemon!</p>
 <h2 id="python">Python<a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h2>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h3>
 <p>You likely want this installed in a virtual environment:</p>
@@ -1000,7 +961,7 @@ example!</p>
 </div>
 <p>See the <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/tree/main/client/python/examples">examples</a> folder for a mix of example (one with submit with auth)!</p>
 <h2 id="go">Go<a class="headerlink" href="#go" title="Permalink to this heading">¶</a></h2>
-<p>Coming soon!</p>
+<p>Coming soon (or sooner upon request)!</p>
 
 
   <hr>
@@ -1008,7 +969,7 @@ example!</p>
   <small>
     
       Last update:
-      Jan 23, 2023
+      Feb 25, 2023
     
   </small>
 </div>
@@ -1121,9 +1082,6 @@ example!</p>
     
       
         <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
-        <script src="../_static/js/rtd_sphinx_search.min.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
   </body>

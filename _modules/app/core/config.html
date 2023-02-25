@@ -34,8 +34,6 @@
       
     
         <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
-        <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-        <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_sphinx_search.min.css" />
         <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -255,8 +253,8 @@
 
 
   <li class="md-tabs__item">
-    <a href="../../../auto_examples/index.html" class="md-tabs__link">
-      <span title="/auto_examples/index.rst (reference label)" class="md-ellipsis">Tutorials</span>
+    <a href="../../../tutorials/index.html" class="md-tabs__link">
+      <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
     </a>
   </li>
 
@@ -367,8 +365,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../auto_examples/index.html" class="md-nav__link">
-        <span title="/auto_examples/index.rst (reference label)" class="md-ellipsis">Tutorials</span>
+      <a href="../../../tutorials/index.html" class="md-nav__link">
+        <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
       </a>
     </li>
   
@@ -544,6 +542,7 @@
 
     <span class="c1"># These map to envars, e.g., FLUX_USER</span>
     <span class="n">has_gpus</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">get_bool_envar</span><span class="p">(</span><span class="s2">&quot;FLUX_HAS_GPUS&quot;</span><span class="p">)</span>
+    <span class="n">enable_pam</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">get_bool_envar</span><span class="p">(</span><span class="s2">&quot;FLUX_ENABLE_PAM&quot;</span><span class="p">)</span>
 
     <span class="c1"># Assume there is at least one node!</span>
     <span class="n">flux_nodes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">get_int_envar</span><span class="p">(</span><span class="s2">&quot;FLUX_NUMBER_NODES&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -568,7 +567,7 @@
   <small>
     
       Last update:
-      Jan 23, 2023
+      Feb 25, 2023
     
   </small>
 </div>
@@ -645,9 +644,6 @@
     
       
         <script src="../../../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
-        <script src="../../../_static/js/rtd_sphinx_search.min.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
   </body>

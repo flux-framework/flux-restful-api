@@ -34,8 +34,6 @@
       
     
         <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
-        <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-        <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_sphinx_search.min.css" />
         <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -255,8 +253,8 @@
 
 
   <li class="md-tabs__item">
-    <a href="../../../auto_examples/index.html" class="md-tabs__link">
-      <span title="/auto_examples/index.rst (reference label)" class="md-ellipsis">Tutorials</span>
+    <a href="../../../tutorials/index.html" class="md-tabs__link">
+      <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
     </a>
   </li>
 
@@ -367,8 +365,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../auto_examples/index.html" class="md-nav__link">
-        <span title="/auto_examples/index.rst (reference label)" class="md-ellipsis">Tutorials</span>
+      <a href="../../../tutorials/index.html" class="md-nav__link">
+        <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
       </a>
     </li>
   
@@ -498,6 +496,7 @@
 
 <div class="viewcode-block" id="alert_auth"><a class="viewcode-back" href="../../../source/app.library.html#app.library.auth.alert_auth">[docs]</a><span class="k">def</span> <span class="nf">alert_auth</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🍓 Require auth: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">require_auth</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🍓     PAM auth: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">enable_pam</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="s2">&quot;🍓    Flux user: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;*&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">flux_user</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">flux_user</span>
@@ -510,25 +509,53 @@
     <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="check_pam_auth"><a class="viewcode-back" href="../../../source/app.library.html#app.library.auth.check_pam_auth">[docs]</a><span class="k">def</span> <span class="nf">check_pam_auth</span><span class="p">(</span><span class="n">credentials</span><span class="p">:</span> <span class="n">HTTPBasicCredentials</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">security</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check base64 encoded auth (this is HTTP Basic auth.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ensure we have pam installed</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">pam</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;python-pam is required for PAM.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pam</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span></div>
+
+
 <div class="viewcode-block" id="check_auth"><a class="viewcode-back" href="../../../source/app.library.html#app.library.auth.check_auth">[docs]</a><span class="k">def</span> <span class="nf">check_auth</span><span class="p">(</span><span class="n">credentials</span><span class="p">:</span> <span class="n">HTTPBasicCredentials</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">security</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check base64 encoded auth (this is HTTP Basic auth.)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First try to authenticate with PAM, if allowed.</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">enable_pam</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🧾️ Checking PAM auth...&quot;</span><span class="p">)</span>
+        <span class="c1"># Return the username if PAM authentication is successful</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">check_pam_auth</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">username</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🧾️ Success!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">username</span>
+
+    <span class="c1"># If we get here, we require the flux user and token</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">flux_user</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">flux_token</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">not_authenticated</span><span class="p">(</span><span class="s2">&quot;Missing FLUX_USER and/or FLUX_TOKEN&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">not_authenticated</span><span class="p">(</span><span class="s2">&quot;Missing FLUX_USER and/or FLUX_TOKEN or pam headers&quot;</span><span class="p">)</span>
+
     <span class="n">current_username_bytes</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
     <span class="n">correct_username_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">flux_user</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
     <span class="n">is_correct_username</span> <span class="o">=</span> <span class="n">secrets</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">(</span>
         <span class="n">current_username_bytes</span><span class="p">,</span> <span class="n">correct_username_bytes</span>
     <span class="p">)</span>
-    <span class="n">current_password_bytes</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
 
+    <span class="n">current_password_bytes</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
     <span class="n">correct_password_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">flux_token</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
     <span class="n">is_correct_password</span> <span class="o">=</span> <span class="n">secrets</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">(</span>
         <span class="n">current_password_bytes</span><span class="p">,</span> <span class="n">correct_password_bytes</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">is_correct_username</span> <span class="ow">and</span> <span class="n">is_correct_password</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">not_authenticated</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">not_authenticated</span><span class="p">(</span><span class="s2">&quot;heree&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span></div>
 
 
@@ -542,7 +569,7 @@
   <small>
     
       Last update:
-      Jan 23, 2023
+      Feb 25, 2023
     
   </small>
 </div>
@@ -619,9 +646,6 @@
     
       
         <script src="../../../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
-        <script src="../../../_static/clipboard.min.js"></script>
-        <script src="../../../_static/copybutton.js"></script>
-        <script src="../../../_static/js/rtd_sphinx_search.min.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
   </body>

@@ -34,8 +34,6 @@
       
     
         <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-        <link rel="stylesheet" type="text/css" href="../_static/css/rtd_sphinx_search.min.css" />
         <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -255,8 +253,8 @@
 
 
   <li class="md-tabs__item">
-    <a href="../auto_examples/index.html" class="md-tabs__link">
-      <span title="/auto_examples/index.rst (reference label)" class="md-ellipsis">Tutorials</span>
+    <a href="../tutorials/index.html" class="md-tabs__link">
+      <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
     </a>
   </li>
 
@@ -369,8 +367,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../auto_examples/index.html" class="md-nav__link">
-        <span title="/auto_examples/index.rst (reference label)" class="md-ellipsis">Tutorials</span>
+      <a href="../tutorials/index.html" class="md-nav__link">
+        <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
       </a>
     </li>
   
@@ -615,6 +613,7 @@
 <li class="toctree-l2"><a class="reference internal" href="app.core.html#module-app.core.config">app.core.config module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.Settings">app.core.config.Settings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.app_name">app_name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.enable_pam">enable_pam</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.flux_nodes">flux_nodes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.flux_token">flux_token</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.flux_user">flux_user</a></li>
@@ -642,6 +641,7 @@
 <li class="toctree-l2"><a class="reference internal" href="app.library.html#module-app.library.auth">app.library.auth module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.alert_auth">app.library.auth.alert_auth</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.check_auth">app.library.auth.check_auth</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.check_pam_auth">app.library.auth.check_pam_auth</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.get_basic_header">app.library.auth.get_basic_header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.not_authenticated">app.library.auth.not_authenticated</a></li>
 </ul>
@@ -675,7 +675,7 @@
   <small>
     
       Last update:
-      Jan 23, 2023
+      Feb 25, 2023
     
   </small>
 </div>
@@ -788,9 +788,6 @@
     
       
         <script src="../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
-        <script src="../_static/js/rtd_sphinx_search.min.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
   </body>

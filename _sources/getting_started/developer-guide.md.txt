@@ -45,6 +45,7 @@ $ docker run --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
 ```
 ```console
 🍓 Require auth: True
+🍓     PAM auth: False
 🍓    Flux user: ********
 🍓   Flux token: *****
 INFO:     Started server process [72]
@@ -88,7 +89,7 @@ $ pip install -r requirements.txt
 Install requirements (note that you also need Flux Python available, which isn't in these requirements as you cannot install from pip).
 
 ```bash
-$ pip install -r app-requirements.txt
+$ pip install -r requirements.txt
 ```
 
 #### 2. Start Service
@@ -111,8 +112,38 @@ For the latter, you can also use the Makefile:
 ```bash
 $ make
 ```
+
 If you are developing, you must do the second approach as the server won't live-update
-with the first.
+with the first. If you want to start flux running as a separate process:
+
+```bash
+sudo -u flux /usr/bin/flux broker \
+  --config-path=/etc/flux/system/conf.d \
+  -Scron.directory=/etc/flux/system/cron.d \
+  -Srundir=/run/flux \
+  -Sstatedir=${STATE_DIRECTORY:-/var/lib/flux} \
+  -Slocal-uri=local:///run/flux/local \
+  -Slog-stderr-level=6 \
+  -Slog-stderr-mode=local \
+  -Sbroker.rc2_none \
+  -Sbroker.quorum=0 \
+  -Sbroker.quorum-timeout=none \
+  -Sbroker.exit-norestart=42 \
+  -Scontent.restore=auto &
+```
+
+And then we need munge to be started (this should be done by the devcontainer):
+
+```bash
+$ sudo service munge start
+```
+
+And export any authentication envars you need before running make.
+
+```bash
+export FLUX_URI=local:///run/flux/local
+$ sudo -E make
+```
 
 #### 3. Authentication
 
@@ -122,8 +153,18 @@ a variable that tells the server to use auth:
 ```bash
 export FLUX_USER=$USER
 export FLUX_TOKEN=123456
-export FLUX_USER_AUTH=true
+export FLUX_REQUIRE_AUTH=true
 ```
+
+As an alternative, you can enable PAM authentication to use user accounts on the running server:
+
+```bash
+export FLUX_ENABLE_PAM=true
+export FLUX_REQUIRE_AUTH=true
+```
+
+Authentication must be enabled for PAM to work too - you can't just enable the first. For the latter (multi-user)
+flux needs to be started first (e.g., the instance or broker) and then the actual server needs to be started by root.
 
 ### Interactions
 
@@ -149,6 +190,7 @@ The following variables are available (with their defaults):
 |FLUX_HAS_GPU | GPUs are available for the user to request | unset |
 |FLUX_NUMBER_NODES| The number of nodes available in the cluster | 1 |
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
+|FLUX_ENABLE_PAM | Enable PAM authentication (e.g., username and password must be users on the running server) | unset |
 
 ### Flux Option Flags
 
