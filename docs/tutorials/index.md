@@ -8,6 +8,10 @@ FLux instance. We also currently provide an example client in the [examples](htt
 folder with additional examples. If you have
 any questions or issues, please [let us know](https://github.com/flux-framework/flux-restful-api/issues)
 
+## External Tutorials
+
+ - [Multi-user mode](https://flux-framework.org/flux-operator/getting_started/tutorials/multi-tenancy.html) deployed via the Flux Operator.
+
 ```{toctree}
 :maxdepth: 3
 ../auto_examples/index

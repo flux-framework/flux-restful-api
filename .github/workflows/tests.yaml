@@ -47,10 +47,5 @@ jobs:
         export FLUX_ENABLE_PAM=true
         flux start pytest -xs tests/test_api.py
 
-        # We can't test multi-user mode here because flux start needs to be run by
-        # flux, and then the test by the user.
-        flux start sleep infinity &
-        pid=$!
-
         # TODO how to test pam in this mode?
         # We would need to start flux as flux and run tests as a user
