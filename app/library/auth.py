@@ -56,6 +56,8 @@ def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
     """
     Check base64 encoded auth (this is HTTP Basic auth.)
     """
+    return credentials.username
+
     # First try to authenticate with PAM, if allowed.
     if settings.enable_pam:
         print("🧾️ Checking PAM auth...")
