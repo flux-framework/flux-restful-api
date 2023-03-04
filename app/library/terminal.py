@@ -81,7 +81,7 @@ def submit_job(jobspec, user):
     Submit a job on behalf of a user.
     """
     # Prepare the command
-    command = ["flux", "mini", "submit"]
+    command = ["flux", "submit"]
     for resource in jobspec.resources:
         if resource["with"][0]["type"] == "core":
             command += ["--cores", str(resource["count"])]
