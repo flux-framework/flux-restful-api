@@ -8,7 +8,7 @@ import time
 import flux
 import flux.job
 
-import app.library.env as env
+# import app.library.env as env
 import app.library.terminal as terminal
 from app.core.config import settings
 
@@ -77,7 +77,6 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     After validation, prepare the job (shared function).
     """
     if settings.enable_pam:
-        print("PAM IS ENABLED")
         return terminal.prepare_job(
             kwargs, runtime=runtime, workdir=workdir, envars=envars
         )
@@ -114,10 +113,10 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
 
     # If we are running as the user, we don't want the current (root) environment
     # This isn't perfect because it's artifically created, but it ensures we have paths
-    if settings.enable_pam:
-        environment = env.user_env
-    else:
-        environment = dict(os.environ)
+    # if settings.enable_pam:
+    #    environment = env.user_env
+    # else:
+    environment = dict(os.environ)
 
     # Additional envars in the payload?
     environment.update(envars)

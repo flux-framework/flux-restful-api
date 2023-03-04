@@ -4,8 +4,8 @@ import pwd
 import shlex
 import subprocess
 
-import app.library.env as env
-from app.core.config import settings
+# import app.library.env as env
+# from app.core.config import settings
 
 # Terminal functions to handle submitting on behalf of a user
 
@@ -66,8 +66,6 @@ def run_as_user(command, user, cwd=None, request_env=None):
 
     # Run command as the user
     print("⭐️ " + " ".join(command))
-    print(cwd)
-    print(env)
     process = subprocess.Popen(
         command,
         preexec_fn=demote(user_uid, user_gid),
@@ -104,7 +102,7 @@ def prepare_job(kwargs, runtime, workdir, envars):
     if workdir is not None:
         submit.append(f"--cwd={workdir}")
 
-    # TODO add
+    # TODO add these!
     # -c, --cores-per-task=N     Number of cores to allocate per task
     # -g, --gpus-per-task=N      Number of GPUs to allocate per task
     if "num_nodes" in kwargs:
@@ -125,10 +123,10 @@ def prepare_job(kwargs, runtime, workdir, envars):
 
     # If we are running as the user, we don't want the current (root) environment
     # This isn't perfect because it's artifically created, but it ensures we have paths
-    if settings.enable_pam:
-        environment = env.user_env
-    else:
-        environment = dict(os.environ)
+    # if settings.enable_pam:
+    #    environment = env.user_env
+    # else:
+    environment = dict(os.environ)
 
     # Additional envars in the payload - add to the front
     environment.update(envars)
