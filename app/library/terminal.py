@@ -118,7 +118,7 @@ def prepare_job(kwargs, runtime, workdir, envars):
         submit.append(f"--cores={kwargs['cores']}")
 
     # A duration of zero (the default) means unlimited
-    submit.append("--time-limit={runtime}")
+    submit.append(f"--time-limit={runtime}")
 
     # Assemble the flux job!
     print(f"⭐️ Flux submit {' '.join(submit)}")
