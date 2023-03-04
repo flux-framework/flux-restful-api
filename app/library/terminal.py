@@ -52,11 +52,6 @@ def run_as_user(command, user, cwd=None, request_env=None):
     env["LOGNAME"] = user_name
     env["USER"] = pw_record.pw_name
 
-    # Ensure we pass forward the flux uri
-    flux_uri = os.environ.get("FLUX_URI")
-    if flux_uri:
-        env["FLUX_URI"] = flux_uri
-
     # Update the environment, if provided
     if request_env is not None:
         env.update(request_env)
