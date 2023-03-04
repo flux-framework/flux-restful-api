@@ -17,6 +17,8 @@ def submit_job(handle, jobspec, user):
     """
     Handle to submit a job, either with flux job submit or on behalf of user.
     """
+    print(f"User submitting job {user}")
+
     # We've enabled PAM auth
     if settings.enable_pam:
         return terminal.submit_job(jobspec, user)

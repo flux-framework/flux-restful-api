@@ -197,6 +197,7 @@ async def submit_job(request: Request, user=user_auth):
             fluxjob = flux_cli.prepare_job(
                 kwargs, runtime=runtime, workdir=workdir, envars=envars
             )
+            print(f"Prepared flux job {fluxjob}")
             # This handles either a single/multi user case
             flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         except Exception as e:
