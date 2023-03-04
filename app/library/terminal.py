@@ -47,14 +47,15 @@ def run_as_user(command, user, cwd=None, request_env=None):
     # cwd will bork on an empty string
     cwd = cwd or None
 
+    # Update the environment, if provided
+    if request_env is not None:
+        env.update(request_env)
+
+    # Ensure we have the correct home, etc.
     print(f"🧾️ Running command as {user_name}")
     env["HOME"] = pw_record.pw_dir
     env["LOGNAME"] = user_name
     env["USER"] = pw_record.pw_name
-
-    # Update the environment, if provided
-    if request_env is not None:
-        env.update(request_env)
 
     # Run command as the user
     print("⭐️ " + " ".join(command))
