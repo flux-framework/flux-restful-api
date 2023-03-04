@@ -8,7 +8,6 @@ import time
 import flux
 import flux.job
 
-# import app.library.env as env
 import app.library.terminal as terminal
 from app.core.config import settings
 
@@ -112,16 +111,13 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     fluxjob.duration = runtime
 
     # If we are running as the user, we don't want the current (root) environment
-    # This isn't perfect because it's artifically created, but it ensures we have paths
-    # if settings.enable_pam:
-    #    environment = env.user_env
-    # else:
+    # However, if we don't provide it, flux stops working.
+    # We need to test different ideas for this.
     environment = dict(os.environ)
 
     # Additional envars in the payload?
     environment.update(envars)
     fluxjob.environment = environment
-    print(fluxjob.jobspec)
     return fluxjob
 
 

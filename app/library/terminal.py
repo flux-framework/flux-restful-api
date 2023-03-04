@@ -4,9 +4,6 @@ import pwd
 import shlex
 import subprocess
 
-# import app.library.env as env
-# from app.core.config import settings
-
 # Terminal functions to handle submitting on behalf of a user
 
 job_format = "{id.f58:>12} {username:<8.8} {name:<10.10+} {status:>9.9} {ntasks:>6} {nnodes:>6h} {t_submit!d:%b%d %R::>12} {t_remaining!F:>12h} {contextual_time!F:>8h}"
@@ -122,10 +119,7 @@ def prepare_job(kwargs, runtime, workdir, envars):
     print(f"⭐️ Flux submit {' '.join(submit)}")
 
     # If we are running as the user, we don't want the current (root) environment
-    # This isn't perfect because it's artifically created, but it ensures we have paths
-    # if settings.enable_pam:
-    #    environment = env.user_env
-    # else:
+    # However flux breaks if we nuke environment, so need to test ideas further
     environment = dict(os.environ)
 
     # Additional envars in the payload - add to the front
