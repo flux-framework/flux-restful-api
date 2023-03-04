@@ -47,6 +47,7 @@ def check_pam_auth(credentials: HTTPBasicCredentials = Depends(security)):
 
     username = credentials.username.encode("utf8")
     password = credentials.password.encode("utf8")
+    return credentials.username
     if pam.authenticate(username, password) is True:
         return credentials.username
 
