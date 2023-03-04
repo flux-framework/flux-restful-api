@@ -102,23 +102,23 @@ def prepare_job(kwargs, runtime, workdir, envars):
         submit += ["-o", f"{option}={value}"]
 
     if workdir is not None:
-        submit += ["--cwd", workdir]
+        submit.append(f"--cwd={workdir}")
 
     # TODO add
     # -c, --cores-per-task=N     Number of cores to allocate per task
     # -g, --gpus-per-task=N      Number of GPUs to allocate per task
     if "num_nodes" in kwargs:
-        submit += ["--nodes", str(kwargs["nodes"])]
+        submit.append(f"--nodes={kwargs['num_nodes']}")
 
     if "num_tasks" in kwargs:
-        submit += ["--ntasks", str(kwargs["num_tasks"])]
+        submit.append(f"--ntasks={kwargs['num_tasks']}")
 
     # It says cores should not be used with ntasks
     elif "cores" in kwargs:
-        submit += ["--cores", str(kwargs["cores"])]
+        submit.append(f"--cores={kwargs['cores']}")
 
     # A duration of zero (the default) means unlimited
-    submit += ["--time-limit", str(runtime)]
+    submit.append("--time-limit={runtime}")
 
     # Assemble the flux job!
     print(f"⭐️ Flux submit {' '.join(submit)}")
