@@ -77,6 +77,7 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     After validation, prepare the job (shared function).
     """
     if settings.enable_pam:
+        print("PAM IS ENABLED")
         return terminal.prepare_job(
             kwargs, runtime=runtime, workdir=workdir, envars=envars
         )
