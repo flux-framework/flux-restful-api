@@ -133,6 +133,9 @@ def prepare_job(kwargs, runtime, workdir, envars):
     # Additional envars in the payload - add to the front
     environment.update(envars)
 
+    # Add the command!
+    submit += command
+
     # Assemble the flux job!
     return {"command": submit, "env": environment, "cwd": workdir}
 
