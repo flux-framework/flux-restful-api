@@ -195,6 +195,7 @@ async def submit_job(request: Request, user=user_auth):
     else:
         # Prepare and submit the job and return the ID, but allow for error
         try:
+            print(f"Preparing flux job with {kwargs}")
             fluxjob = flux_cli.prepare_job(
                 kwargs, runtime=runtime, workdir=workdir, envars=envars
             )
