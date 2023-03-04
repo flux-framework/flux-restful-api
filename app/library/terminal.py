@@ -59,6 +59,8 @@ def run_as_user(command, user, cwd=None, request_env=None):
 
     # Run command as the user
     print("⭐️ " + " ".join(command))
+    print(env)
+    print(cwd)
     process = subprocess.Popen(
         command,
         preexec_fn=demote(user_uid, user_gid),
@@ -110,9 +112,6 @@ def prepare_job(kwargs, runtime, workdir, envars):
 
     # A duration of zero (the default) means unlimited
     submit.append(f"--time-limit={runtime}")
-
-    # Assemble the flux job!
-    print(f"⭐️ Flux submit {' '.join(submit)}")
 
     # If we are running as the user, we don't want the current (root) environment
     # However flux breaks if we nuke environment, so need to test ideas further
