@@ -24,6 +24,15 @@ user_env = {
     "MAKE_TERMERR": "/dev/pts/1",
     "LANG": "C.UTF-8",
     "TERM": "xterm-256color",
+    # TODO we should get these via flux env instead at server start
+    "FLUX_PMI_LIBRARY_PATH": "/usr/lib/flux/libpmi.so",
+    "LUA_PATH": "/usr/share/lua/5.2/?.lua;",
+    "FLUX_EXEC_PATH": "/usr/libexec/flux/cmd",
+    "PYTHONPATH": "/usr/lib/flux/python3.8",
+    "LUA_CPATH": "/usr/lib/lua/5.2/?.so;",
+    "FLUX_CONNECTOR_PATH": "/usr/lib/flux/connectors",
+    "MANPATH": "/usr/share/man",
+    "FLUX_MODULE_PATH": "/usr/lib/flux/modules",
 }
 
 
