@@ -1,7 +1,11 @@
 import json
 import os
 import pwd
+import shlex
 import subprocess
+
+import app.library.env as env
+from app.core.config import settings
 
 # Terminal functions to handle submitting on behalf of a user
 
@@ -76,24 +80,71 @@ def run_as_user(command, user, cwd=None, request_env=None):
     return process.communicate()
 
 
-def submit_job(jobspec, user):
+def prepare_job(kwargs, runtime, workdir, envars):
+    """
+    Prepare a job to submit on the command line.
+    """
+    envars = envars or {}
+    option_flags = kwargs.get("option_flags") or {}
+
+    # Generate the flux job
+    command = kwargs["command"]
+    if isinstance(command, str):
+        command = shlex.split(command)
+
+    print(f"⭐️ Command being submit: {command}")
+
+    # Mapping of keys to command
+    submit = ["flux", "submit"]
+
+    for option, value in option_flags.items():
+        print(f"⭐️ Setting shell option: {option}={value}")
+        submit += ["-o", f"{option}={value}"]
+
+    if workdir is not None:
+        submit += ["--cwd", workdir]
+
+    # TODO add
+    # -c, --cores-per-task=N     Number of cores to allocate per task
+    # -g, --gpus-per-task=N      Number of GPUs to allocate per task
+    if "nodes" in kwargs:
+        submit += ["--nodes", kwargs["nodes"]]
+
+    if "num_tasks" in kwargs:
+        submit += ["--ntasks", kwargs["num_tasks"]]
+
+    # It says cores should not be used with ntasks
+    elif "cores" in kwargs:
+        submit += ["--cores", kwargs["cores"]]
+
+    # A duration of zero (the default) means unlimited
+    submit += ["--time-limit", runtime]
+
+    # Assemble the flux job!
+    print(f"⭐️ Flux submit {' '.join(submit)}")
+
+    # If we are running as the user, we don't want the current (root) environment
+    # This isn't perfect because it's artifically created, but it ensures we have paths
+    if settings.enable_pam:
+        environment = env.user_env
+    else:
+        environment = dict(os.environ)
+
+    # Additional envars in the payload - add to the front
+    environment.update(envars)
+
+    # Assemble the flux job!
+    return {"command": submit, "env": environment, "cwd": workdir}
+
+
+def submit_job(fluxjob, user):
     """
     Submit a job on behalf of a user.
     """
-    # Prepare the command
-    command = ["flux", "submit"]
-    for resource in jobspec.resources:
-        if resource["with"][0]["type"] == "core":
-            command += ["--cores", str(resource["count"])]
-
-    for cmd in jobspec.tasks:
-        if "command" in cmd:
-            command += cmd["command"]
-            break
-
+    # Convert jobspec into job
     # Flux submit as the user
     result = run_as_user(
-        command, request_env=jobspec.environment, user=user, cwd=jobspec.cwd
+        fluxjob["command"], request_env=fluxjob["env"], user=user, cwd=fluxjob["cwd"]
     )
     jobid = (result[0].decode("utf-8")).strip()
     return JobId(jobid)

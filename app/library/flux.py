@@ -8,23 +8,9 @@ import time
 import flux
 import flux.job
 
+import app.library.env as env
 import app.library.terminal as terminal
 from app.core.config import settings
-
-# Faux user environment (filtered set of application environment)
-# We could likely find a way to better do this, but likely the users won't have customized environments
-user_env = {
-    "SHELL": "/bin/bash",
-    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
-    "XDG_RUNTIME_DIR": "/tmp/user/0",
-    "DISPLAY": ":0",
-    "COLORTERM": "truecolor",
-    "SHLVL": "2",
-    "DEBIAN_FRONTEND": "noninteractive",
-    "MAKE_TERMERR": "/dev/pts/1",
-    "LANG": "C.UTF-8",
-    "TERM": "xterm-256color",
-}
 
 
 def submit_job(handle, jobspec, user):
@@ -88,6 +74,11 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     """
     After validation, prepare the job (shared function).
     """
+    if settings.enable_pam:
+        return terminal.prepare_job(
+            kwargs, runtime=runtime, workdir=workdir, envars=envars
+        )
+
     envars = envars or {}
     option_flags = kwargs.get("option_flags") or {}
 
@@ -121,7 +112,7 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     # If we are running as the user, we don't want the current (root) environment
     # This isn't perfect because it's artifically created, but it ensures we have paths
     if settings.enable_pam:
-        environment = user_env
+        environment = env.user_env
     else:
         environment = dict(os.environ)
 
