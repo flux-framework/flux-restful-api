@@ -1,6 +1,5 @@
 import os
 import time
-from copy import deepcopy
 
 import flux_restful_client.main.schemas as schemas
 import flux_restful_client.utils as utils
@@ -138,47 +137,13 @@ class FluxRestfulClient:
         Given a response, look for a Www-Authenticate header to parse. We
         return True/False to indicate if the request should be retried.
         """
-        authHeaderRaw = originalResponse.headers.get("Www-Authenticate")
-        if not authHeaderRaw:
-            return False
-
         # If we have a username and password, set basic auth automatically
-        if self.token and self.user:
+        if self.token and self.user and "Authorization" not in self.headers:
             self.set_basic_auth(self.user, self.token)
+            return True
 
-        headers = deepcopy(self.headers)
-        if "Authorization" not in headers:
-            logger.error(
-                "This endpoint requires a token. Please set "
-                "client.set_basic_auth(username, password) first "
-                "or export them to the environment."
-            )
-            return False
-
-        # Prepare request to retry
-
-        h = utils.parse_auth_header(authHeaderRaw)
-        headers.update(
-            {
-                "Accept": "application/json",
-                "User-Agent": "flux-restful-client",
-            }
-        )
-
-        # Currently we don't set a scope (it defaults to build)
-        authResponse = self.session.request("GET", h.Realm, headers=headers)
-        if authResponse.status_code != 200:
-            return False
-
-        # Request the token
-        info = authResponse.json()
-        token = info.get("token")
-        if not token:
-            token = info.get("access_token")
-
-        # Set the token to the original request and retry
-        self.headers.update({"Authorization": "Bearer %s" % token})
-        return True
+        logger.warning("Authentication not provided, use set_basic_auth.")
+        return False
 
     def list_nodes(self):
         """
