@@ -1,5 +1,5 @@
 import flux.job
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
@@ -12,6 +12,8 @@ from app.library.auth import check_auth
 
 # These views never have auth!
 router = APIRouter(tags=["views"])
+
+templates = Jinja2Templates(directory="templates/")
 
 # These views do :)
 auth_views_router = APIRouter(
@@ -53,6 +55,24 @@ async def jobs_table(request: Request, user=user_auth):
     )
 
 
+@router.get("/logout")
+async def logout(request: Request, response: Response):
+    """
+    This isn't entirely working yet.
+    """
+    response.delete_cookie("basic")
+    response.delete_cookie("bearer")
+    response.delete_cookie("access_token")
+    data = helpers.get_page("index.md")
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "data": data,
+        },
+    )
+
+
 # View job detail (and log)
 @auth_views_router.get(
     "/job/{jobid}",
@@ -87,7 +107,8 @@ async def job_info(request: Request, jobid, msg=None, user=user_auth):
 
 # Submit a job via a form
 @auth_views_router.get("/jobs/submit", response_class=HTMLResponse)
-async def submit_job(request: Request, _=user_auth):
+async def submit_job(request: Request, user=user_auth):
+    print(user)
     form = SubmitForm(request)
     return templates.TemplateResponse(
         "jobs/submit.html",
@@ -143,10 +164,10 @@ def submit_job_helper(request, app, form, user):
     A helper to submit a flux job (not a launcher)
     """
     # Submit the job and return the ID, but allow for error
-    if 1 == 1:
-        # Prepare the flux job! We don't support envars here yet
+    # Prepare the flux job! We don't support envars here yet
+    try:
         fluxjob = flux_cli.prepare_job(
-            form.kwargs, runtime=form.runtime, workdir=form.workdir
+            user, form.kwargs, runtime=form.runtime, workdir=form.workdir
         )
         flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         jobid = flux_future.get_id()
@@ -160,8 +181,8 @@ def submit_job_helper(request, app, form, user):
                 "messages": [message],
             },
         )
-    # except Exception as e:
-    #    form.errors.append("There was an issue submitting that job: %s" % str(e))
+    except Exception as e:
+        form.errors.append("There was an issue submitting that job: %s" % str(e))
 
     return templates.TemplateResponse(
         "jobs/submit.html",

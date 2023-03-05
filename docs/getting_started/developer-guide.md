@@ -248,7 +248,57 @@ And to install as a hook (recommended so you never commit with linting flaws!)
 ```bash
 $ pre-commit install
 ```
+## Database
 
+The database config was created with:
+
+```bash
+$ alembic init --template generic ./migrations
+```
+
+At this point we need to edit `migrations/env.py` so it could see our database models. This part:
+
+```python
+# This line was added so we import our database
+from app.db.base import Base  # noqa
+
+target_metadata = Base.metadata
+```
+
+At this point we can do a migration to create the initial (empty) tables.
+
+```bash
+$ alembic revision --autogenerate -m "Create intital tables"
+```
+
+And then to run the first set of migrations:
+
+```bash
+$ alembic upgrade head
+```
+
+At this point we can create our initial super flux user:
+
+```bash
+export FLUX_USER=fluxuser
+export FLUX_TOKEN=12345
+```
+```bash
+$ python app/db/init_db.py init
+```
+```console
+# python app/db/init_db.py init
+
+INFO:__main__:Creating initial data
+INFO:__main__:User fluxuser has been created.
+INFO:__main__:Initial data created
+```
+
+or add a user:
+
+```bash
+$ python app/db/init_db.py add-user peenut peenut
+```
 
 ## Documentation
 

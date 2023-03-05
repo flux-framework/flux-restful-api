@@ -1,6 +1,5 @@
 import json
 import os
-import pwd
 import re
 import shlex
 import time
@@ -8,7 +7,6 @@ import time
 import flux
 import flux.job
 
-import app.library.terminal as terminal
 from app.core.config import settings
 
 
@@ -17,10 +15,6 @@ def submit_job(handle, jobspec, user):
     Handle to submit a job, either with flux job submit or on behalf of user.
     """
     print(f"User submitting job {user}")
-
-    # We've enabled PAM auth
-    if settings.enable_pam:
-        return terminal.submit_job(jobspec, user)
     return flux.job.submit_async(handle, jobspec)
 
 
@@ -71,15 +65,10 @@ def validate_submit_kwargs(kwargs, envars=None, runtime=None):
     return errors
 
 
-def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
+def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     """
     After validation, prepare the job (shared function).
     """
-    if settings.enable_pam:
-        return terminal.prepare_job(
-            kwargs, runtime=runtime, workdir=workdir, envars=envars
-        )
-
     envars = envars or {}
     option_flags = kwargs.get("option_flags") or {}
 
@@ -103,6 +92,10 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
         print(f"⭐️ Setting shell option: {option}={value}")
         fluxjob.setattr_shell_option(option, value)
 
+    # Set an attribute about the owning user
+    fluxjob.setattr("user", user)
+
+    # Set a provided working directory
     print(f"⭐️ Workdir provided: {workdir}")
     if workdir is not None:
         fluxjob.cwd = workdir
@@ -161,9 +154,7 @@ def cancel_job(jobid, user):
 
     Returns a message to the user and a return code.
     """
-    if settings.enable_pam:
-        return terminal.cancel_job(jobid, user)
-
+    # TODO need to validate the user owns the job here
     from app.main import app
 
     try:
@@ -180,13 +171,12 @@ def get_job_output(jobid, user=None, delay=None):
 
     If there is a delay, we are requesting on demand, so we want to return early.
     """
-    # We've enabled PAM auth
-    if settings.enable_pam:
-        return terminal.get_job_output(jobid, user, delay=delay)
-
+    # TODO need to validate the user owns the job here
     lines = []
     start = time.time()
     from app.main import app
+
+    jobid = flux.job.JobID(jobid)
 
     # If the submit is too close to the log reqest, it cannot find the file handle
     # It could be also the jobid cannot be found.
@@ -237,13 +227,10 @@ def list_jobs(user=None):
     """
     Get a simple listing of jobs (just the ids)
     """
+    # TODO need to validate the user owns the job here
     from app.main import app
 
-    if user is None or not settings.enable_pam:
-        return flux.job.job_list(app.handle)
-    pw_record = pwd.getpwnam(user)
-    user_uid = pw_record.pw_uid
-    return flux.job.job_list(app.handle, userid=user_uid)
+    return flux.job.job_list(app.handle)
 
 
 def get_simple_job(jobid):
@@ -256,17 +243,16 @@ def get_simple_job(jobid):
     return json.loads(info.get_str())["job"]
 
 
-def get_job(jobid, user):
+def get_job(jobid, user=None):
     """
     Get details for a job
     """
+    # TODO need to validate the user owns the job here
     from app.main import app
 
     jobid = flux.job.JobID(jobid)
 
     payload = {"id": jobid, "attrs": ["all"]}
-    if settings.enable_pam:
-        payload["user"] = user
     rpc = flux.job.list.JobListIdRPC(app.handle, "job-list.list-id", payload)
     try:
         jobinfo = rpc.get()

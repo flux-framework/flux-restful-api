@@ -1,10 +1,12 @@
 import logging
-import secrets
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from sqlalchemy.orm import Session
 
+import app.routers.depends as deps
 from app.core.config import settings
+from app.crud import user as crud_user
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,6 @@ def not_authenticated(detail="Incorrect user or token."):
 
 def alert_auth():
     print("🍓 Require auth: %s" % settings.require_auth)
-    print("🍓     PAM auth: %s" % settings.enable_pam)
     print(
         "🍓    Flux user: %s" % ("*" * len(settings.flux_user))
         if settings.flux_user
@@ -34,56 +35,20 @@ def alert_auth():
     )
 
 
-def check_pam_auth(credentials: HTTPBasicCredentials = Depends(security)):
+def check_auth(
+    credentials: HTTPBasicCredentials = Depends(security),
+    db: Session = Depends(deps.get_db),
+):
     """
     Check base64 encoded auth (this is HTTP Basic auth.)
     """
-    # Ensure we have pam installed
-    try:
-        import pam
-    except ImportError:
-        print("python-pam is required for PAM.")
-        return
-
-    username = credentials.username.encode("utf8")
-    password = credentials.password.encode("utf8")
-    return credentials.username
-    if pam.authenticate(username, password) is True:
-        return credentials.username
-
-
-def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
-    """
-    Check base64 encoded auth (this is HTTP Basic auth.)
-    """
-    return credentials.username
-
-    # First try to authenticate with PAM, if allowed.
-    if settings.enable_pam:
-        print("🧾️ Checking PAM auth...")
-        # Return the username if PAM authentication is successful
-        username = check_pam_auth(credentials)
-        if username:
-            print("🧾️ Success!")
-            return username
-
-    # If we get here, we require the flux user and token
-    if not settings.flux_user or not settings.flux_token:
-        return not_authenticated("Missing FLUX_USER and/or FLUX_TOKEN or pam headers")
-
-    current_username_bytes = credentials.username.encode("utf8")
-    correct_username_bytes = bytes(settings.flux_user.encode("utf8"))
-    is_correct_username = secrets.compare_digest(
-        current_username_bytes, correct_username_bytes
+    user = crud_user.authenticate(
+        db, user_name=credentials.username, password=credentials.password
     )
-
-    current_password_bytes = credentials.password.encode("utf8")
-    correct_password_bytes = bytes(settings.flux_token.encode("utf8"))
-    is_correct_password = secrets.compare_digest(
-        current_password_bytes, correct_password_bytes
-    )
-    if not (is_correct_username and is_correct_password):
-        return not_authenticated("heree")
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    elif not crud_user.is_active(user):
+        raise HTTPException(status_code=400, detail="Inactive user")
     return credentials.username
 
 

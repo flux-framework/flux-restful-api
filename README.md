@@ -47,8 +47,11 @@ tool to generate a contributors graphic below.
 
 ## TODO
 
-- Interface view with nice job table
-- We can put additional assets for the server in [data](data), not sure what those are yet!
+ - [ ] refactor client to handle token handshake
+ - [ ] create a simple init script obviously in root directory for database
+ - [ ] update tests and examples
+ - [ ] update all docs
+ - [ ] when passing, test with flux operator / flux-cloud
 
 #### Release
 

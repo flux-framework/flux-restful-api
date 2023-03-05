@@ -1,7 +1,9 @@
 import logging
 import os
 import re
+import secrets
 import shlex
+import string
 
 from pydantic import BaseSettings
 
@@ -58,23 +60,38 @@ def parse_option_flags(flags, prefix="-o"):
     return values
 
 
+def generate_secret_key(length=32):
+    """
+    Generate a secret key to encrypt, if one not provided.
+    """
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for i in range(length))
+
+
 class Settings(BaseSettings):
     """
     Basic settings and defaults for the Flux RESTFul API
     """
 
     app_name: str = "Flux RESTFul API"
+    api_version: str = "v1"
 
     # These map to envars, e.g., FLUX_USER
     has_gpus: bool = get_bool_envar("FLUX_HAS_GPUS")
-    enable_pam: bool = get_bool_envar("FLUX_ENABLE_PAM")
 
     # Assume there is at least one node!
     flux_nodes: int = get_int_envar("FLUX_NUMBER_NODES", 1)
+    require_auth: bool = get_bool_envar("FLUX_REQUIRE_AUTH")
 
+    # If you change this, also change in alembic.ini
+    db_file: str = "sqlite:///./flux-restful.db"
     flux_user: str = os.environ.get("FLUX_USER")
     flux_token: str = os.environ.get("FLUX_TOKEN")
-    require_auth: bool = get_bool_envar("FLUX_REQUIRE_AUTH")
+    users_file: str = os.environ.get("FLUX_USERS_FILE")
+    secret_key: str = os.environ.get("FLUX_SECRET_KEY") or generate_secret_key()
+
+    # Expires in 10 hours
+    access_token_expires_minutes: int = 600
 
     # Default server option flags
     option_flags: dict = get_option_flags("FLUX_OPTION_FLAGS")

@@ -13,4 +13,10 @@ fi
 
 # We always need to start in this PWD
 cd /code
+
+# Create flux user
+python app/db/init_db.py init
+# python app/db/init_db.py add-user myuser mypass
+
+# And start the webserver
 flux start uvicorn app.main:app --host=${HOST} --port=${PORT} --workers=${WORKERS}
