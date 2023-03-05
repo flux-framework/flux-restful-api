@@ -192,6 +192,7 @@ The following variables are available (with their defaults):
 |FLUX_NUMBER_NODES| The number of nodes available in the cluster | 1 |
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
 |FLUX_SECRET_KEY | secret key to be shared between user and server (required) | unset |
+|FLUX_ACCESS_TOKEN_EXPIRES_MINUTES| number of minutes to expire an access token | 600 |
 
 Note that we currently use a global secret key, and this could be improved to use a user-specific one.
 

@@ -87,11 +87,12 @@ class Settings(BaseSettings):
     db_file: str = "sqlite:///./flux-restful.db"
     flux_user: str = os.environ.get("FLUX_USER")
     flux_token: str = os.environ.get("FLUX_TOKEN")
-    users_file: str = os.environ.get("FLUX_USERS_FILE")
     secret_key: str = os.environ.get("FLUX_SECRET_KEY") or generate_secret_key()
 
     # Expires in 10 hours
-    access_token_expires_minutes: int = 600
+    access_token_expires_minutes: int = get_int_envar(
+        "FLUX_ACCESS_TOKEN_EXPIRES_MINUTES", 600
+    )
 
     # Default server option flags
     option_flags: dict = get_option_flags("FLUX_OPTION_FLAGS")

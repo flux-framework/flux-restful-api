@@ -87,6 +87,9 @@ async def jobs_table(request: Request, user=user_auth):
 async def logout(request: Request, response: Response):
     """
     This isn't entirely working yet.
+
+    I usually open a new tab/window to reset basic auth. We likely
+    need a logout button to be handled somehow in javascript.
     """
     response.delete_cookie("basic")
     response.delete_cookie("bearer")

@@ -21,7 +21,7 @@ EXPOSE ${port}
 ENV PYTHONPATH=/usr/lib/flux/python3.8:/code
 
 # For easier Python development, and install time for timed commands
-RUN python3 -m pip install -r /requirements.txt && \
+RUN pip install -r /requirements.txt && \
     apt-get update && apt-get install -y time && \
     apt-get clean && \
     apt-get autoremove && \

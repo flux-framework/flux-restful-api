@@ -17,8 +17,8 @@ log = logging.getLogger("flux-restful")
 # Alembic should make the models
 try:
     Base.metadata.create_all(bind=engine)
-except Exception as e:
-    print(e)
+except Exception:
+    pass
 
 app = FastAPI()
 

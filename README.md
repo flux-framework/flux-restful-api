@@ -45,14 +45,6 @@ tool to generate a contributors graphic below.
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 
-## TODO
-
- - [ ] refactor client to handle token handshake
- - [ ] create a simple init script obviously in root directory for database
- - [ ] update tests and examples
- - [ ] update all docs
- - [ ] when passing, test with flux operator / flux-cloud
-
 #### Release
 
 SPDX-License-Identifier: LGPL-3.0
