@@ -14,7 +14,9 @@ fi
 # We always need to start in this PWD
 cd /code
 
-# Create flux user
+# prepare the database - we always start from scratch, it's ephemeral
+alembic revision --autogenerate -m "Create intital tables"
+alembic upgrade head
 python3 app/db/init_db.py init
 # python3 app/db/init_db.py add-user myuser mypass
 

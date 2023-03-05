@@ -1,4 +1,5 @@
-*.db
+flux-restful.db
 __pycache__
 .devcontainer
 .git
+migrations/versions/*

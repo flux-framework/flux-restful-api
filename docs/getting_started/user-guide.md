@@ -73,7 +73,7 @@ $ pip install -e .
 
 Although most of you will want to interact with the client in Python, we also install
 a simple command line client to let you "one off" a quick command without needing to write
-a script. Here are examples:
+a script. The same environment variables would be needed to be exported. Here are examples:
 
 #### Submit
 
@@ -292,15 +292,6 @@ Here is an example to edit:
 ```bash
 $ flux-restful-cli config edit
 ```
-
-### Stop Service
-
-Finally, to stop your service (this is a special functionality intended for the operator!)
-
-```bash
-$ flux-restful-cli stop-service
-```
-(this isn't tested yet with the operator - might have a bug or two!)
 
 
 ### Within Python
