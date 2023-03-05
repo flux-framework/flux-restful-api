@@ -6,6 +6,48 @@
   padding: 0px !important;
 }
 
+/* Define light colors */
+:root, html[data-theme="light"], body[data-theme="light"]{
+  --sg-tooltip-foreground: black;
+  --sg-tooltip-background: rgba(250, 250, 250, 0.9);
+  --sg-tooltip-border: #ccc transparent;
+  --sg-thumb-box-shadow-color: #6c757d40;
+  --sg-thumb-hover-border: #0069d9;
+  --sg-script-out: #888;
+  --sg-script-pre: #fafae2;
+  --sg-pytb-foreground: #000;
+  --sg-pytb-background: #ffe4e4;
+  --sg-pytb-border-color: #f66;
+  --sg-download-a-background-color: #ffc;
+  --sg-download-a-background-image: linear-gradient(to bottom, #ffc, #d5d57e);
+  --sg-download-a-border-color: 1px solid #c2c22d;
+  --sg-download-a-color: #000;
+  --sg-download-a-hover-background-color: #d5d57e;
+  --sg-download-a-hover-box-shadow-1: rgba(255, 255, 255, 0.1);
+  --sg-download-a-hover-box-shadow-2: rgba(0, 0, 0, 0.25);
+}
+@media(prefers-color-scheme: light) {
+  :root[data-theme="auto"], html[data-theme="auto"], body[data-theme="auto"] {
+    --sg-tooltip-foreground: black;
+    --sg-tooltip-background: rgba(250, 250, 250, 0.9);
+    --sg-tooltip-border: #ccc transparent;
+    --sg-thumb-box-shadow-color: #6c757d40;
+    --sg-thumb-hover-border: #0069d9;
+    --sg-script-out: #888;
+    --sg-script-pre: #fafae2;
+    --sg-pytb-foreground: #000;
+    --sg-pytb-background: #ffe4e4;
+    --sg-pytb-border-color: #f66;
+    --sg-download-a-background-color: #ffc;
+    --sg-download-a-background-image: linear-gradient(to bottom, #ffc, #d5d57e);
+    --sg-download-a-border-color: 1px solid #c2c22d;
+    --sg-download-a-color: #000;
+    --sg-download-a-hover-background-color: #d5d57e;
+    --sg-download-a-hover-box-shadow-1: rgba(255, 255, 255, 0.1);
+    --sg-download-a-hover-box-shadow-2: rgba(0, 0, 0, 0.25);
+  }
+}
+
 /* Fix ugly mustard buttons! */
 div.sphx-glr-download a {
   background-color: #FFF;
@@ -16,4 +58,21 @@ div.sphx-glr-download a {
 
 div.sphx-glr-download a:hover {
   background-color: gold !important;
+}
+
+div.sphx-glr-download code.download {
+  display: inline-block;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  /* border and background are given by the enclosing 'a' */
+  border: none;
+  background: none;
+}
+
+div.sphx-glr-download a:hover {
+  box-shadow: inset 0 1px 0 var(--sg-download-a-hover-box-shadow-1), 0 1px 5px var(--sg-download-a-hover-box-shadow-2);
+  text-decoration: none;
+  background-image: none;
+  background-color: var(--sg-download-a-hover-background-color);
 }

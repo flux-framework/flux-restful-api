@@ -1,29 +1,29 @@
-app.routers package
+app.schemas package
 ===================
 
 Submodules
 ----------
 
-app.routers.api module
+app.schemas.job module
 ----------------------
 
-.. automodule:: app.routers.api
+.. automodule:: app.schemas.job
    :members:
    :undoc-members:
    :show-inheritance:
 
-app.routers.depends module
---------------------------
-
-.. automodule:: app.routers.depends
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-app.routers.views module
+app.schemas.token module
 ------------------------
 
-.. automodule:: app.routers.views
+.. automodule:: app.schemas.token
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+app.schemas.user module
+-----------------------
+
+.. automodule:: app.schemas.user
    :members:
    :undoc-members:
    :show-inheritance:
@@ -31,7 +31,7 @@ app.routers.views module
 Module contents
 ---------------
 
-.. automodule:: app.routers
+.. automodule:: app.schemas
    :members:
    :undoc-members:
    :show-inheritance:

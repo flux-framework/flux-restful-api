@@ -14,8 +14,10 @@ def submit_job(handle, jobspec, user):
     """
     Handle to submit a job, either with flux job submit or on behalf of user.
     """
-    if user:
+    if user and hasattr(user, "user_name"):
         print(f"User submitting job {user.user_name}")
+    elif user and isinstance(user, str):
+        print(f"User submitting job {user}")
     return flux.job.submit_async(handle, jobspec)
 
 

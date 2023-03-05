@@ -340,7 +340,10 @@ dependencies (done in devcontainer):
 cd docs
 pip install -r requirements.txt
 
-# Build the docs into _build/html
+# Ensure auth is off
+unset FLUX_REQUIRE_AUTH
+
+# And build the docs into _build/html
 make html
 ```
 

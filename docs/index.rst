@@ -1,6 +1,9 @@
-# Flux RESTFul API
+:hide-navigation:
 
-![Flux RESTFul API Logo](images/logo.png)
+Flux RESTFul API
+================
+
+.. image:: images/logo.png
 
 Welcome to the Flux RESTFul API!
 
@@ -33,18 +36,20 @@ you have ideas.
 
 To get started, check out the links below!
 Would you like to request a feature or contribute?
-[Open an issue](https://github.com/flux-framework/flux-restful-api/issues).
+`Open an issue <https://github.com/flux-framework/flux-restful-api/issues>`_.
 
-```{toctree}
-:maxdepth: 1
-getting_started/index.md
-tutorials/index
-contributing.md
-about/license
-```
 
-```{toctree}
-:caption: API
-:maxdepth: 1
-source/modules.rst
-```
+.. toctree::
+  :caption: Getting Started
+  :maxdepth: 2
+
+  getting_started/index.md
+  tutorials/index
+  contributing.md
+  about/license
+
+.. toctree::
+  :caption: API
+  :maxdepth: 1
+
+  source/modules.rst
