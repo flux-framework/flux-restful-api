@@ -22,7 +22,7 @@ jobs:
     needs: [prepare-container]
     services:
       api:
-        image: ghcr.io/flux-framework/flux-restful-api:test
+        image: ghcr.io/flux-framework/flux-restful-api:latest
         ports:
           - 5000:5000
         env:
@@ -44,7 +44,7 @@ jobs:
         env:
           INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
           INSTALL_REPO: ${{ github.repository }}
-        image: ghcr.io/flux-framework/flux-restful-api:test
+        image: ghcr.io/flux-framework/flux-restful-api:latest
         ports:
           - 5000:5000
     steps:
