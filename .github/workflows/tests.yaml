@@ -23,7 +23,6 @@ jobs:
       env:
         INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
         INSTALL_REPO: ${{ github.repository }}
-        FLUX_REQUIRE_AUTH: true
         FLUX_SECRET_KEY: notsosecrethoo
         FLUX_USER: fluxuser
         FLUX_TOKEN: "12345"
