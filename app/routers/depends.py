@@ -16,6 +16,9 @@ reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=login_url)
 
 
 def get_db() -> Generator:
+    """
+    Get the database in a context so we can then close it.
+    """
     try:
         db = SessionLocal()
         yield db
@@ -26,6 +29,11 @@ def get_db() -> Generator:
 def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> models.User:
+    """
+    Get the current user (via the token from the jwt)
+
+    And fail if not authenticated or expired.
+    """
     try:
         payload = jwt.decode(
             token, settings.secret_key, algorithms=[security.ALGORITHM]
@@ -45,6 +53,9 @@ def get_current_user(
 def get_current_active_user(
     current_user: models.User = Depends(get_current_user),
 ) -> models.User:
+    """
+    Get the currently active user.
+    """
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -53,6 +64,9 @@ def get_current_active_user(
 def get_current_active_superuser(
     current_user: models.User = Depends(get_current_user),
 ) -> models.User:
+    """
+    Get the currently active superuser.
+    """
     if not crud.user.is_superuser(current_user):
         raise HTTPException(
             status_code=400, detail="The user doesn't have enough privileges"

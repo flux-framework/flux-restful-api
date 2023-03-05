@@ -22,7 +22,7 @@ jobs:
     needs: [prepare-container]
     services:
       api:
-        image: ghcr.io/flux-framework/flux-restful-api:latest
+        image: ghcr.io/flux-framework/flux-restful-api:test
         ports:
           - 5000:5000
         env:
@@ -47,15 +47,18 @@ jobs:
           FLUX_USER: fluxuser
           FLUX_TOKEN: "12345"
           FLUX_REQUIRE_AUTH: true
-        image: ghcr.io/flux-framework/flux-restful-api:latest
+          FLUX_SECRET_KEY: notsecrethoo
+        image: ghcr.io/flux-framework/flux-restful-api:test
         ports:
           - 5000:5000
     steps:
     - uses: actions/checkout@v3
     - name: Run tests with auth
+      env:
+        FLUX_USER: fluxuser
+        FLUX_TOKEN: "12345"
+        FLUX_SECRET_KEY: notsecrethoo
       run: |
         cd clients/python
         pip install -e .[all]
-        export FLUX_USER=fluxuser
-        export FLUX_TOKEN=12345
         pytest -xs flux_restful_client/tests/test_api.py

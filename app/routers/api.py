@@ -4,18 +4,17 @@ from datetime import timedelta
 
 import flux.job
 import flux.resource
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
+from jose import jwt
 from sqlalchemy.orm import Session
 
 import app.core.security as security
 import app.library.flux as flux_cli
 import app.library.helpers as helpers
 import app.library.launcher as launcher
-import app.models as models
 import app.routers.depends as deps
 from app.core.config import settings
 from app.crud import user as crud_user
@@ -23,27 +22,50 @@ from app.library.auth import alert_auth
 
 # Print (hidden message) to give status of auth
 alert_auth()
-router = APIRouter(prefix="/v1", tags=["jobs"])
-no_auth_router = APIRouter(prefix="/v1", tags=["jobs"])
+router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
+no_auth_router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
 
 
 templates = Jinja2Templates(directory="templates/")
+user_auth = Depends(deps.get_current_active_user) if settings.require_auth else None
+
+denied_response = JSONResponse(content={"Message": "Denied"}, status_code=400)
 
 
-@router.post(f"/{deps.login_url}")
-async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(deps.get_db)
-):
+@router.post("/token")
+async def login(request: Request, db: Session = Depends(deps.get_db)):
     """
     This is the API endpoint to request an authentication token.
+
+    The Authorization header should have an encoded bearer token that
+    is a jwt payload with user, pass, and scope (token) encoded
+    with a shared secret.
     """
+    if "Authorization" not in request.headers:
+        return denied_response
+
+    header = request.headers["Authorization"].split(" ")[-1].strip()
+
+    # Decode with jwt and server secret
+    credentials = jwt.decode(
+        header, settings.secret_key, algorithms=[security.ALGORITHM]
+    )
+    for required in ["user", "pass", "scope"]:
+        if required not in credentials or not credentials[required]:
+            return denied_response
+
+    if credentials["scope"] != "token":
+        return denied_response
+
     user = crud_user.authenticate(
-        db, user_name=form_data.username, password=form_data.password
+        db, user_name=credentials["user"], password=credentials["pass"]
     )
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        return denied_response
     elif not crud_user.is_active(user):
-        raise HTTPException(status_code=400, detail="Inactive user")
+        return denied_response
+
+    # Generate a new access token
     access_token_expires = timedelta(minutes=settings.access_token_expires_minutes)
     return {
         "access_token": security.create_access_token(
@@ -54,7 +76,7 @@ async def login(
 
 
 @router.post("/service/stop")
-async def service_stop(user: models.User = Depends(deps.get_current_active_superuser)):
+async def service_stop(user=Depends(deps.get_current_active_superuser)):
     """
     Raise an error to stop (kill) the service.
 
@@ -65,9 +87,7 @@ async def service_stop(user: models.User = Depends(deps.get_current_active_super
 
 
 @router.get("/jobs/search")
-async def jobs_listing(
-    request: Request, user: models.User = Depends(deps.get_current_active_user)
-):
+async def jobs_listing(request: Request, user=user_auth):
     """
     Jobslist is intended to be used by the server to render data tables
 
@@ -107,9 +127,7 @@ async def jobs_listing(
 
 
 @router.get("/jobs")
-async def list_jobs(
-    request: Request, user: models.User = Depends(deps.get_current_active_user)
-):
+async def list_jobs(request: Request, user=user_auth):
     """
     List flux jobs associated with the handle.
     """
@@ -133,7 +151,7 @@ async def list_jobs(
 
 
 @router.get("/nodes")
-async def list_nodes(user: models.User = Depends(deps.get_current_active_user)):
+async def list_nodes(user=user_auth):
     """
     List nodes known to the Flux handle.
     """
@@ -148,7 +166,7 @@ async def list_nodes(user: models.User = Depends(deps.get_current_active_user)):
 
 
 @router.post("/jobs/{jobid}/cancel")
-async def cancel_job(jobid, user: models.User = Depends(deps.get_current_active_user)):
+async def cancel_job(jobid, user=user_auth):
     """
     Cancel a running flux job
     """
@@ -159,9 +177,7 @@ async def cancel_job(jobid, user: models.User = Depends(deps.get_current_active_
 
 
 @router.post("/jobs/submit")
-async def submit_job(
-    request: Request, user: models.User = Depends(deps.get_current_active_user)
-):
+async def submit_job(request: Request, user=user_auth):
     """
     Submit a job to our running cluster.
 
@@ -169,7 +185,7 @@ async def submit_job(
     include everything in this function instead of having separate
     functions.
     """
-    print(f"User for submit is {user}")
+    print(f"User for submit is {user.user_name}")
     from app.main import app
 
     # This can bork if no payload is provided
@@ -244,7 +260,7 @@ async def submit_job(
 
 
 @router.get("/jobs/{jobid}")
-async def get_job(jobid, user: models.User = Depends(deps.get_current_active_user)):
+async def get_job(jobid, user=user_auth):
     """
     Get job info based on id.
     """
@@ -254,9 +270,7 @@ async def get_job(jobid, user: models.User = Depends(deps.get_current_active_use
 
 
 @router.get("/jobs/{jobid}/output")
-async def get_job_output(
-    jobid, user: models.User = Depends(deps.get_current_active_user)
-):
+async def get_job_output(jobid, user=user_auth):
     """
     Get job output based on id.
     """

@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 
 import flux_restful_client.main.schemas as schemas
@@ -6,9 +7,19 @@ import flux_restful_client.utils as utils
 import jsonschema
 import requests
 from flux_restful_client.logger import logger
-from requests.auth import HTTPBasicAuth
+from jose import jwt
 
 from .settings import Settings
+
+
+def get_encoded_auth(user, token, secret_key):
+    """
+    This is encoded with the shared user/server secret
+    """
+    if not secret_key:
+        sys.exit("Cannot generate header without secret key")
+    auth_str = {"user": user, "pass": token, "scope": "token"}
+    return jwt.encode(auth_str, secret_key)  # algorithm is 'HS256'
 
 
 class FluxRestfulClient:
@@ -22,6 +33,7 @@ class FluxRestfulClient:
         user=None,
         token=None,
         quiet=False,
+        secret_key=None,
         settings_file=None,
         prefix="v1",
         attempts=5,
@@ -35,6 +47,7 @@ class FluxRestfulClient:
         self.host = host or self.settings.host
         self.user = user or os.environ.get("FLUX_USER") or self.settings.flux_user
         self.token = token or os.environ.get("FLUX_TOKEN") or self.settings.flux_token
+        self.secret_key = secret_key or os.environ.get("FLUX_SECRET_KEY")
         self.headers = {}
         self.quiet = quiet
         self.prefix = prefix
@@ -49,7 +62,7 @@ class FluxRestfulClient:
         """
         Add a token directly to a request
         """
-        self.set_header("Authorization", "Bearer %s" % token)
+        self.set_header("Authorization", f"Bearer {token}")
 
     def set_basic_auth(self, username, password):
         """
@@ -89,12 +102,8 @@ class FluxRestfulClient:
         # Always reset headers for new request.
         self.reset()
 
-        basic = None
-        if self.user and self.token:
-            basic = HTTPBasicAuth(self.user, self.token)
-
         headers = headers or self.headers
-        url = "%s/%s/%s" % (self.host, self.prefix, endpoint)
+        url = f"{self.host}/{self.prefix}/{endpoint}"
 
         # Make the request and return to calling function, unless requires auth
         try:
@@ -105,7 +114,6 @@ class FluxRestfulClient:
                 json=data,
                 headers=headers,
                 stream=stream,
-                auth=basic,
             )
         except Exception as e:
             if attempts > 0:
@@ -137,13 +145,28 @@ class FluxRestfulClient:
         Given a response, look for a Www-Authenticate header to parse. We
         return True/False to indicate if the request should be retried.
         """
-        # If we have a username and password, set basic auth automatically
-        if self.token and self.user and "Authorization" not in self.headers:
-            self.set_basic_auth(self.user, self.token)
-            return True
+        # If we have user and token and get here, likely need to recreate
+        if "Authorization" in self.headers:
+            del self.headers["Authorization"]
 
-        logger.warning("Authentication not provided, use set_basic_auth.")
-        return False
+        if "www-authenticate" not in originalResponse.headers:
+            logger.error(f"{originalResponse.url} missing www-authenticate header.")
+            return False
+
+        # Make request with encoded secret payload
+        headers = {
+            "Authorization": "Bearer %s"
+            % get_encoded_auth(self.user, self.token, self.secret_key)
+        }
+        response = self.do_request("token", method="post", headers=headers)
+        if response.status_code != 200:
+            logger.error(f"Issue requesting token: {response.reason}")
+            return False
+
+        token = response.json()
+        assert "access_token" in token and "token_type" in token
+        self.set_bearer_auth(token["access_token"])
+        return True
 
     def list_nodes(self):
         """
