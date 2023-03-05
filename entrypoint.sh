@@ -15,8 +15,8 @@ fi
 cd /code
 
 # Create flux user
-python app/db/init_db.py init
-# python app/db/init_db.py add-user myuser mypass
+python3 app/db/init_db.py init
+# python3 app/db/init_db.py add-user myuser mypass
 
 # And start the webserver
 flux start uvicorn app.main:app --host=${HOST} --port=${PORT} --workers=${WORKERS}

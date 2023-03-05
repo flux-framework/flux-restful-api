@@ -7,16 +7,33 @@ We provide [clients](https://github.com/flux-framework/flux-restful-api/tree/mai
 a running server, each described below, along with a quick container tutorial.
 The Python client is also included in our [Tutorials](https://flux-framework.org/flux-restful-api/auto_examples/index.html).
 
+## How does it work?
+
+If you choose to deploy without authentication, this is a ⚠️ proceed at your own risk ⚠️ sort of deal.
+By default it's not required, but it's highly recommended. To require authentication, we set a few
+environment variables to turn it on and define credentials and a secret (e.g., a driver that
+is running the API might randomly generate these accounts and secret) and then all interactions
+with the API or interface require authenticating. In the case of the web interface, we fall back
+to basic auth, and the user needs to enter a username and password. In the case of the API,
+we taken an OAuth2 based approach, where a request will original return with a 401 status
+and the "www-authenticate" header, and the calling client needs to then prepare an encoded
+payload to request a token. A successful receipt of the payload will return the token,
+which can be added to an Authorization header for subsequent requests.
+
+You largely don't need to worry about the complexity of the above because the SDKs will
+handle these interactions for you, given that you've provided some credentials and secret key.
+If you are using the Flux Operator, you largely don't need to do anything, as it will
+generate and provide both.
+
 ## Environment
 
-You should either have a Flux user and token from the server you created, or provided to you
-by an administrator. Currently Flux RESTFul API only supports the single user case,
-however this could be extended for other use cases (please [reach out](https://github.com/flux-framework/flux-restful-api/issues)
-to talk about design).
+You should either have a Flux user, token, and secret key from the server you created, or provided to you
+by an administrator. E.g.,
 
 ```bash
 $ export FLUX_USER=fluxuser
 $ export FLUX_TOKEN=12345
+$ export FLUX_SECRET_KEY=notsecrethoo
 ```
 
 You really should only be interacting with a server that doesn't require authentication if you are a developer.
