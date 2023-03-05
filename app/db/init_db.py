@@ -98,6 +98,11 @@ def get_parser():
     )
 
     # Submit a job (all extra is the command)
+    subparsers.add_parser(
+        "list-users",
+        description="list existing users",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     add_user = subparsers.add_parser(
         "add-user",
         description="add a new user and password to the database",
