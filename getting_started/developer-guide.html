@@ -244,43 +244,7 @@
 
   <li class="md-tabs__item">
     <a href="index.html" class="md-tabs__link md-tabs__link--active">
-      <span title="/getting_started/index.md (reference label)" class="md-ellipsis">Documentation</span>
-    </a>
-  </li>
-
-      
-        
-  
-  
-
-
-  <li class="md-tabs__item">
-    <a href="../tutorials/index.html" class="md-tabs__link">
-      <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
-    </a>
-  </li>
-
-      
-        
-  
-  
-
-
-  <li class="md-tabs__item">
-    <a href="../contributing.html" class="md-tabs__link">
-      <span title="/contributing.md (reference label)" class="md-ellipsis">Contributing</span>
-    </a>
-  </li>
-
-      
-        
-  
-  
-
-
-  <li class="md-tabs__item">
-    <a href="../about/license.html" class="md-tabs__link">
-      <span title="/about/license.md (reference label)" class="md-ellipsis">License</span>
+      <span class="md-ellipsis">Getting Started</span>
     </a>
   </li>
 
@@ -359,18 +323,47 @@
       
       
       
+        <label class="md-nav__link" for="__nav_1">
+          <span class="md-ellipsis">Getting Started</span>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Getting Started" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          <span class="md-ellipsis">Getting Started</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_1" type="checkbox" id="__nav_1_1" checked>
+      
+      
+      
         
         <div class="md-nav__link md-nav__link--index ">
           <a href="index.html"><span title="/getting_started/index.md (reference label)" class="md-ellipsis">Documentation</span></a>
           
-            <label for="__nav_1">
+            <label for="__nav_1_1">
               <span class="md-nav__icon md-icon"></span>
             </label>
           
         </div>
       
-      <nav class="md-nav" aria-label="Documentation" data-md-level="1">
-        <label class="md-nav__title" for="__nav_1">
+      <nav class="md-nav" aria-label="Documentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_1_1">
           <span class="md-nav__icon md-icon"></span>
           <span title="/getting_started/index.md (reference label)" class="md-ellipsis">Documentation</span>
         </label>
@@ -511,6 +504,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#database" class="md-nav__link">
+    <span title="/getting_started/developer-guide.md#database (reference label)" class="md-ellipsis">Database</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#documentation" class="md-nav__link">
     <span title="/getting_started/developer-guide.md#documentation (reference label)" class="md-ellipsis">Documentation</span>
   </a>
@@ -596,11 +596,10 @@
   
   
 
-    
-      
-      
-      
-
+            
+          
+            
+              
   
   
   
@@ -612,11 +611,10 @@
     </li>
   
 
-    
-      
-      
-      
-
+            
+          
+            
+              
   
   
   
@@ -628,11 +626,10 @@
     </li>
   
 
-    
-      
-      
-      
-
+            
+          
+            
+              
   
   
   
@@ -642,6 +639,14 @@
         <span title="/about/license.md (reference label)" class="md-ellipsis">License</span>
       </a>
     </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
   
 
     
@@ -656,17 +661,17 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
       
       
       
-        <label class="md-nav__link" for="__nav_5">
+        <label class="md-nav__link" for="__nav_2">
           <span class="md-ellipsis">API</span>
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
+        <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           <span class="md-ellipsis">API</span>
         </label>
@@ -719,7 +724,7 @@ environment.</p>
 <h2 id="devcontainer">Devcontainer<a class="headerlink" href="#devcontainer" title="Permalink to this heading">¶</a></h2>
 <p>If you use VSCode a  <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/tree/main/.devcontainer">.devcontainer</a>
 recipe is available that makes it easy to spin up an environment just by way of opening the repository in VSCode! After doing
-this, continue to <span class="xref myst">Local</span> below.</p>
+this, continue to <a class="reference internal" href="#Local"><span class="xref myst">Local</span></a> below.</p>
 <h2 id="docker">Docker<a class="headerlink" href="#docker" title="Permalink to this heading">¶</a></h2>
 <p>You can use the <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/pkgs/container/flux-restful-api">demo container</a>,
 either as provided or build on your own, to
@@ -780,9 +785,10 @@ correctly provided auth (or not):</p>
 </code></pre></div>
 </div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">🍓 Require auth: True</span>
-<span class="go">🍓     PAM auth: False</span>
+<span class="go">🍓   Secret key ***********</span>
 <span class="go">🍓    Flux user: ********</span>
 <span class="go">🍓   Flux token: *****</span>
+<span class="go">collected 5 items</span>
 <span class="go">INFO:     Started server process [72]</span>
 <span class="go">INFO:     Waiting for application startup.</span>
 <span class="go">INFO:     Application startup complete.</span>
@@ -920,12 +926,18 @@ The following variables are available (with their defaults):</p>
 <td>unset</td>
 </tr>
 <tr>
-<td>FLUX_ENABLE_PAM</td>
-<td>Enable PAM authentication (e.g., username and password must be users on the running server)</td>
+<td>FLUX_SECRET_KEY</td>
+<td>secret key to be shared between user and server (required)</td>
 <td>unset</td>
+</tr>
+<tr>
+<td>FLUX_ACCESS_TOKEN_EXPIRES_MINUTES</td>
+<td>number of minutes to expire an access token</td>
+<td>600</td>
 </tr>
 </tbody>
 </table>
+<p>Note that we currently use a global secret key, and this could be improved to use a user-specific one.</p>
 <h3 id="flux-option-flags">Flux Option Flags<a class="headerlink" href="#flux-option-flags" title="Permalink to this heading">¶</a></h3>
 <p>Option flags can be set server-wide or on the fly by a user in the interface
 (or restful API). An option set by a user will over-ride the server setting.
@@ -970,6 +982,51 @@ you can use pre-commit as follows. Here is a manual run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>pre-commit<span class="w"> </span>install
 </code></pre></div>
 </div>
+<h2 id="database">Database<a class="headerlink" href="#database" title="Permalink to this heading">¶</a></h2>
+<p>The database config was created with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>alembic<span class="w"> </span>init<span class="w"> </span>--template<span class="w"> </span>generic<span class="w"> </span>./migrations
+</code></pre></div>
+</div>
+<p>At this point we need to edit <code class="docutils literal notranslate"><span class="pre">migrations/env.py</span></code> so it could see our database models. This part:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># This line was added so we import our database</span>
+<span class="kn">from</span> <span class="nn">app.db.base</span> <span class="kn">import</span> <span class="n">Base</span>  <span class="c1"># noqa</span>
+
+<span class="n">target_metadata</span> <span class="o">=</span> <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span>
+</code></pre></div>
+</div>
+<p>At this point we can do a migration to create the initial (empty) tables.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>alembic<span class="w"> </span>revision<span class="w"> </span>--autogenerate<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Create intital tables&quot;</span>
+</code></pre></div>
+</div>
+<p>And then to run the first set of migrations:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>alembic<span class="w"> </span>upgrade<span class="w"> </span>head
+</code></pre></div>
+</div>
+<p>At this point we can create our initial super flux user:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_USER</span><span class="o">=</span>fluxuser
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_TOKEN</span><span class="o">=</span><span class="m">12345</span>
+</code></pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>python<span class="w"> </span>app/db/init_db.py<span class="w"> </span>init
+</code></pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp"># </span>python<span class="w"> </span>app/db/init_db.py<span class="w"> </span>init
+
+<span class="go">INFO:__main__:Creating initial data</span>
+<span class="go">INFO:__main__:User fluxuser has been created.</span>
+<span class="go">INFO:__main__:Initial data created</span>
+</code></pre></div>
+</div>
+<p>or add a user:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>python<span class="w"> </span>app/db/init_db.py<span class="w"> </span>add-user<span class="w"> </span>peenut<span class="w"> </span>peenut
+</code></pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">INFO:__main__:User peenut has been created.</span>
+</code></pre></div>
+</div>
+<p>You can see how we run these commands in the <code class="docutils literal notranslate"><span class="pre">entrypoint.sh</span></code> for the container.
+The database is always created fresh, and the flux user and token (superuser)
+are always generated from the environment variables shown above.</p>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">¶</a></h2>
 <p>The documentation is provided in the <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder of the repository,
 and generally most content that you might want to add is under
@@ -991,7 +1048,10 @@ dependencies (done in devcontainer):</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">cd docs</span>
 <span class="go">pip install -r requirements.txt</span>
 
-<span class="gp"># </span>Build<span class="w"> </span>the<span class="w"> </span>docs<span class="w"> </span>into<span class="w"> </span>_build/html
+<span class="gp"># </span>Ensure<span class="w"> </span>auth<span class="w"> </span>is<span class="w"> </span>off
+<span class="go">unset FLUX_REQUIRE_AUTH</span>
+
+<span class="gp"># </span>And<span class="w"> </span>build<span class="w"> </span>the<span class="w"> </span>docs<span class="w"> </span>into<span class="w"> </span>_build/html
 <span class="go">make html</span>
 </code></pre></div>
 </div>
@@ -1024,7 +1084,7 @@ functions from oras-py source code.</p>
   <small>
     
       Last update:
-      Feb 25, 2023
+      Mar 05, 2023
     
   </small>
 </div>
@@ -1101,7 +1161,7 @@ functions from oras-py source code.</p>
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    5.3.0.
+    6.1.3.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

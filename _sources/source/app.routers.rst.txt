@@ -12,6 +12,14 @@ app.routers.api module
    :undoc-members:
    :show-inheritance:
 
+app.routers.depends module
+--------------------------
+
+.. automodule:: app.routers.depends
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.routers.views module
 ------------------------
 

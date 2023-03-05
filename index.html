@@ -242,43 +242,7 @@
 
   <li class="md-tabs__item">
     <a href="getting_started/index.html" class="md-tabs__link">
-      <span title="/getting_started/index.md (reference label)" class="md-ellipsis">Documentation</span>
-    </a>
-  </li>
-
-      
-        
-  
-  
-
-
-  <li class="md-tabs__item">
-    <a href="tutorials/index.html" class="md-tabs__link">
-      <span title="/tutorials/index.md (reference label)" class="md-ellipsis">Tutorials</span>
-    </a>
-  </li>
-
-      
-        
-  
-  
-
-
-  <li class="md-tabs__item">
-    <a href="contributing.html" class="md-tabs__link">
-      <span title="/contributing.md (reference label)" class="md-ellipsis">Contributing</span>
-    </a>
-  </li>
-
-      
-        
-  
-  
-
-
-  <li class="md-tabs__item">
-    <a href="about/license.html" class="md-tabs__link">
-      <span title="/about/license.md (reference label)" class="md-ellipsis">License</span>
+      <span class="md-ellipsis">Getting Started</span>
     </a>
   </li>
 
@@ -306,7 +270,9 @@
           
             
               
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -347,6 +313,31 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1">
+          <span class="md-ellipsis">Getting Started</span>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Getting Started" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          <span class="md-ellipsis">Getting Started</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
   
     <li class="md-nav__item">
       <a href="getting_started/index.html" class="md-nav__link">
@@ -355,11 +346,10 @@
     </li>
   
 
-    
-      
-      
-      
-
+            
+          
+            
+              
   
   
   
@@ -371,11 +361,10 @@
     </li>
   
 
-    
-      
-      
-      
-
+            
+          
+            
+              
   
   
   
@@ -387,11 +376,10 @@
     </li>
   
 
-    
-      
-      
-      
-
+            
+          
+            
+              
   
   
   
@@ -401,6 +389,14 @@
         <span title="/about/license.md (reference label)" class="md-ellipsis">License</span>
       </a>
     </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
   
 
     
@@ -415,17 +411,17 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
       
       
       
-        <label class="md-nav__link" for="__nav_5">
+        <label class="md-nav__link" for="__nav_2">
           <span class="md-ellipsis">API</span>
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
+        <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           <span class="md-ellipsis">API</span>
         </label>
@@ -467,37 +463,61 @@
                   
 
 
-  <a href="https://github.com/flux-framework/flux-restful-api/blob/main/docs/index.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/flux-framework/flux-restful-api/blob/main/docs/index.rst" title="Edit this page" class="md-content__button md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
   </a>
 
 <h1 id="flux-restful-api">Flux RESTFul API<a class="headerlink" href="#flux-restful-api" title="Permalink to this heading">¶</a></h1>
-<p><img alt="Flux RESTFul API Logo" src="_images/logo.png" /></p>
+<img alt="_images/logo.png" src="_images/logo.png" />
 <p>Welcome to the Flux RESTFul API!</p>
 <p>This is a small Flux Python API (using FastAPI) that can be containerized
 alongside Flux, and provide an easy means to interact with Flux via the API.
 With Flux RESTful we can:</p>
 <ol class="arabic simple">
 <li><p>provide simple endpoints to submit jobs, list jobs, or get job status</p></li>
-<li><p>eventually support subscribing to events and a user interface job table</p></li>
-<li><p>option to kill or stop the server (intended for Flux Operator)</p></li>
-<li><p>allow for start with a user name and token (for basic auth)</p></li>
+<li><p>eventually support subscribing to events with the user interface job table</p></li>
+<li><p>OAuth2 flow with a user account and secret to retrieve tokens</p></li>
 </ol>
-<p>The assumption for a “Mini Cluster” use case, where one user owns an entire cluster
-and can submit jobs to it (see the <a class="reference external" href="https://github.com/flux-framework/flux-operator">Flux Operator</a>,
-is that we deploy this on the fly, alongside a Flux broker, and we only need to
-authenticate for the single user case. Given this setup, after deploying
-the Mini Cluster the user can submit jobs to it (and have it taken down)
-by way of a RESTful API call.</p>
+<p>There are three potential use cases:</p>
+<ol class="arabic simple">
+<li><p>No authentication: “I like to live dangerously.”</p></li>
+<li><p>Single-user authentication: “Use the default single account created by the server”</p></li>
+<li><p>Multi-user authentication: “Add one or more users in addition to the superuser.”</p></li>
+</ol>
+<p>The authentication serves as a light wrapper to submitting jobs to Flux,
+and there is not much more than that. The assumption for a “MiniCluster” use case
+is that one or more users own an entire cluster and can submit jobs to
+using the [Flux Operator](<a class="reference external" href="https://github.com/flux-framework/flux-operator">https://github.com/flux-framework/flux-operator</a>).
+This means that the Flux Operator creates and authenticates the server on
+the fly, alongside a Flux broker. In the case of deploying alongside a more
+production level Flux install, you likely want to expose the user interface
+for cluster users. We will be adding back a PAM authentication flow to go
+alongside with this, likely having users on the host match to server users.
+Note that I (&#64;vsoch) have not thought deeply about this use case yet, so
+please [ping me](<a class="reference external" href="https://github.com/flux-framework/flux-restful-api/issues">https://github.com/flux-framework/flux-restful-api/issues</a>) if
+you have ideas.</p>
 <p>To get started, check out the links below!
 Would you like to request a feature or contribute?
 <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/issues">Open an issue</a>.</p>
 <div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started/index.html">Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/index.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started/user-guide.html">User Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started/developer-guide.html">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started/interface.html">Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started/api.html">API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/index.html#external-tutorials">External Tutorials</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#pull-request-process">Pull Request Process</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="about/license.html">License</a></li>
 </ul>
 </div>
@@ -514,12 +534,14 @@ Would you like to request a feature or contribute?
   <small>
     
       Last update:
-      Feb 25, 2023
+      Mar 05, 2023
     
   </small>
 </div>
 
 
+
+  
 
 
 
@@ -541,6 +563,8 @@ Would you like to request a feature or contribute?
       
         <footer class="md-footer">
   
+    
+      
     
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
@@ -576,7 +600,7 @@ Would you like to request a feature or contribute?
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    5.3.0.
+    6.1.3.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   

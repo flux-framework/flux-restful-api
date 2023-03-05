@@ -20,6 +20,14 @@ app.core.logging module
    :undoc-members:
    :show-inheritance:
 
+app.core.security module
+------------------------
+
+.. automodule:: app.core.security
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
