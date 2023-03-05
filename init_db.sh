@@ -5,5 +5,5 @@
 FLUX_USER=${FLUX_USER:-fluxuser}
 FLUX_TOKEN=${FLUX_USER:-12345}
 
-python app/db/init_db.py init
+python app/db/init_db.py init || python3 app/db/init_db.py init
 # python app/db/init_db.py add-user peenut peenut
