@@ -261,29 +261,14 @@ def get_job(jobid, user=None):
     payload = {"id": jobid, "attrs": ["all"]}
     rpc = flux.job.list.JobListIdRPC(app.handle, "job-list.list-id", payload)
     try:
-        jobinfo = rpc.get()
+        jobinfo = rpc.get_job()
 
     # The job does not exist!
     except FileNotFoundError:
         return None
 
-    jobinfo = jobinfo["job"]
-
     # User friendly string from integer
-    state = jobinfo["state"]
-    jobinfo["state"] = flux.job.info.statetostr(state)
-
-    # Get job info to add to result
-    info = rpc.get_jobinfo()
-    jobinfo["nnodes"] = info._nnodes
-    jobinfo["result"] = info.result
-    jobinfo["returncode"] = info.returncode
-    jobinfo["runtime"] = info.runtime
-    jobinfo["priority"] = info._priority
-    jobinfo["waitstatus"] = info._waitstatus
-    jobinfo["nodelist"] = info._nodelist
-    jobinfo["nodelist"] = info._nodelist
-    jobinfo["exception"] = info._exception.__dict__
+    jobinfo["state"] = flux.job.info.statetostr(jobinfo["state"])
 
     # Only appears after finished?
     if "duration" not in jobinfo:

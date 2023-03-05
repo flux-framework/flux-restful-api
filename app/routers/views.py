@@ -170,7 +170,9 @@ async def submit_job_post(request: Request, user=user_auth):
         print(form.kwargs)
 
         if form.kwargs.get("is_launcher") is True:
-            messages.append(launcher.launch(form.kwargs, workdir=form.workdir))
+            messages.append(
+                launcher.launch(form.kwargs, workdir=form.workdir, user=user)
+            )
         else:
             return submit_job_helper(request, app, form, user=user)
     else:

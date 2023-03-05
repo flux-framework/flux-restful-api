@@ -11,5 +11,6 @@ pyaml
 sqlalchemy
 # install also provides alembic binary
 alembic
+pydantic
 python-jose[cryptography]
 passlib[bcrypt]

@@ -240,7 +240,7 @@ async def submit_job(request: Request, user=user_auth):
     is_launcher = payload.get("is_launcher", False)
     if is_launcher:
         print("TODO need to test multi-user")
-        message = launcher.launch(kwargs, workdir=workdir, envars=envars)
+        message = launcher.launch(kwargs, workdir=workdir, envars=envars, user=user)
         result = jsonable_encoder({"Message": message, "id": "MANY"})
     else:
         # Prepare and submit the job and return the ID, but allow for error

@@ -5,10 +5,11 @@ import subprocess
 from app.core.config import settings
 
 
-def launch(kwargs, workdir=None, envars=None):
+def launch(kwargs, workdir=None, envars=None, user=None):
     """
     Launch a job with a known launcher
     """
+    # TODO handle user case
     envars = envars or {}
 
     # Generate the flux job
