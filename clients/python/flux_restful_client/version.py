@@ -1,4 +1,4 @@
-__version__ = "0.0.16"
+__version__ = "0.1.0"
 AUTHOR = "Vanessa Sochat"
 EMAIL = "vsoch@users.noreply.github.com"
 NAME = "flux-restful-client"
@@ -17,6 +17,7 @@ INSTALL_REQUIRES = (
     ("ruamel.yaml", {"min_version": None}),
     ("requests", {"min_version": None}),
     ("jsonschema", {"min_version": None}),
+    ("python-jose[cryptography]", {"min_version": None}),
 )
 
 TESTS_REQUIRES = (("pytest", {"min_version": "4.6.2"}),)

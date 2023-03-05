@@ -45,11 +45,6 @@ tool to generate a contributors graphic below.
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 
-## TODO
-
-- Interface view with nice job table
-- We can put additional assets for the server in [data](data), not sure what those are yet!
-
 #### Release
 
 SPDX-License-Identifier: LGPL-3.0

@@ -1,6 +1,5 @@
 import json
 import os
-import pwd
 import re
 import shlex
 import time
@@ -8,32 +7,17 @@ import time
 import flux
 import flux.job
 
-import app.library.terminal as terminal
 from app.core.config import settings
-
-# Faux user environment (filtered set of application environment)
-# We could likely find a way to better do this, but likely the users won't have customized environments
-user_env = {
-    "SHELL": "/bin/bash",
-    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
-    "XDG_RUNTIME_DIR": "/tmp/user/0",
-    "DISPLAY": ":0",
-    "COLORTERM": "truecolor",
-    "SHLVL": "2",
-    "DEBIAN_FRONTEND": "noninteractive",
-    "MAKE_TERMERR": "/dev/pts/1",
-    "LANG": "C.UTF-8",
-    "TERM": "xterm-256color",
-}
 
 
 def submit_job(handle, jobspec, user):
     """
     Handle to submit a job, either with flux job submit or on behalf of user.
     """
-    # We've enabled PAM auth
-    if settings.enable_pam:
-        return terminal.submit_job(jobspec, user)
+    if user and hasattr(user, "user_name"):
+        print(f"User submitting job {user.user_name}")
+    elif user and isinstance(user, str):
+        print(f"User submitting job {user}")
     return flux.job.submit_async(handle, jobspec)
 
 
@@ -84,7 +68,7 @@ def validate_submit_kwargs(kwargs, envars=None, runtime=None):
     return errors
 
 
-def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
+def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     """
     After validation, prepare the job (shared function).
     """
@@ -111,6 +95,13 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
         print(f"⭐️ Setting shell option: {option}={value}")
         fluxjob.setattr_shell_option(option, value)
 
+    # Set an attribute about the owning user
+    if user and hasattr(user, "user_name"):
+        fluxjob.setattr("user", user.user_name)
+    elif isinstance(user, str):
+        fluxjob.setattr("user", user)
+
+    # Set a provided working directory
     print(f"⭐️ Workdir provided: {workdir}")
     if workdir is not None:
         fluxjob.cwd = workdir
@@ -119,11 +110,9 @@ def prepare_job(kwargs, runtime=0, workdir=None, envars=None):
     fluxjob.duration = runtime
 
     # If we are running as the user, we don't want the current (root) environment
-    # This isn't perfect because it's artifically created, but it ensures we have paths
-    if settings.enable_pam:
-        environment = user_env
-    else:
-        environment = dict(os.environ)
+    # However, if we don't provide it, flux stops working.
+    # We need to test different ideas for this.
+    environment = dict(os.environ)
 
     # Additional envars in the payload?
     environment.update(envars)
@@ -171,9 +160,7 @@ def cancel_job(jobid, user):
 
     Returns a message to the user and a return code.
     """
-    if settings.enable_pam:
-        return terminal.cancel_job(jobid, user)
-
+    # TODO need to validate the user owns the job here
     from app.main import app
 
     try:
@@ -190,13 +177,12 @@ def get_job_output(jobid, user=None, delay=None):
 
     If there is a delay, we are requesting on demand, so we want to return early.
     """
-    # We've enabled PAM auth
-    if settings.enable_pam:
-        return terminal.get_job_output(jobid, user, delay=delay)
-
+    # TODO need to validate the user owns the job here
     lines = []
     start = time.time()
     from app.main import app
+
+    jobid = flux.job.JobID(jobid)
 
     # If the submit is too close to the log reqest, it cannot find the file handle
     # It could be also the jobid cannot be found.
@@ -247,13 +233,10 @@ def list_jobs(user=None):
     """
     Get a simple listing of jobs (just the ids)
     """
+    # TODO need to validate the user owns the job here
     from app.main import app
 
-    if user is None or not settings.enable_pam:
-        return flux.job.job_list(app.handle)
-    pw_record = pwd.getpwnam(user)
-    user_uid = pw_record.pw_uid
-    return flux.job.job_list(app.handle, userid=user_uid)
+    return flux.job.job_list(app.handle)
 
 
 def get_simple_job(jobid):
@@ -266,44 +249,33 @@ def get_simple_job(jobid):
     return json.loads(info.get_str())["job"]
 
 
-def get_job(jobid, user):
+def get_job(jobid, user=None):
     """
     Get details for a job
     """
+    # TODO need to validate the user owns the job here
     from app.main import app
 
     jobid = flux.job.JobID(jobid)
 
     payload = {"id": jobid, "attrs": ["all"]}
-    if settings.enable_pam:
-        payload["user"] = user
     rpc = flux.job.list.JobListIdRPC(app.handle, "job-list.list-id", payload)
     try:
-        jobinfo = rpc.get()
+        jobinfo = rpc.get_job()
 
     # The job does not exist!
     except FileNotFoundError:
         return None
 
-    jobinfo = jobinfo["job"]
-
     # User friendly string from integer
-    state = jobinfo["state"]
-    jobinfo["state"] = flux.job.info.statetostr(state)
+    jobinfo["state"] = flux.job.info.statetostr(jobinfo["state"])
 
-    # Get job info to add to result
-    info = rpc.get_jobinfo()
-    jobinfo["nnodes"] = info._nnodes
-    jobinfo["result"] = info.result
-    jobinfo["returncode"] = info.returncode
-    jobinfo["runtime"] = info.runtime
-    jobinfo["priority"] = info._priority
-    jobinfo["waitstatus"] = info._waitstatus
-    jobinfo["nodelist"] = info._nodelist
-    jobinfo["nodelist"] = info._nodelist
-    jobinfo["exception"] = info._exception.__dict__
+    # These likely appear only after completion
+    for required in ["result", "returncode", "runtime", "waitstatus", "duration"]:
+        if required not in jobinfo:
+            jobinfo[required] = ""
 
-    # Only appears after finished?
-    if "duration" not in jobinfo:
-        jobinfo["duration"] = ""
+    # This should be a dictionary
+    if "exception" not in jobinfo:
+        jobinfo["exception"] = {}
     return jobinfo

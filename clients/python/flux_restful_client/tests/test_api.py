@@ -36,6 +36,7 @@ def test_submit_list_job():
     jobid = response["id"]
 
     # Now we should see jobs
+    time.sleep(3)
     response = client.jobs()
     assert response["jobs"]
     assert len(response["jobs"]) == 1

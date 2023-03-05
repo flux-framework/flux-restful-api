@@ -1,5 +1,6 @@
 import asyncio
 import os
+from datetime import timedelta
 
 import flux.job
 import flux.resource
@@ -7,31 +8,80 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
+from jose import jwt
+from sqlalchemy.orm import Session
 
-import app.core.config as config
+import app.core.security as security
 import app.library.flux as flux_cli
 import app.library.helpers as helpers
 import app.library.launcher as launcher
-from app.library.auth import alert_auth, check_auth
+import app.routers.depends as deps
+from app.core.config import settings
+from app.crud import user as crud_user
+from app.library.auth import alert_auth
 
 # Print (hidden message) to give status of auth
 alert_auth()
-router = APIRouter(
-    prefix="/v1",
-    tags=["jobs"],
-    dependencies=[Depends(check_auth)] if config.settings.require_auth else [],
-    responses={404: {"description": "Not found"}},
-)
-no_auth_router = APIRouter(prefix="/v1", tags=["jobs"])
+router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
+no_auth_router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
 
-# Require auth (and the user in the view)
-user_auth = Depends(check_auth) if config.settings.require_auth else None
 
 templates = Jinja2Templates(directory="templates/")
+user_auth = Depends(deps.get_current_active_user) if settings.require_auth else None
+
+denied_response = JSONResponse(content={"Message": "Denied"}, status_code=400)
+
+
+@router.post("/token")
+async def login(request: Request, db: Session = Depends(deps.get_db)):
+    """
+    This is the API endpoint to request an authentication token.
+
+    The Authorization header should have an encoded bearer token that
+    is a jwt payload with user, pass, and scope (token) encoded
+    with a shared secret.
+    """
+    print(request.headers)
+    if "Authorization" not in request.headers:
+        return denied_response
+
+    header = request.headers["Authorization"].split(" ")[-1].strip()
+
+    # Decode with jwt and server secret
+    credentials = jwt.decode(
+        header, settings.secret_key, algorithms=[security.ALGORITHM]
+    )
+    print(credentials)
+
+    for required in ["user", "pass", "scope"]:
+        if required not in credentials or not credentials[required]:
+            return denied_response
+
+    if credentials["scope"] != "token":
+        return denied_response
+
+    user = crud_user.authenticate(
+        db, user_name=credentials["user"], password=credentials["pass"]
+    )
+    if not user:
+        print("cannot find user")
+        return denied_response
+    elif not crud_user.is_active(user):
+        print("user is not active")
+        return denied_response
+
+    # Generate a new access token
+    access_token_expires = timedelta(minutes=settings.access_token_expires_minutes)
+    return {
+        "access_token": security.create_access_token(
+            user.id, expires_delta=access_token_expires
+        ),
+        "token_type": "Bearer",
+    }
 
 
 @router.post("/service/stop")
-async def service_stop():
+async def service_stop(user=Depends(deps.get_current_active_superuser)):
     """
     Raise an error to stop (kill) the service.
 
@@ -106,7 +156,7 @@ async def list_jobs(request: Request, user=user_auth):
 
 
 @router.get("/nodes")
-async def list_nodes():
+async def list_nodes(user=user_auth):
     """
     List nodes known to the Flux handle.
     """
@@ -140,6 +190,7 @@ async def submit_job(request: Request, user=user_auth):
     include everything in this function instead of having separate
     functions.
     """
+    print(f"User for submit is {user}")
     from app.main import app
 
     # This can bork if no payload is provided
@@ -188,15 +239,16 @@ async def submit_job(request: Request, user=user_auth):
     # Are we using a launcher instead?
     is_launcher = payload.get("is_launcher", False)
     if is_launcher:
-        print("TODO need to test multi-user")
-        message = launcher.launch(kwargs, workdir=workdir, envars=envars)
+        message = launcher.launch(kwargs, workdir=workdir, envars=envars, user=user)
         result = jsonable_encoder({"Message": message, "id": "MANY"})
     else:
         # Prepare and submit the job and return the ID, but allow for error
         try:
+            print(f"Preparing flux job with {kwargs}")
             fluxjob = flux_cli.prepare_job(
-                kwargs, runtime=runtime, workdir=workdir, envars=envars
+                user, kwargs, runtime=runtime, workdir=workdir, envars=envars
             )
+            print(f"Prepared flux job {fluxjob}")
             # This handles either a single/multi user case
             flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         except Exception as e:

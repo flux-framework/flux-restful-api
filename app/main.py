@@ -7,10 +7,18 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.core.logging import init_loggers
+from app.db.base import Base
+from app.db.session import engine
 from app.routers import api, views
 
 init_loggers()
 log = logging.getLogger("flux-restful")
+
+# Alembic should make the models
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception:
+    pass
 
 app = FastAPI()
 

@@ -45,9 +45,10 @@ $ docker run --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
 ```
 ```console
 🍓 Require auth: True
-🍓     PAM auth: False
+🍓   Secret key ***********
 🍓    Flux user: ********
 🍓   Flux token: *****
+collected 5 items
 INFO:     Started server process [72]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
@@ -190,7 +191,10 @@ The following variables are available (with their defaults):
 |FLUX_HAS_GPU | GPUs are available for the user to request | unset |
 |FLUX_NUMBER_NODES| The number of nodes available in the cluster | 1 |
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
-|FLUX_ENABLE_PAM | Enable PAM authentication (e.g., username and password must be users on the running server) | unset |
+|FLUX_SECRET_KEY | secret key to be shared between user and server (required) | unset |
+|FLUX_ACCESS_TOKEN_EXPIRES_MINUTES| number of minutes to expire an access token | 600 |
+
+Note that we currently use a global secret key, and this could be improved to use a user-specific one.
 
 ### Flux Option Flags
 
@@ -249,6 +253,64 @@ And to install as a hook (recommended so you never commit with linting flaws!)
 $ pre-commit install
 ```
 
+## Database
+
+The database config was created with:
+
+```bash
+$ alembic init --template generic ./migrations
+```
+
+At this point we need to edit `migrations/env.py` so it could see our database models. This part:
+
+```python
+# This line was added so we import our database
+from app.db.base import Base  # noqa
+
+target_metadata = Base.metadata
+```
+
+At this point we can do a migration to create the initial (empty) tables.
+
+```bash
+$ alembic revision --autogenerate -m "Create intital tables"
+```
+
+And then to run the first set of migrations:
+
+```bash
+$ alembic upgrade head
+```
+
+At this point we can create our initial super flux user:
+
+```bash
+export FLUX_USER=fluxuser
+export FLUX_TOKEN=12345
+```
+```bash
+$ python app/db/init_db.py init
+```
+```console
+# python app/db/init_db.py init
+
+INFO:__main__:Creating initial data
+INFO:__main__:User fluxuser has been created.
+INFO:__main__:Initial data created
+```
+
+or add a user:
+
+```bash
+$ python app/db/init_db.py add-user peenut peenut
+```
+```console
+INFO:__main__:User peenut has been created.
+```
+
+You can see how we run these commands in the `entrypoint.sh` for the container.
+The database is always created fresh, and the flux user and token (superuser)
+are always generated from the environment variables shown above.
 
 ## Documentation
 
@@ -279,7 +341,10 @@ dependencies (done in devcontainer):
 cd docs
 pip install -r requirements.txt
 
-# Build the docs into _build/html
+# Ensure auth is off
+unset FLUX_REQUIRE_AUTH
+
+# And build the docs into _build/html
 make html
 ```
 
