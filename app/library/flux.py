@@ -14,7 +14,8 @@ def submit_job(handle, jobspec, user):
     """
     Handle to submit a job, either with flux job submit or on behalf of user.
     """
-    print(f"User submitting job {user.user_name}")
+    if user:
+        print(f"User submitting job {user.user_name}")
     return flux.job.submit_async(handle, jobspec)
 
 
@@ -93,7 +94,10 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
         fluxjob.setattr_shell_option(option, value)
 
     # Set an attribute about the owning user
-    fluxjob.setattr("user", user.user_name)
+    if user and hasattr(user, "user_name"):
+        fluxjob.setattr("user", user.user_name)
+    elif isinstance(user, str):
+        fluxjob.setattr("user", user)
 
     # Set a provided working directory
     print(f"⭐️ Workdir provided: {workdir}")
