@@ -9,14 +9,25 @@ from app.schemas.user import UserCreate, UserUpdate
 
 
 class UserModel(ModelBase[User, UserCreate, UserUpdate]):
+    """
+    Class that wraps the User model.
+    """
+
     def get_by_username(self, db: Session, *, user_name: str) -> Optional[User]:
+        """
+        Get a user by username from the database.
+        """
         return db.query(User).filter(User.user_name == user_name).first()
 
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
+        """
+        Create a new user object.
+        """
         db_obj = User(
             user_name=obj_in.user_name,
             hashed_password=get_password_hash(obj_in.password),
             is_superuser=obj_in.is_superuser,
+            is_active=obj_in.is_active,
         )
         db.add(db_obj)
         db.commit()
@@ -26,6 +37,9 @@ class UserModel(ModelBase[User, UserCreate, UserUpdate]):
     def update(
         self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
     ) -> User:
+        """
+        Update a user.
+        """
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
@@ -39,6 +53,9 @@ class UserModel(ModelBase[User, UserCreate, UserUpdate]):
     def authenticate(
         self, db: Session, *, user_name: str, password: str
     ) -> Optional[User]:
+        """
+        Determine if a user exists by the user name and checking the password.
+        """
         user = self.get_by_username(db, user_name=user_name)
         if not user:
             return None
@@ -47,9 +64,15 @@ class UserModel(ModelBase[User, UserCreate, UserUpdate]):
         return user
 
     def is_active(self, user: User) -> bool:
+        """
+        Courtesy function to see if user is active.
+        """
         return user.is_active
 
     def is_superuser(self, user: User) -> bool:
+        """
+        Courtesy function to check if a user is a superuser.
+        """
         return user.is_superuser
 
 

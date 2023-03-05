@@ -41,6 +41,15 @@ def init_db() -> None:
     logger.info("Initial data created")
 
 
+def list_users():
+    """
+    List users in the database.
+    """
+    db = SessionLocal()
+    for user in crud_user.get_multi(db):
+        logger.info(user)
+
+
 def add_user(username, password, superuser=False, is_active=True) -> None:
     """
     One off function to add a user to the database
@@ -68,6 +77,8 @@ def main() -> None:
     args, _ = parser.parse_known_args()
     if args.command == "init":
         init_db()
+    elif args.command == "list-users":
+        list_users()
     elif args.command == "add-user":
         add_user(args.username, args.password)
     else:
