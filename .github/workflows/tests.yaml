@@ -17,12 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare-container]
     container:
-      image: ghcr.io/flux-framework/flux-restful-api:latest
+      image: ghcr.io/flux-framework/flux-restful-api:test
       ports:
        - 5000
       env:
         INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
         INSTALL_REPO: ${{ github.repository }}
+        FLUX_SECRET_KEY: notsosecret
     steps:
     - uses: actions/checkout@v3
     - name: Install Dependencies (in case changes)
@@ -38,7 +39,7 @@ jobs:
         ./init_db.sh
 
         # Require auth and shared secret key
-        export FLUX_SECRET_KEY=secretkey
+        export FLUX_SECRET_KEY=notsosecret
         export FLUX_REQUIRE_AUTH=true
         export TEST_AUTH=true
         flux start pytest -xs tests/test_api.py
