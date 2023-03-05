@@ -4,19 +4,14 @@ FROM fluxrm/flux-sched:focal
 
 # This must be set to work (username / token set won't trigger it alone)
 ARG use_auth
-ARG user="fluxuser"
-ARG token="12345"
-ARG port="5000"
-ARG host="0.0.0.0"
-ARG workers="1"
 LABEL maintainer="Vanessasaurus <@vsoch>"
 
-ENV FLUX_USER=${user}
-ENV FLUX_TOKEN=${token}
+ENV FLUX_USER=${user:-fluxuser}
+ENV FLUX_TOKEN=${token:-12345}
 ENV FLUX_REQUIRE_AUTH=${use_auth}
-ENV PORT=${port}
-ENV HOST=${host}
-ENV WORKERS=${workers}
+ENV PORT=${port:-5000}
+ENV HOST=${host:-0.0.0.0}
+ENV WORKERS=${workers:-1}
 
 USER root
 RUN apt-get update

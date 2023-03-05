@@ -23,7 +23,10 @@ jobs:
       env:
         INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
         INSTALL_REPO: ${{ github.repository }}
+        FLUX_REQUIRE_AUTH: true
         FLUX_SECRET_KEY: notsosecrethoo
+        FLUX_USER: fluxuser
+        FLUX_TOKEN: "12345"
     steps:
     - uses: actions/checkout@v3
     - name: Install Dependencies (in case changes)
