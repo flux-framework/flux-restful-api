@@ -44,21 +44,17 @@ jobs:
         env:
           INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
           INSTALL_REPO: ${{ github.repository }}
-          FLUX_USER: fluxuser
-          FLUX_TOKEN: "12345"
-          FLUX_REQUIRE_AUTH: true
-          FLUX_SECRET_KEY: notsecrethoo
         image: ghcr.io/flux-framework/flux-restful-api:test
         ports:
           - 5000:5000
     steps:
     - uses: actions/checkout@v3
     - name: Run tests with auth
-      env:
-        FLUX_USER: fluxuser
-        FLUX_TOKEN: "12345"
-        FLUX_SECRET_KEY: notsecrethoo
       run: |
+        export FLUX_USER=fluxuser
+        export FLUX_TOKEN=12345
+        export FLUX_REQUIRE_AUTH=true
+        export FLUX_SECRET_KEY=notsecrethoo
         cd clients/python
         pip install -e .[all]
         pytest -xs flux_restful_client/tests/test_api.py
