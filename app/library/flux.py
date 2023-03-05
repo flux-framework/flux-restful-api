@@ -270,7 +270,12 @@ def get_job(jobid, user=None):
     # User friendly string from integer
     jobinfo["state"] = flux.job.info.statetostr(jobinfo["state"])
 
-    # Only appears after finished?
-    if "duration" not in jobinfo:
-        jobinfo["duration"] = ""
+    # These likely appear only after completion
+    for required in ["result", "returncode", "runtime", "waitstatus", "duration"]:
+        if required not in jobinfo:
+            jobinfo[required] = ""
+
+    # This should be a dictionary
+    if "exception" not in jobinfo:
+        jobinfo["exception"] = {}
     return jobinfo
