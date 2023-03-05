@@ -41,6 +41,7 @@ async def login(request: Request, db: Session = Depends(deps.get_db)):
     is a jwt payload with user, pass, and scope (token) encoded
     with a shared secret.
     """
+    print(request.headers)
     if "Authorization" not in request.headers:
         return denied_response
 
@@ -50,6 +51,8 @@ async def login(request: Request, db: Session = Depends(deps.get_db)):
     credentials = jwt.decode(
         header, settings.secret_key, algorithms=[security.ALGORITHM]
     )
+    print(credentials)
+
     for required in ["user", "pass", "scope"]:
         if required not in credentials or not credentials[required]:
             return denied_response
@@ -61,8 +64,10 @@ async def login(request: Request, db: Session = Depends(deps.get_db)):
         db, user_name=credentials["user"], password=credentials["pass"]
     )
     if not user:
+        print("cannot find user")
         return denied_response
     elif not crud_user.is_active(user):
+        print("user is not active")
         return denied_response
 
     # Generate a new access token

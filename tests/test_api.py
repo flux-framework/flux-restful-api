@@ -36,6 +36,9 @@ def get_headers():
     flux_user = os.environ.get("FLUX_USER")
     flux_token = os.environ.get("FLUX_TOKEN")
     secret_key = os.environ.get("FLUX_SECRET_KEY")
+    print(flux_user)
+    print(flux_token)
+    print(secret_key)
     if not secret_key:
         sys.exit("Cannot generate header without secret key")
     auth_str = {"user": flux_user, "pass": flux_token, "scope": "token"}

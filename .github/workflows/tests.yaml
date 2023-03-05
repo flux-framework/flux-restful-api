@@ -36,7 +36,6 @@ jobs:
         # Create main user in database
         export FLUX_USER=fluxuser
         export FLUX_TOKEN=12345
-        cat ./init_db.sh
         ./init_db.sh
 
         # Require auth and shared secret key

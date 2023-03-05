@@ -45,9 +45,10 @@ $ docker run --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
 ```
 ```console
 🍓 Require auth: True
-🍓     PAM auth: False
+🍓   Secret key ***********
 🍓    Flux user: ********
 🍓   Flux token: *****
+collected 5 items
 INFO:     Started server process [72]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
