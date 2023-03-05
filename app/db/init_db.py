@@ -41,10 +41,12 @@ def init_db() -> None:
     logger.info("Initial data created")
 
 
-def add_user(username, password, superuser=False) -> None:
+def add_user(username, password, superuser=False, is_active=True) -> None:
     """
     One off function to add a user to the database
     """
+    username = username.strip()
+    password = password.strip()
     db = SessionLocal()
 
     user = crud_user.get_by_username(db, user_name=username)
@@ -53,6 +55,7 @@ def add_user(username, password, superuser=False) -> None:
             user_name=username,
             password=password,
             is_superuser=superuser,
+            is_active=is_active,
         )
         user = crud_user.create(db, obj_in=user_in)  # noqa: F841
         logger.info(f"User {username} has been created.")
