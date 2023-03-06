@@ -151,15 +151,13 @@ def sign_job(fluxjob, uid):
     )
     ps.wait()
 
-    # Give the jobspec to the job
-    fluxjob.jobspec = output.strip()
     # There is a newline present that wouldn't be there if it weren't for subprocess
     # This is how it's done on the command line, where fluxuser is 1002 and flux 1000
     # is the instance owner
     # flux run --dry-run -n1 id -u | flux python sign-job.py 1002 > job.signed
     # flux job submit --flags=signed job.signed
     # This is the signed payload
-    return fluxjob
+    return output
 
 
 def query_job(jobinfo, query):
