@@ -14,6 +14,14 @@ root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 submit_script = os.path.join(root, "scripts", "submit-job.py")
 
 
+class FakeJob:
+    def __init__(self, jobid):
+        self.jobid = jobid
+
+    def get_id(self):
+        return self.jobid
+
+
 def submit_job(handle, fluxjob, user):
     """
     Submit the job on behalf of user.
@@ -36,8 +44,10 @@ def submit_job(handle, fluxjob, user):
         stdin=ps.stdout,
     )
     ps.wait()
-    print(output)
-    return {"id": output.strip()}
+
+    job = FakeJob(output.strip())
+    print(job)
+    return job
 
 
 def validate_submit_kwargs(kwargs, envars=None, runtime=None):
