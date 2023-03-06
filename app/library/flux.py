@@ -147,7 +147,7 @@ def sign_job(fluxjob, uid):
     # We ideally need to pipe the payload into flux python
     ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
     output = subprocess.check_output(
-        ("sudo", "flux", "python", sign_script, str(uid)), stdin=ps.stdout
+        ("flux", "python", sign_script, str(uid)), stdin=ps.stdout
     )
     ps.wait()
 
