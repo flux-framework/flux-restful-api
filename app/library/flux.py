@@ -1,6 +1,5 @@
 import json
 import os
-import pwd
 import re
 import shlex
 import subprocess
@@ -12,20 +11,33 @@ import flux.job
 from app.core.config import settings
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sign_script = os.path.join(root, "scripts", "sign-job.py")
+submit_script = os.path.join(root, "scripts", "submit-job.py")
 
 
-def submit_job(handle, jobspec, user):
+def submit_job(handle, fluxjob, user):
     """
-    Handle to submit a job, either with flux job submit or on behalf of user.
+    Submit the job on behalf of user.
     """
     if user and hasattr(user, "user_name"):
         print(f"User submitting job {user.user_name}")
     elif user and isinstance(user, str):
         print(f"User submitting job {user}")
-    if not settings.require_auth:
-        return flux.job.submit_async(handle, jobspec)
-    return flux.job.submit_async(handle, jobspec, pre_signed=True)
+
+    # TODO get rid of handle
+    # Update the payload for the correct user
+    # Use helper script to sign payload
+    payload = json.dumps(fluxjob.jobspec)
+    print(payload)
+
+    # We ideally need to pipe the payload into flux python
+    ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
+    output = subprocess.check_output(
+        ("sudo", "-u", user, "flux", "python", submit_script),
+        stdin=ps.stdout,
+    )
+    ps.wait()
+    print(output)
+    return {"id": output.strip()}
 
 
 def validate_submit_kwargs(kwargs, envars=None, runtime=None):
@@ -125,40 +137,7 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     # Additional envars in the payload?
     environment.update(envars)
     fluxjob.environment = environment
-
-    # If auth is disabled, we don't have users
-    if not settings.require_auth:
-        return fluxjob
-
-    return sign_job(fluxjob, user)
-
-
-def sign_job(fluxjob, user):
-    """
-    Sign a flux job.
-    """
-    # Get the user id in question TODO verify this is the one on the system
-    # We likely want to generate a shared password and double check with pam
-    uid = pwd.getpwnam(user).pw_uid
-
-    # Use helper script to sign payload
-    payload = json.dumps(fluxjob.jobspec)
-
-    # We ideally need to pipe the payload into flux python
-    ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
-    output = subprocess.check_output(
-        ("sudo", "-u", user, "flux", "python", sign_script, str(uid)),
-        stdin=ps.stdout,
-    )
-    ps.wait()
-
-    # There is a newline present that wouldn't be there if it weren't for subprocess
-    # This is how it's done on the command line, where fluxuser is 1002 and flux 1000
-    # is the instance owner
-    # flux run --dry-run whoami | flux python sign-job.py 1001 > job.signed
-    # flux job submit --flags=signed job.signed
-    # This is the signed payload
-    return output
+    return fluxjob
 
 
 def query_job(jobinfo, query):
