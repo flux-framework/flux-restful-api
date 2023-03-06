@@ -1,13 +1,18 @@
 import json
 import os
+import pwd
 import re
 import shlex
+import subprocess
 import time
 
 import flux
 import flux.job
 
 from app.core.config import settings
+
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sign_script = os.path.join(root, "scripts", "sign-job.py")
 
 
 def submit_job(handle, jobspec, user):
@@ -18,7 +23,9 @@ def submit_job(handle, jobspec, user):
         print(f"User submitting job {user.user_name}")
     elif user and isinstance(user, str):
         print(f"User submitting job {user}")
-    return flux.job.submit_async(handle, jobspec)
+    if not settings.require_auth:
+        return flux.job.submit_async(handle, jobspec)
+    return flux.job.submit_async(handle, jobspec, pre_signed=True)
 
 
 def validate_submit_kwargs(kwargs, envars=None, runtime=None):
@@ -98,8 +105,10 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     # Set an attribute about the owning user
     if user and hasattr(user, "user_name"):
         fluxjob.setattr("user", user.user_name)
+        uid = pwd.getpwnam(user.user_name).pw_uid
     elif isinstance(user, str):
         fluxjob.setattr("user", user)
+        uid = pwd.getpwnam(user).pw_uid
 
     # Set a provided working directory
     print(f"⭐️ Workdir provided: {workdir}")
@@ -117,7 +126,38 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     # Additional envars in the payload?
     environment.update(envars)
     fluxjob.environment = environment
-    return fluxjob
+
+    # If auth is disabled, we don't have users
+    if not settings.require_auth:
+        return fluxjob
+
+    return sign_job(fluxjob, uid)
+
+
+def sign_job(fluxjob, uid):
+    """
+    Sign a flux job.
+    """
+    # Get the user id in question TODO verify this is the one on the system
+    # We likely want to generate a shared password and double check with pam
+
+    # Use helper script to sign payload
+    payload = json.dumps(fluxjob.jobspec)
+
+    # We ideally need to pipe the payload into flux python
+    ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
+    output = subprocess.check_output(
+        ("sudo", "flux", "python", sign_script, str(uid)), stdin=ps.stdout
+    )
+    ps.wait()
+
+    # There is a newline present that wouldn't be there if it weren't for subprocess
+    # This is how it's done on the command line, where fluxuser is 1002 and flux 1000
+    # is the instance owner
+    # flux run --dry-run -n1 id -u | flux python sign-job.py 1002 > job.signed
+    # flux job submit --flags=signed job.signed
+    # This is the signed payload
+    return output.strip()
 
 
 def query_job(jobinfo, query):
