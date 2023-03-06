@@ -105,10 +105,9 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     # Set an attribute about the owning user
     if user and hasattr(user, "user_name"):
         fluxjob.setattr("user", user.user_name)
-        uid = pwd.getpwnam(user.user_name).pw_uid
-    elif isinstance(user, str):
-        fluxjob.setattr("user", user)
-        uid = pwd.getpwnam(user).pw_uid
+        user = user.user_name
+
+    fluxjob.setattr("user", user)
 
     # Set a provided working directory
     print(f"⭐️ Workdir provided: {workdir}")
@@ -131,15 +130,16 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     if not settings.require_auth:
         return fluxjob
 
-    return sign_job(fluxjob, uid)
+    return sign_job(fluxjob, user)
 
 
-def sign_job(fluxjob, uid):
+def sign_job(fluxjob, user):
     """
     Sign a flux job.
     """
     # Get the user id in question TODO verify this is the one on the system
     # We likely want to generate a shared password and double check with pam
+    uid = pwd.getpwnam(user).pw_uid
 
     # Use helper script to sign payload
     payload = json.dumps(fluxjob.jobspec)
@@ -147,14 +147,15 @@ def sign_job(fluxjob, uid):
     # We ideally need to pipe the payload into flux python
     ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
     output = subprocess.check_output(
-        ("flux", "python", sign_script, str(uid)), stdin=ps.stdout
+        ("sudo", "-u", user, "flux", "python", sign_script, str(uid)),
+        stdin=ps.stdout,
     )
     ps.wait()
 
     # There is a newline present that wouldn't be there if it weren't for subprocess
     # This is how it's done on the command line, where fluxuser is 1002 and flux 1000
     # is the instance owner
-    # flux run --dry-run -n1 id -u | flux python sign-job.py 1002 > job.signed
+    # flux run --dry-run whoami | flux python sign-job.py 1001 > job.signed
     # flux job submit --flags=signed job.signed
     # This is the signed payload
     return output

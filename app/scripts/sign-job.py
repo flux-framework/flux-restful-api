@@ -14,4 +14,4 @@ userid = int(sys.argv[1])
 ctx = SecurityContext()
 payload = sys.stdin.read()
 
-print(ctx.sign_wrap_as(userid, payload, mech_type="none").decode("utf-8"))
+print(ctx.sign_wrap_as(userid, payload, mech_type="munge").decode("utf-8"))
