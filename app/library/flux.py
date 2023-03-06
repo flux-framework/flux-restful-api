@@ -22,7 +22,7 @@ class FakeJob:
         return self.jobid
 
 
-def submit_job(handle, fluxjob, user):
+def submit_job(fluxjob, user):
     """
     Submit the job on behalf of user.
     """
@@ -31,7 +31,6 @@ def submit_job(handle, fluxjob, user):
     elif user and isinstance(user, str):
         print(f"User submitting job {user}")
 
-    # TODO get rid of handle
     # Update the payload for the correct user
     # Use helper script to sign payload
     payload = json.dumps(fluxjob.jobspec)

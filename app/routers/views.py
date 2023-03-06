@@ -163,7 +163,6 @@ async def submit_job_post(request: Request, user=user_auth):
     Receive data posted (submit) to the form.
     """
     print(user)
-    from app.main import app
 
     messages = []
     form = SubmitForm(request)
@@ -177,7 +176,7 @@ async def submit_job_post(request: Request, user=user_auth):
                 launcher.launch(form.kwargs, workdir=form.workdir, user=user)
             )
         else:
-            return submit_job_helper(request, app, form, user=user)
+            return submit_job_helper(request, form, user=user)
     else:
         print("🍒 Submit form is NOT valid!")
     return templates.TemplateResponse(
@@ -192,7 +191,7 @@ async def submit_job_post(request: Request, user=user_auth):
     )
 
 
-def submit_job_helper(request, app, form, user):
+def submit_job_helper(request, form, user):
     """
     A helper to submit a flux job (not a launcher)
     """
@@ -202,7 +201,7 @@ def submit_job_helper(request, app, form, user):
         fluxjob = flux_cli.prepare_job(
             user, form.kwargs, runtime=form.runtime, workdir=form.workdir
         )
-        flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
+        flux_future = flux_cli.submit_job(fluxjob, user=user)
         jobid = flux_future.get_id()
         intid = flux.job.JobID(jobid)
         message = f"Your job was successfully submit! 🦊 <a target='_blank' style='color:magenta' href='/job/{intid}'>{jobid}</a>"
