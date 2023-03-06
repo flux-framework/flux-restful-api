@@ -8,4 +8,4 @@ import flux.job
 payload = sys.stdin.read()
 fluxjob = flux.job.JobspecV1.from_yaml_stream(payload)
 job = flux.job.submit_async(flux.Flux(), payload)
-print(str(job.get_id()))
+print(job.get_id())
