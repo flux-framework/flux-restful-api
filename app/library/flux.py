@@ -45,8 +45,9 @@ def submit_job(handle, fluxjob, user):
     )
     ps.wait()
 
-    job = FakeJob(output.strip())
-    print(job)
+    jobid = output.decode("utf-8").strip()
+    print("Submit job {jobid}")
+    job = FakeJob(jobid)
     return job
 
 
