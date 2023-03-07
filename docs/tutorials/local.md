@@ -138,7 +138,7 @@ And finally, get the log:
 
 ```bash
 out = cli.output()
-# {'Output': ['sochat1\n']}
+# {'Output': ['dinosaur1\n']}
 ```
 
 And that's it! You've successfully used the flux restful API in single user
@@ -226,7 +226,17 @@ $ flux-restful-cli list-nodes
         "corona194"
     ]
 }
-
 ```
 
 Or finally, get the output!
+
+```bash
+$ flux-restful-cli logs 1944496111616
+```
+```console
+dinosaur1
+```
+
+And that's it! This is entirely not needed for a cluster since the Flux
+command line tool is available, but it's a nice proof of concept to show
+that it works.
