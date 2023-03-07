@@ -1,5 +1,6 @@
 import json
 import os
+import pwd
 import re
 import shlex
 import subprocess
@@ -37,10 +38,16 @@ def submit_job(handle, fluxjob, user):
         print("Submit in single-user mode.")
         return flux.job.submit_async(handle, fluxjob)
 
+    pw_record = pwd.getpwnam(user)
+    user_name = pw_record.pw_name
+    # user_uid = pw_record.pw_uid
+    # user_gid = pw_record.pw_gid
+
     # Update the payload for the correct user
-    # Use helper script to sign payload
+    fluxjob.environment["HOME"] = pw_record.pw_dir
+    fluxjob.environment["LOGNAME"] = user_name
+    fluxjob.environment["USER"] = pw_record.pw_name
     payload = json.dumps(fluxjob.jobspec)
-    # payload['HOME'] =
 
     # We ideally need to pipe the payload into flux python
     try:
