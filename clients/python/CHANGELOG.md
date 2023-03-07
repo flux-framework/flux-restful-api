@@ -14,6 +14,10 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+ - Expose host to environment and bug fix for logs (0.1.14)
+ - Ensure we update flux environment for user (0.1.13)
+ - Add better multi-user mode - running jobs on behalf of user (0.1.12)
+ - Restore original rpc to get job info (has more information) (0.1.11)
  - refactor to require secret key, oauth2 flow (0.1.0)
  - add simple retry to requests (0.0.16)
  - support for adding option flags to submit (0.0.15)

@@ -15,6 +15,7 @@ def main(args, parser, extra, subparser):
 
     # The command is the "extra"
     kwargs = {"command": extra}
+    logger.debug(f"Command: {extra}")
     for arg in [
         "num_tasks",
         "cores_per_task",

@@ -12,7 +12,7 @@ def main(args, parser, extra, subparser):
         for line in cli.stream_output(jobid=args.jobid, stream=args.stream):
             print(line.strip())
     else:
-        logs = cli.output(jobid=args.jobid, stream=args.stream)
+        logs = cli.output(jobid=args.jobid)
         if "Output" in logs:
             for line in logs["Output"]:
                 # Ensure we only have one newline!

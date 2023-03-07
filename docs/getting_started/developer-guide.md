@@ -193,8 +193,8 @@ The following variables are available (with their defaults):
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
 |FLUX_SECRET_KEY | secret key to be shared between user and server (required) | unset |
 |FLUX_ACCESS_TOKEN_EXPIRES_MINUTES| number of minutes to expire an access token | 600 |
+|FLUX_RESTFUL_HOST| Host for command line client | http://127.0.0.1:5000 |
 
-Note that we currently use a global secret key, and this could be improved to use a user-specific one.
 
 ### Flux Option Flags
 
