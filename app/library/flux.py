@@ -67,7 +67,7 @@ def submit_job(handle, fluxjob, user):
         )
 
     jobid = output.decode("utf-8").strip()
-    print("Submit job {jobid}")
+    print(f"Submit job {jobid}")
     job = FakeJob(jobid)
     return job
 
