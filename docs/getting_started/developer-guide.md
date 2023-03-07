@@ -363,7 +363,14 @@ And open your browser to `localhost:9999`
 ### Run Tests
 
 To run tests, from within the devcontainers environment (or with a local install)
-of Flux alongside the app) you can do:
+of Flux alongside the app) you can use flux start. You will need to run them as the
+flux instance owner. E.g., if it's flux:
+
+```bash
+$ sudo -u flux flux start pytest -xs tests/test_api.py
+```
+
+or if it's just root / a single user:
 
 ```bash
 $ flux start pytest -xs tests/test_api.py
