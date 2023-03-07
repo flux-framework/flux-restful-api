@@ -1,7 +1,7 @@
 # Local Install
 
 This tutorial will show running the Flux Restful API on an allocation where you have flux
-(so you are the instance owner). This is arguably unecessary, because you have the Flux
+(so you are the instance owner). This is arguably unnecessary, because you have the Flux
 command line client to interact with, but we show the example to demonstrate that it's
 possible.
 
