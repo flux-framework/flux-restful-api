@@ -51,4 +51,5 @@ jobs:
         # This needs to be run as the flux instance owner
         # E.g., if it's flux
         # sudo -u flux flux start pytest -xs tests/test_api.py
-        flux start pytest -xs tests/test_api.py
+        whoami
+        sudo -u fluxuser flux start pytest -xs tests/test_api.py
