@@ -935,9 +935,13 @@ The following variables are available (with their defaults):</p>
 <td>number of minutes to expire an access token</td>
 <td>600</td>
 </tr>
+<tr>
+<td>FLUX_RESTFUL_HOST</td>
+<td>Host for command line client</td>
+<td>http://127.0.0.1:5000</td>
+</tr>
 </tbody>
 </table>
-<p>Note that we currently use a global secret key, and this could be improved to use a user-specific one.</p>
 <h3 id="flux-option-flags">Flux Option Flags<a class="headerlink" href="#flux-option-flags" title="Permalink to this heading">¶</a></h3>
 <p>Option flags can be set server-wide or on the fly by a user in the interface
 (or restful API). An option set by a user will over-ride the server setting.
