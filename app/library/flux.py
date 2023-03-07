@@ -2,6 +2,7 @@ import json
 import os
 import re
 import shlex
+import subprocess
 import time
 
 import flux
@@ -9,16 +10,59 @@ import flux.job
 
 from app.core.config import settings
 
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+submit_script = os.path.join(root, "scripts", "submit-job.py")
 
-def submit_job(handle, jobspec, user):
+
+class FakeJob:
+    def __init__(self, jobid):
+        self.jobid = jobid
+
+    def get_id(self):
+        return self.jobid
+
+
+def submit_job(handle, fluxjob, user):
     """
-    Handle to submit a job, either with flux job submit or on behalf of user.
+    Submit the job on behalf of user.
     """
     if user and hasattr(user, "user_name"):
         print(f"User submitting job {user.user_name}")
+        user = user.user_name
     elif user and isinstance(user, str):
         print(f"User submitting job {user}")
-    return flux.job.submit_async(handle, jobspec)
+
+    # If we don't have auth enabled, submit in single-user mode
+    if not settings.require_auth:
+        print("Submit in single-user mode.")
+        return flux.job.submit_async(handle, fluxjob)
+
+    # Update the payload for the correct user
+    # Use helper script to sign payload
+    payload = json.dumps(fluxjob.jobspec)
+    # payload['HOME'] =
+
+    # We ideally need to pipe the payload into flux python
+    try:
+        ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
+        output = subprocess.check_output(
+            ("sudo", "-E", "-u", user, "flux", "python", submit_script),
+            stdin=ps.stdout,
+            env=os.environ,
+        )
+        ps.wait()
+
+    # A flux start without sudo -u flux can cause this
+    # This will be caught and returned to the user
+    except PermissionError as e:
+        raise ValueError(
+            f"Permission error: {e}! Are you running the instance as the flux user?"
+        )
+
+    jobid = output.decode("utf-8").strip()
+    print("Submit job {jobid}")
+    job = FakeJob(jobid)
+    return job
 
 
 def validate_submit_kwargs(kwargs, envars=None, runtime=None):
@@ -98,8 +142,9 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     # Set an attribute about the owning user
     if user and hasattr(user, "user_name"):
         fluxjob.setattr("user", user.user_name)
-    elif isinstance(user, str):
-        fluxjob.setattr("user", user)
+        user = user.user_name
+
+    fluxjob.setattr("user", user)
 
     # Set a provided working directory
     print(f"⭐️ Workdir provided: {workdir}")

@@ -190,8 +190,9 @@ async def submit_job(request: Request, user=user_auth):
     include everything in this function instead of having separate
     functions.
     """
-    print(f"User for submit is {user}")
     from app.main import app
+
+    print(f"User for submit is {user}")
 
     # This can bork if no payload is provided
     try:

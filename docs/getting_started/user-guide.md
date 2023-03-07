@@ -9,26 +9,65 @@ The Python client is also included in our [Tutorials](https://flux-framework.org
 
 ## How does it work?
 
+### Modes
+
+There are two modes of interaction:
+
+ - **single-user mode**: assumes you are running an instance as the flux user, and submitting jobs as that user.
+ - **multi-user mode**: requires authentication via the RESTful API with an encoded payload to request expiring tokens. When authentication is successful, the
+   job is run as the same user on the system on behalf of the flux user.
+
+### Authentication
+
 If you choose to deploy without authentication, this is a ⚠️ proceed at your own risk ⚠️ sort of deal.
-By default it's not required, but it's highly recommended. To require authentication, we set a few
-environment variables to turn it on and define credentials and a secret (e.g., a driver that
-is running the API might randomly generate these accounts and secret) and then all interactions
-with the API or interface require authenticating. In the case of the web interface, we fall back
-to basic auth, and the user needs to enter a username and password. In the case of the API,
-we taken an OAuth2 based approach, where a request will original return with a 401 status
-and the "www-authenticate" header, and the calling client needs to then prepare an encoded
+We call this the "single-user" case, and it means that you are submitting jobs as the instance owner,
+typically a user named "flux." If it's just you that owns the cluster, or a small group of trusted friends,
+this is probably OK. When you enable authentication, the following happens:
+
+ - A server secret that you export via `FLUX_SECREY_KEY` is used to encode payloads. You'll need to provide this to users.
+ - The server is created adding users with names and passwords, so every user known to Flux Restful is known to the server.
+   - Passwords are hashed
+   - We don't currently check authentication here with PAM (but we could).
+ - A user making a request provided an encoded payload (first) with the encoded username and password
+ - The server decodes the payload, authenticates, and (given a valid username and password) generates an expiring token.
+ - The user adds the token header to subsequent requests.
+
+To require this authentication, we set a few environment variables to turn it on and define credentials
+and a secret (e.g., a driver that is running the API might randomly generate these accounts and secret) and then all interactions
+with the API or interface require authenticating. As an example, the Flux Operator will make both the server user
+accounts and the Flux Restful database accounts when you spin up a MiniCluster.
+
+#### Web Interface Basic Authentication
+
+In the case of the web interface (which does not necessarily need to be exposed, e.g., the Flux Operator requires a port forward)
+we fall back to basic auth, and the user needs to enter a username and password.
+
+#### API OAuth2 Style Authentication
+
+In the case of the API, we taken an OAuth2 based approach, where a request will originally
+return with a 401 status and the "www-authenticate" header, and the calling client needs to then prepare an encoded
 payload to request a token. A successful receipt of the payload will return the token,
-which can be added to an Authorization header for subsequent requests.
+which can be added to an Authorization header for subsequent requests (up until it expires).
 
 You largely don't need to worry about the complexity of the above because the SDKs will
 handle these interactions for you, given that you've provided some credentials and secret key.
 If you are using the Flux Operator, you largely don't need to do anything, as it will
 generate and provide both.
 
+## What does this user-guide include?
+
+This user-guide assumes you are a user of the flux restful API, meaning you are either
+running it alongside a production Flux cluster, or it's running already in another
+context and you have been given credentials to access it. If you want to learn about how
+to setup the API itself, see the [developer documentation](developer-guide.md).
+
+
 ## Environment
 
-You should either have a Flux user, token, and secret key from the server you created, or provided to you
-by an administrator. E.g.,
+Whether you are in single- or multi- user mode, you will need a username and token to
+interact with the server. In single-user mode this will be the flux superuser credentials
+that the server was created with. In multi-user mode this will be your username and password,
+along with a secret key to encode paylods for the token. E.g.,
 
 ```bash
 $ export FLUX_USER=fluxuser
@@ -36,9 +75,9 @@ $ export FLUX_TOKEN=12345
 $ export FLUX_SECRET_KEY=notsecrethoo
 ```
 
-You really should only be interacting with a server that doesn't require authentication if you are a developer.
 From here, continue reading the user guide for different language clients,
-or see our Python [examples](https://github.com/flux-framework/flux-restful-api/tree/main/clients/python/examples) folder.
+or see our Python [examples](https://github.com/flux-framework/flux-restful-api/tree/main/clients/python/examples) folder
+for snippet examples, or the [tutorials](../tutorials/index.md) for more complex setups.
 
 ## Python
 

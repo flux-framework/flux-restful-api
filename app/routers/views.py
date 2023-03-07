@@ -163,7 +163,6 @@ async def submit_job_post(request: Request, user=user_auth):
     Receive data posted (submit) to the form.
     """
     print(user)
-    from app.main import app
 
     messages = []
     form = SubmitForm(request)
@@ -177,7 +176,7 @@ async def submit_job_post(request: Request, user=user_auth):
                 launcher.launch(form.kwargs, workdir=form.workdir, user=user)
             )
         else:
-            return submit_job_helper(request, app, form, user=user)
+            return submit_job_helper(request, form, user=user)
     else:
         print("🍒 Submit form is NOT valid!")
     return templates.TemplateResponse(
@@ -192,10 +191,12 @@ async def submit_job_post(request: Request, user=user_auth):
     )
 
 
-def submit_job_helper(request, app, form, user):
+def submit_job_helper(request, form, user):
     """
     A helper to submit a flux job (not a launcher)
     """
+    from app.main import app
+
     # Submit the job and return the ID, but allow for error
     # Prepare the flux job! We don't support envars here yet
     try:

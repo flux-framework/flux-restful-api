@@ -1,4 +1,4 @@
-__version__ = "0.1.1"
+__version__ = "0.1.12"
 AUTHOR = "Vanessa Sochat"
 EMAIL = "vsoch@users.noreply.github.com"
 NAME = "flux-restful-client"

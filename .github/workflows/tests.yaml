@@ -48,4 +48,8 @@ jobs:
         export FLUX_REQUIRE_AUTH=true
         export TEST_AUTH=true
 
-        flux start pytest -xs tests/test_api.py
+        # This needs to be run as the flux instance owner
+        # E.g., if it's flux
+        # sudo -u flux flux start pytest -xs tests/test_api.py
+        whoami
+        sudo -u fluxuser flux start pytest -xs tests/test_api.py
