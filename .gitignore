@@ -1,5 +1,6 @@
 flux-restful.db
 env
+migrations/versions/*.py
 .env
 __pycache__
 *.tar.gz

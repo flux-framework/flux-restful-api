@@ -44,7 +44,7 @@ class FluxRestfulClient:
         if not hasattr(self, "settings"):
             self.settings = Settings(settings_file)
 
-        self.host = host or self.settings.host
+        self.host = host or os.environ.get("FLUX_RESTFUL_HOST") or self.settings.host
         self.user = user or os.environ.get("FLUX_USER") or self.settings.flux_user
         self.token = token or os.environ.get("FLUX_TOKEN") or self.settings.flux_token
         self.secret_key = secret_key or os.environ.get("FLUX_SECRET_KEY")
