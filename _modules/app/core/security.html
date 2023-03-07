@@ -482,8 +482,17 @@
 
 
 <div class="viewcode-block" id="create_access_token"><a class="viewcode-back" href="../../../source/app.core.html#app.core.security.create_access_token">[docs]</a><span class="k">def</span> <span class="nf">create_access_token</span><span class="p">(</span>
-    <span class="n">subject</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">expires_delta</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">subject</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">expires_delta</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a jwt access token.</span>
+
+<span class="sd">    We either use the user&#39;s secret key (which is hashed) or fall</span>
+<span class="sd">    back to the server set secret key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Use a user secret key, if they have one.</span>
+    <span class="c1"># Otherwise fall back to server secret key</span>
+    <span class="n">secret_key</span> <span class="o">=</span> <span class="n">secret_key</span> <span class="ow">or</span> <span class="n">settings</span><span class="o">.</span><span class="n">secret_key</span>
     <span class="k">if</span> <span class="n">expires_delta</span><span class="p">:</span>
         <span class="n">expire</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">expires_delta</span>
     <span class="k">else</span><span class="p">:</span>
@@ -491,14 +500,20 @@
             <span class="n">minutes</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">access_token_expires_minutes</span>
         <span class="p">)</span>
     <span class="n">to_encode</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">expire</span><span class="p">,</span> <span class="s2">&quot;sub&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">subject</span><span class="p">)}</span>
-    <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">to_encode</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">ALGORITHM</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">to_encode</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">ALGORITHM</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="verify_password"><a class="viewcode-back" href="../../../source/app.core.html#app.core.security.verify_password">[docs]</a><span class="k">def</span> <span class="nf">verify_password</span><span class="p">(</span><span class="n">plain_password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">hashed_password</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verify the password</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">pwd_context</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">plain_password</span><span class="p">,</span> <span class="n">hashed_password</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_password_hash"><a class="viewcode-back" href="../../../source/app.core.html#app.core.security.get_password_hash">[docs]</a><span class="k">def</span> <span class="nf">get_password_hash</span><span class="p">(</span><span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Note we aren&#39;t providing a salt here, so the same password can generate different.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">pwd_context</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">password</span><span class="p">)</span></div>
 </code></pre></div>
 
@@ -507,7 +522,7 @@
   <small>
     
       Last update:
-      Mar 05, 2023
+      Mar 07, 2023
     
   </small>
 </div>

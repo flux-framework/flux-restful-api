@@ -498,6 +498,8 @@
 <div class="viewcode-block" id="ModelBase.get_multi"><a class="viewcode-back" href="../../../source/app.crud.html#app.crud.base.ModelBase.get_multi">[docs]</a>    <span class="k">def</span> <span class="nf">get_multi</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ModelType</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">skip</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">skip</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ModelBase.create"><a class="viewcode-back" href="../../../source/app.crud.html#app.crud.base.ModelBase.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">obj_in</span><span class="p">:</span> <span class="n">CreateSchemaType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelType</span><span class="p">:</span>
@@ -540,7 +542,7 @@
   <small>
     
       Last update:
-      Mar 05, 2023
+      Mar 07, 2023
     
   </small>
 </div>

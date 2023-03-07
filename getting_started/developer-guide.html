@@ -1064,7 +1064,12 @@ server to preview:</p>
 <p>And open your browser to <code class="docutils literal notranslate"><span class="pre">localhost:9999</span></code></p>
 <h3 id="run-tests">Run Tests<a class="headerlink" href="#run-tests" title="Permalink to this heading">¶</a></h3>
 <p>To run tests, from within the devcontainers environment (or with a local install)
-of Flux alongside the app) you can do:</p>
+of Flux alongside the app) you can use flux start. You will need to run them as the
+flux instance owner. E.g., if it’s flux:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>-u<span class="w"> </span>flux<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>pytest<span class="w"> </span>-xs<span class="w"> </span>tests/test_api.py
+</code></pre></div>
+</div>
+<p>or if it’s just root / a single user:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>pytest<span class="w"> </span>-xs<span class="w"> </span>tests/test_api.py
 </code></pre></div>
 </div>
@@ -1084,7 +1089,7 @@ functions from oras-py source code.</p>
   <small>
     
       Last update:
-      Mar 05, 2023
+      Mar 07, 2023
     
   </small>
 </div>

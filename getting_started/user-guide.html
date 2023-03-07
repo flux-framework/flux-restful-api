@@ -411,6 +411,53 @@
     <span title="/getting_started/user-guide.md#how-does-it-work (reference label)" class="md-ellipsis">How does it work?</span>
   </a>
   
+    <nav class="md-nav" aria-label="How does it work?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modes" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#modes (reference label)" class="md-ellipsis">Modes</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#authentication (reference label)" class="md-ellipsis">Authentication</span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web-interface-basic-authentication" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#web-interface-basic-authentication (reference label)" class="md-ellipsis">Web Interface Basic Authentication</span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-oauth2-style-authentication" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#api-oauth2-style-authentication (reference label)" class="md-ellipsis">API OAuth2 Style Authentication</span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-does-this-user-guide-include" class="md-nav__link">
+    <span title="/getting_started/user-guide.md#what-does-this-user-guide-include (reference label)" class="md-ellipsis">What does this user-<wbr>guide include?</span>
+  </a>
+  
 </li>
       
         <li class="md-nav__item">
@@ -713,31 +760,64 @@ We provide <a class="reference external" href="https://github.com/flux-framework
 a running server, each described below, along with a quick container tutorial.
 The Python client is also included in our <a class="reference external" href="https://flux-framework.org/flux-restful-api/auto_examples/index.html">Tutorials</a>.</p>
 <h2 id="how-does-it-work">How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this heading">¶</a></h2>
+<h3 id="modes">Modes<a class="headerlink" href="#modes" title="Permalink to this heading">¶</a></h3>
+<p>There are two modes of interaction:</p>
+<ul class="simple">
+<li><p><strong>single-user mode</strong>: assumes you are running an instance as the flux user, and submitting jobs as that user.</p></li>
+<li><p><strong>multi-user mode</strong>: requires authentication via the RESTful API with an encoded payload to request expiring tokens. When authentication is successful, the
+job is run as the same user on the system on behalf of the flux user.</p></li>
+</ul>
+<h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading">¶</a></h3>
 <p>If you choose to deploy without authentication, this is a ⚠️ proceed at your own risk ⚠️ sort of deal.
-By default it’s not required, but it’s highly recommended. To require authentication, we set a few
-environment variables to turn it on and define credentials and a secret (e.g., a driver that
-is running the API might randomly generate these accounts and secret) and then all interactions
-with the API or interface require authenticating. In the case of the web interface, we fall back
-to basic auth, and the user needs to enter a username and password. In the case of the API,
-we taken an OAuth2 based approach, where a request will original return with a 401 status
-and the “www-authenticate” header, and the calling client needs to then prepare an encoded
+We call this the “single-user” case, and it means that you are submitting jobs as the instance owner,
+typically a user named “flux.” If it’s just you that owns the cluster, or a small group of trusted friends,
+this is probably OK. When you enable authentication, the following happens:</p>
+<ul class="simple">
+<li><p>A server secret that you export via <code class="docutils literal notranslate"><span class="pre">FLUX_SECREY_KEY</span></code> is used to encode payloads. You’ll need to provide this to users.</p></li>
+<li><p>The server is created adding users with names and passwords, so every user known to Flux Restful is known to the server.</p>
+<ul>
+<li><p>Passwords are hashed</p></li>
+<li><p>We don’t currently check authentication here with PAM (but we could).</p></li>
+</ul>
+</li>
+<li><p>A user making a request provided an encoded payload (first) with the encoded username and password</p></li>
+<li><p>The server decodes the payload, authenticates, and (given a valid username and password) generates an expiring token.</p></li>
+<li><p>The user adds the token header to subsequent requests.</p></li>
+</ul>
+<p>To require this authentication, we set a few environment variables to turn it on and define credentials
+and a secret (e.g., a driver that is running the API might randomly generate these accounts and secret) and then all interactions
+with the API or interface require authenticating. As an example, the Flux Operator will make both the server user
+accounts and the Flux Restful database accounts when you spin up a MiniCluster.</p>
+<h4 id="web-interface-basic-authentication">Web Interface Basic Authentication<a class="headerlink" href="#web-interface-basic-authentication" title="Permalink to this heading">¶</a></h4>
+<p>In the case of the web interface (which does not necessarily need to be exposed, e.g., the Flux Operator requires a port forward)
+we fall back to basic auth, and the user needs to enter a username and password.</p>
+<h4 id="api-oauth2-style-authentication">API OAuth2 Style Authentication<a class="headerlink" href="#api-oauth2-style-authentication" title="Permalink to this heading">¶</a></h4>
+<p>In the case of the API, we taken an OAuth2 based approach, where a request will originally
+return with a 401 status and the “www-authenticate” header, and the calling client needs to then prepare an encoded
 payload to request a token. A successful receipt of the payload will return the token,
-which can be added to an Authorization header for subsequent requests.</p>
+which can be added to an Authorization header for subsequent requests (up until it expires).</p>
 <p>You largely don’t need to worry about the complexity of the above because the SDKs will
 handle these interactions for you, given that you’ve provided some credentials and secret key.
 If you are using the Flux Operator, you largely don’t need to do anything, as it will
 generate and provide both.</p>
+<h2 id="what-does-this-user-guide-include">What does this user-guide include?<a class="headerlink" href="#what-does-this-user-guide-include" title="Permalink to this heading">¶</a></h2>
+<p>This user-guide assumes you are a user of the flux restful API, meaning you are either
+running it alongside a production Flux cluster, or it’s running already in another
+context and you have been given credentials to access it. If you want to learn about how
+to setup the API itself, see the <a class="reference internal" href="developer-guide.html"><span class="std std-doc">developer documentation</span></a>.</p>
 <h2 id="environment">Environment<a class="headerlink" href="#environment" title="Permalink to this heading">¶</a></h2>
-<p>You should either have a Flux user, token, and secret key from the server you created, or provided to you
-by an administrator. E.g.,</p>
+<p>Whether you are in single- or multi- user mode, you will need a username and token to
+interact with the server. In single-user mode this will be the flux superuser credentials
+that the server was created with. In multi-user mode this will be your username and password,
+along with a secret key to encode paylods for the token. E.g.,</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_USER</span><span class="o">=</span>fluxuser
 $<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_TOKEN</span><span class="o">=</span><span class="m">12345</span>
 $<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_SECRET_KEY</span><span class="o">=</span>notsecrethoo
 </code></pre></div>
 </div>
-<p>You really should only be interacting with a server that doesn’t require authentication if you are a developer.
-From here, continue reading the user guide for different language clients,
-or see our Python <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/tree/main/clients/python/examples">examples</a> folder.</p>
+<p>From here, continue reading the user guide for different language clients,
+or see our Python <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/tree/main/clients/python/examples">examples</a> folder
+for snippet examples, or the <a class="reference internal" href="../tutorials/index.html"><span class="std std-doc">tutorials</span></a> for more complex setups.</p>
 <h2 id="python">Python<a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h2>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h3>
 <p>You likely want this installed in a virtual environment:</p>
@@ -975,7 +1055,7 @@ example!</p>
   <small>
     
       Last update:
-      Mar 05, 2023
+      Mar 07, 2023
     
   </small>
 </div>
