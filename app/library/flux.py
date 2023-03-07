@@ -22,27 +22,42 @@ class FakeJob:
         return self.jobid
 
 
-def submit_job(fluxjob, user):
+def submit_job(handle, fluxjob, user):
     """
     Submit the job on behalf of user.
     """
     if user and hasattr(user, "user_name"):
         print(f"User submitting job {user.user_name}")
+        user = user.user_name
     elif user and isinstance(user, str):
         print(f"User submitting job {user}")
+
+    # If we don't have auth enabled, submit in single-user mode
+    if not settings.require_auth:
+        print("Submit in single-user mode.")
+        return flux.job.submit_async(handle, fluxjob)
 
     # Update the payload for the correct user
     # Use helper script to sign payload
     payload = json.dumps(fluxjob.jobspec)
-    print(payload)
+    # payload['HOME'] =
 
     # We ideally need to pipe the payload into flux python
-    ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
-    output = subprocess.check_output(
-        ("sudo", "-u", user, "flux", "python", submit_script),
-        stdin=ps.stdout,
-    )
-    ps.wait()
+    try:
+        ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
+        output = subprocess.check_output(
+            ("sudo", "-E", "-u", user, "flux", "python", submit_script),
+            stdin=ps.stdout,
+            env=os.environ,
+        )
+        ps.wait()
+
+    # A flux start without sudo -u flux can cause this
+    # This will be caught and returned to the user
+    except PermissionError as e:
+        raise ValueError(
+            f"Permission error: {e}! Are you running the instance as the flux user?"
+        )
 
     jobid = output.decode("utf-8").strip()
     print("Submit job {jobid}")

@@ -195,13 +195,15 @@ def submit_job_helper(request, form, user):
     """
     A helper to submit a flux job (not a launcher)
     """
+    from app.main import app
+
     # Submit the job and return the ID, but allow for error
     # Prepare the flux job! We don't support envars here yet
     try:
         fluxjob = flux_cli.prepare_job(
             user, form.kwargs, runtime=form.runtime, workdir=form.workdir
         )
-        flux_future = flux_cli.submit_job(fluxjob, user=user)
+        flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         jobid = flux_future.get_id()
         intid = flux.job.JobID(jobid)
         message = f"Your job was successfully submit! 🦊 <a target='_blank' style='color:magenta' href='/job/{intid}'>{jobid}</a>"

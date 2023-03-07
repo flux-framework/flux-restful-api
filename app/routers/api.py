@@ -190,6 +190,8 @@ async def submit_job(request: Request, user=user_auth):
     include everything in this function instead of having separate
     functions.
     """
+    from app.main import app
+
     print(f"User for submit is {user}")
 
     # This can bork if no payload is provided
@@ -249,7 +251,7 @@ async def submit_job(request: Request, user=user_auth):
             )
             print(f"Prepared flux job {fluxjob}")
             # This handles either a single/multi user case
-            flux_future = flux_cli.submit_job(fluxjob, user=user)
+            flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         except Exception as e:
             result = jsonable_encoder(
                 {"Message": "There was an issue submitting that job.", "Error": str(e)}
