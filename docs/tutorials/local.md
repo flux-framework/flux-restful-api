@@ -52,7 +52,8 @@ export FLUX_TOKEN=dinosaur
 
 ## Start
 
-And run! This can also be done by running `make`
+And run! This can also be done by running `make` (and inspect the Makefile first
+for port variables, etc):
 
 ```bash
 $ flux start uvicorn app.main:app --host=0.0.0.0 --port=16798 --workers=2
@@ -155,3 +156,77 @@ export FLUX_RESTFUL_HOST=http://127.0.0.1:16798
 ```
 
 And then submit the job:
+
+```bash
+$ flux-restful-cli submit whoami
+```
+```console
+{
+    "Message": "Job submit.",
+    "id": 1944496111616
+}
+```
+```console
+{
+    "id": 1944496111616,
+    "userid": 34633,
+    "urgency": 16,
+    "priority": 16,
+    "t_submit": 1678217369.1978858,
+    "t_depend": 1678217369.1978858,
+    "t_run": 1678217369.211171,
+    "t_cleanup": 1678217369.2724185,
+    "t_inactive": 1678217369.2742176,
+    "state": "INACTIVE",
+    "name": "whoami",
+    "ntasks": 1,
+    "ncores": 1,
+    "duration": 0.0,
+    "nnodes": 1,
+    "ranks": "0",
+    "nodelist": "corona194",
+    "success": true,
+    "exception_occurred": false,
+    "result": "COMPLETED",
+    "expiration": 4831817369.0,
+    "waitstatus": 0,
+    "returncode": 0,
+    "runtime": 0.06124758720397949,
+    "exception": {
+        "occurred": false,
+        "severity": "",
+        "type": "",
+        "note": ""
+    }
+}
+```
+
+Or list jobs...
+
+```bash
+$ flux-restful-cli list-jobs
+```
+```console
+{
+    "jobs": [
+        {
+            "id": 1944496111616
+        }
+    ]
+}
+```
+or nodes..
+
+```bash
+$ flux-restful-cli list-nodes
+```
+```console
+{
+    "nodes": [
+        "corona194"
+    ]
+}
+
+```
+
+Or finally, get the output!
