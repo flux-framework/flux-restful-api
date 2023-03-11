@@ -10,7 +10,7 @@ any questions or issues, please [let us know](https://github.com/flux-framework/
 
 ## External Tutorials
 
- - [Multi-user mode](https://flux-framework.org/flux-operator/getting_started/tutorials/multi-tenancy.html) deployed via the Flux Operator.
+ - [Multi-user mode](https://flux-framework.org/flux-operator/tutorials/multi-tenancy.html) deployed via the Flux Operator.
 
 ```{toctree}
 :maxdepth: 3
