@@ -27,6 +27,11 @@ RUN pip install -r /requirements.txt && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Copy the flux tree commands to the install
+RUN git clone --depth 1 https://github.com/flux-framework/flux-sched && \
+    cp ./flux-sched/t/scripts/flux-tree* /usr/libexec/flux/cmd/ && \
+    rm -rf ./flux-sched
+
 WORKDIR /code
 COPY . /code
 ENTRYPOINT ["/code/entrypoint.sh"]
