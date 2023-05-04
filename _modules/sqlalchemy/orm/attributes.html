@@ -33,7 +33,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.74678bd4555640f0b.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.8118e13f191069ea1.min.css" />
         <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -553,6 +553,9 @@
 <span class="kn">from</span> <span class="nn">..sql</span> <span class="kn">import</span> <span class="n">coercions</span>
 <span class="kn">from</span> <span class="nn">..sql</span> <span class="kn">import</span> <span class="n">roles</span>
 <span class="kn">from</span> <span class="nn">..sql</span> <span class="kn">import</span> <span class="n">visitors</span>
+<span class="kn">from</span> <span class="nn">..sql.cache_key</span> <span class="kn">import</span> <span class="n">HasCacheKey</span>
+<span class="kn">from</span> <span class="nn">..sql.visitors</span> <span class="kn">import</span> <span class="n">_TraverseInternalsType</span>
+<span class="kn">from</span> <span class="nn">..sql.visitors</span> <span class="kn">import</span> <span class="n">InternalTraversal</span>
 <span class="kn">from</span> <span class="nn">..util.typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 <span class="kn">from</span> <span class="nn">..util.typing</span> <span class="kn">import</span> <span class="n">Self</span>
 <span class="kn">from</span> <span class="nn">..util.typing</span> <span class="kn">import</span> <span class="n">TypeGuard</span>
@@ -795,13 +798,16 @@
         <span class="c1"># non-string keys.</span>
         <span class="c1"># ideally Proxy() would have a separate set of methods to deal</span>
         <span class="c1"># with this case.</span>
+        <span class="n">entity_namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entity_namespace</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entity_namespace</span><span class="p">,</span> <span class="n">HasCacheKey</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="n">_UNKNOWN_ATTR_KEY</span><span class="p">:</span>  <span class="c1"># type: ignore[comparison-overlap]</span>
-            <span class="n">annotations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entity_namespace&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entity_namespace</span><span class="p">}</span>
+            <span class="n">annotations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entity_namespace&quot;</span><span class="p">:</span> <span class="n">entity_namespace</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">annotations</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;proxy_key&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
                 <span class="s2">&quot;proxy_owner&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parententity</span><span class="p">,</span>
-                <span class="s2">&quot;entity_namespace&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entity_namespace</span><span class="p">,</span>
+                <span class="s2">&quot;entity_namespace&quot;</span><span class="p">:</span> <span class="n">entity_namespace</span><span class="p">,</span>
             <span class="p">}</span>
 
         <span class="n">ce</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comparator</span><span class="o">.</span><span class="n">__clause_element__</span><span class="p">()</span>
@@ -874,7 +880,7 @@
 
     <span class="k">def</span> <span class="nf">and_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">clauses</span><span class="p">:</span> <span class="n">_ColumnExpressionArgument</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">interfaces</span><span class="o">.</span><span class="n">PropComparator</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryableAttribute</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comparator</span><span class="p">,</span> <span class="n">RelationshipProperty</span><span class="o">.</span><span class="n">Comparator</span><span class="p">)</span>
 
@@ -1027,12 +1033,20 @@
 
 
 <span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AdHocHasEntityNamespace</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">AdHocHasEntityNamespace</span><span class="p">(</span><span class="n">HasCacheKey</span><span class="p">):</span>
+    <span class="n">_traverse_internals</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">_TraverseInternalsType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;_entity_namespace&quot;</span><span class="p">,</span> <span class="n">InternalTraversal</span><span class="o">.</span><span class="n">dp_has_cache_key</span><span class="p">),</span>
+    <span class="p">]</span>
+
     <span class="c1"># py37 compat, no slots=True on dataclass</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;entity_namespace&quot;</span><span class="p">,)</span>
-    <span class="n">entity_namespace</span><span class="p">:</span> <span class="n">_ExternalEntityType</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_entity_namespace&quot;</span><span class="p">,)</span>
+    <span class="n">_entity_namespace</span><span class="p">:</span> <span class="n">_InternalEntityType</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
     <span class="n">is_mapper</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">is_aliased_class</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">entity_namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entity_namespace</span><span class="o">.</span><span class="n">entity_namespace</span>
 
 
 <span class="k">def</span> <span class="nf">create_proxied_attribute</span><span class="p">(</span>
@@ -1107,7 +1121,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># used by hybrid attributes which try to remain</span>
                 <span class="c1"># agnostic of any ORM concepts like mappers</span>
-                <span class="k">return</span> <span class="n">AdHocHasEntityNamespace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">AdHocHasEntityNamespace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parententity</span><span class="p">)</span>
 
         <span class="nd">@property</span>
         <span class="k">def</span> <span class="nf">property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -3286,7 +3300,7 @@
   <small>
     
       Last update:
-      Apr 21, 2023
+      May 04, 2023
     
   </small>
 </div>
@@ -3327,7 +3341,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.1.3.
+    6.2.1.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
