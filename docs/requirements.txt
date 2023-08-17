@@ -1,5 +1,8 @@
+sphinx
+markupsafe
 sphinx_immaterial
-numpy>=1.16
+numpy
+pydantic==1.10.8
 pandas
 matplotlib
 nbsphinx
@@ -11,6 +14,7 @@ recommonmark
 sphinx_markdown_tables
 sphinx-copybutton
 readthedocs-sphinx-search
-sphinx-gallery
 myst-parser
+pymdown-extensions
+sphinx-gallery
 flux-restful-client
