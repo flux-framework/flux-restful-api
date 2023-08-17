@@ -51,7 +51,7 @@ def check_auth(
         db, user_name=credentials.username, password=credentials.password
     )
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        raise HTTPException(status_code=401, detail="Incorrect email or password", headers={"WWW-Authenticate": "Basic"})
     elif not crud_user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     return credentials.username
