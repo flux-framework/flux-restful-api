@@ -1,7 +1,7 @@
 # Flux RESTFul API
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ![img/flux-restful-eyes-small.png](img/flux-restful-eyes-small.png)
@@ -35,6 +35,7 @@ tool to generate a contributors graphic below.
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://vsoch.github.io"><img src="https://avatars.githubusercontent.com/u/814322?v=4?s=100" width="100px;" alt="Vanessasaurus"/><br /><sub><b>Vanessasaurus</b></sub></a><br /><a href="https://github.com/flux-framework/flux-restful-api/commits?author=vsoch" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://linkedin.com/in/tgamblin/"><img src="?s=100" width="100px;" alt="Todd Gamblin"/><br /><sub><b>Todd Gamblin</b></sub></a><br /><a href="https://github.com/flux-framework/flux-restful-api/commits?author=tgamblin" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/khoing0810"><img src="https://avatars.githubusercontent.com/u/47909147?v=4?s=100" width="100px;" alt="Khoi Nguyen"/><br /><sub><b>Khoi Nguyen</b></sub></a><br /><a href="https://github.com/flux-framework/flux-restful-api/commits?author=khoing0810" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
