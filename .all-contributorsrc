@@ -31,6 +31,17 @@
             "avatar_url": [
                 null
             ]
+        },
+        {
+            "login": "khoing0810",
+            "name": "Khoi Nguyen",
+            "contributions": [
+                "code"
+            ],
+            "profile": "https://github.com/khoing0810",
+            "avatar_url": [
+                "https://avatars.githubusercontent.com/u/47909147?v=4"
+            ]
         }
     ],
     "contributorsPerLine": 7
