@@ -1,5 +1,5 @@
 requests==2.27.1
-fastapi==0.72.0
+fastapi
 uvicorn==0.17.0
 python-dotenv==0.19.2
 aiofiles==0.8.0
@@ -11,6 +11,7 @@ pyaml
 sqlalchemy
 # install also provides alembic binary
 alembic
-pydantic==2.0.1
+pydantic
+pydantic-settings
 python-jose[cryptography]
 passlib[bcrypt]

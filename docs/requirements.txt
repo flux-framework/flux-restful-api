@@ -1,6 +1,6 @@
 sphinx<7.2
 markupsafe
-sphinx-immaterial>=0.11.6 
+sphinx-immaterial>=0.11.6
 numpy
 pydantic
 pandas
