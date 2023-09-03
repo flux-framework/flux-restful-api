@@ -3,6 +3,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+[![DOI](https://zenodo.org/badge/561527661.svg)](https://zenodo.org/badge/latestdoi/561527661)
 
 ![img/flux-restful-eyes-small.png](img/flux-restful-eyes-small.png)
 
