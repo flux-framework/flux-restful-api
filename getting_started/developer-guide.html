@@ -33,7 +33,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=f7c3c3dc" />
+        <link rel="stylesheet" type="text/css" href="../_static/sphinx_immaterial_theme.79d3faa9841bcddc6.min.css?v=f1230fcf" />
         <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=84ccdeda" />
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -814,11 +814,15 @@ in a VSCode environment.</p>
 <p>After cloning the repository, install dependencies:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>env
 $<span class="w"> </span><span class="nb">source</span><span class="w"> </span>env/bin/activate
-$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </code></pre></div>
 </div>
 <p>Install requirements (note that you also need Flux Python available, which isn’t in these requirements as you cannot install from pip).</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</code></pre></div>
+</div>
+<p>Note that there is a bug with fastapi so we need to do some installs outside of the requirements.txt:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">pydantic</span><span class="o">==</span><span class="m">1</span>.10.11
+pip<span class="w"> </span>install<span class="w"> </span>pydantic-settings
 </code></pre></div>
 </div>
 <h3 id="start-service">2. Start Service<a class="headerlink" href="#start-service" title="Permalink to this heading">¶</a></h3>
@@ -1093,7 +1097,7 @@ functions from oras-py source code.</p>
   <small>
     
       Last update:
-      Aug 18, 2023
+      Oct 23, 2023
     
   </small>
 </div>

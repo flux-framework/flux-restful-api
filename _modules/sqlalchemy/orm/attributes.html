@@ -33,7 +33,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.a60204c58f5e4ff66.min.css?v=f7c3c3dc" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.79d3faa9841bcddc6.min.css?v=f1230fcf" />
         <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=84ccdeda" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -589,6 +589,7 @@
 
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
+<span class="n">_T_co</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T_co&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="n">_AllPendingType</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">[</span>
@@ -601,10 +602,10 @@
 
 <span class="nd">@inspection</span><span class="o">.</span><span class="n">_self_inspects</span>
 <span class="k">class</span> <span class="nc">QueryableAttribute</span><span class="p">(</span>
-    <span class="n">_DeclarativeMapped</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span>
-    <span class="n">SQLORMExpression</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span>
+    <span class="n">_DeclarativeMapped</span><span class="p">[</span><span class="n">_T_co</span><span class="p">],</span>
+    <span class="n">SQLORMExpression</span><span class="p">[</span><span class="n">_T_co</span><span class="p">],</span>
     <span class="n">interfaces</span><span class="o">.</span><span class="n">InspectionAttr</span><span class="p">,</span>
-    <span class="n">interfaces</span><span class="o">.</span><span class="n">PropComparator</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span>
+    <span class="n">interfaces</span><span class="o">.</span><span class="n">PropComparator</span><span class="p">[</span><span class="n">_T_co</span><span class="p">],</span>
     <span class="n">roles</span><span class="o">.</span><span class="n">JoinTargetRole</span><span class="p">,</span>
     <span class="n">roles</span><span class="o">.</span><span class="n">OnClauseRole</span><span class="p">,</span>
     <span class="n">sql_base</span><span class="o">.</span><span class="n">Immutable</span><span class="p">,</span>
@@ -647,13 +648,13 @@
 
     <span class="n">is_attribute</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="n">dispatch</span><span class="p">:</span> <span class="n">dispatcher</span><span class="p">[</span><span class="n">QueryableAttribute</span><span class="p">[</span><span class="n">_T</span><span class="p">]]</span>
+    <span class="n">dispatch</span><span class="p">:</span> <span class="n">dispatcher</span><span class="p">[</span><span class="n">QueryableAttribute</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]]</span>
 
     <span class="n">class_</span><span class="p">:</span> <span class="n">_ExternalEntityType</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">parententity</span><span class="p">:</span> <span class="n">_InternalEntityType</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
     <span class="n">impl</span><span class="p">:</span> <span class="n">AttributeImpl</span>
-    <span class="n">comparator</span><span class="p">:</span> <span class="n">interfaces</span><span class="o">.</span><span class="n">PropComparator</span><span class="p">[</span><span class="n">_T</span><span class="p">]</span>
+    <span class="n">comparator</span><span class="p">:</span> <span class="n">interfaces</span><span class="o">.</span><span class="n">PropComparator</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]</span>
     <span class="n">_of_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_InternalEntityType</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
     <span class="n">_extra_criteria</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ColumnElement</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">_doc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -667,7 +668,7 @@
         <span class="n">class_</span><span class="p">:</span> <span class="n">_ExternalEntityType</span><span class="p">[</span><span class="n">_O</span><span class="p">],</span>
         <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">parententity</span><span class="p">:</span> <span class="n">_InternalEntityType</span><span class="p">[</span><span class="n">_O</span><span class="p">],</span>
-        <span class="n">comparator</span><span class="p">:</span> <span class="n">interfaces</span><span class="o">.</span><span class="n">PropComparator</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span>
+        <span class="n">comparator</span><span class="p">:</span> <span class="n">interfaces</span><span class="o">.</span><span class="n">PropComparator</span><span class="p">[</span><span class="n">_T_co</span><span class="p">],</span>
         <span class="n">impl</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AttributeImpl</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">of_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_InternalEntityType</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">extra_criteria</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ColumnElement</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
@@ -783,7 +784,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">expression</span><span class="p">:</span> <span class="n">ColumnElement</span><span class="p">[</span><span class="n">_T</span><span class="p">]</span>
+    <span class="n">expression</span><span class="p">:</span> <span class="n">ColumnElement</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The SQL expression object represented by this</span>
 <span class="sd">    :class:`.QueryableAttribute`.</span>
 
@@ -803,7 +804,7 @@
         <span class="n">entity_namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entity_namespace</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entity_namespace</span><span class="p">,</span> <span class="n">HasCacheKey</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="n">_UNKNOWN_ATTR_KEY</span><span class="p">:</span>  <span class="c1"># type: ignore[comparison-overlap]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">is</span> <span class="n">_UNKNOWN_ATTR_KEY</span><span class="p">:</span>
             <span class="n">annotations</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;entity_namespace&quot;</span><span class="p">:</span> <span class="n">entity_namespace</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">annotations</span> <span class="o">=</span> <span class="p">{</span>
@@ -845,7 +846,7 @@
     <span class="k">def</span> <span class="nf">_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_AnnotationDict</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clause_element__</span><span class="p">()</span><span class="o">.</span><span class="n">_annotations</span>
 
-    <span class="k">def</span> <span class="nf">__clause_element__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ColumnElement</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">__clause_element__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ColumnElement</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expression</span>
 
     <span class="nd">@property</span>
@@ -912,18 +913,18 @@
             <span class="n">extra_criteria</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_extra_criteria</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Label</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Label</span><span class="p">[</span><span class="n">_T_co</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clause_element__</span><span class="p">()</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">OperatorType</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ColumnElement</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comparator</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore[return-value,no-any-return]  # noqa: E501</span>
+        <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comparator</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore[no-any-return]  # noqa: E501</span>
 
     <span class="k">def</span> <span class="nf">reverse_operate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">OperatorType</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ColumnElement</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comparator</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore[return-value,no-any-return]  # noqa: E501</span>
+        <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comparator</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore[no-any-return]  # noqa: E501</span>
 
     <span class="k">def</span> <span class="nf">hasparent</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">InstanceState</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">optimistic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -989,16 +990,16 @@
     <span class="c1"># InstrumentedAttribute, while still keeping classlevel</span>
     <span class="c1"># __doc__ correct</span>
 
-    <span class="nd">@util</span><span class="o">.</span><span class="n">rw_hybridproperty</span>  <span class="c1"># type: ignore</span>
-    <span class="k">def</span> <span class="nf">__doc__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
+    <span class="nd">@util</span><span class="o">.</span><span class="n">rw_hybridproperty</span>
+    <span class="k">def</span> <span class="nf">__doc__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_doc</span>
 
     <span class="nd">@__doc__</span><span class="o">.</span><span class="n">setter</span>  <span class="c1"># type: ignore</span>
-    <span class="k">def</span> <span class="nf">__doc__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+    <span class="k">def</span> <span class="nf">__doc__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_doc</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@__doc__</span><span class="o">.</span><span class="n">classlevel</span>  <span class="c1"># type: ignore</span>
-    <span class="k">def</span> <span class="nf">__doc__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
+    <span class="k">def</span> <span class="nf">__doc__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="vm">__doc__</span>
 
     <span class="k">def</span> <span class="fm">__set__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1259,7 +1260,7 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="s2">&quot;impl&quot;</span><span class="p">,</span> <span class="s2">&quot;op&quot;</span><span class="p">,</span> <span class="s2">&quot;parent_token&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute_impl</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute_impl</span><span class="p">:</span> <span class="n">AttributeImpl</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">util</span><span class="o">.</span><span class="n">symbol</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">attribute_impl</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">op</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parent_token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">parent_token</span>
@@ -1302,7 +1303,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">class_</span><span class="p">:</span> <span class="n">_ExternalEntityType</span><span class="p">[</span><span class="n">_O</span><span class="p">],</span>
         <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">callable_</span><span class="p">:</span> <span class="n">_LoaderCallable</span><span class="p">,</span>
+        <span class="n">callable_</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_LoaderCallable</span><span class="p">],</span>
         <span class="n">dispatch</span><span class="p">:</span> <span class="n">_Dispatch</span><span class="p">[</span><span class="n">QueryableAttribute</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
         <span class="n">trackparent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">compare_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2409,7 +2410,7 @@
                         <span class="ow">and</span> <span class="s2">&quot;None&quot;</span>
                         <span class="ow">or</span> <span class="n">iterable</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
                     <span class="p">)</span>
-                    <span class="n">wanted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_duck_typed_as</span><span class="o">.</span><span class="vm">__name__</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">wanted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_duck_typed_as</span><span class="o">.</span><span class="vm">__name__</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                         <span class="s2">&quot;Incompatible collection type: </span><span class="si">%s</span><span class="s2"> is not </span><span class="si">%s</span><span class="s2">-like&quot;</span>
                         <span class="o">%</span> <span class="p">(</span><span class="n">given</span><span class="p">,</span> <span class="n">wanted</span><span class="p">)</span>
@@ -3086,7 +3087,7 @@
         <span class="c1"># TODO: this appears to be the WriteOnlyAttributeImpl /</span>
         <span class="c1"># DynamicAttributeImpl constructor which is hardcoded</span>
         <span class="n">impl</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Type[WriteOnlyAttributeImpl]&quot;</span><span class="p">,</span> <span class="n">impl_class</span><span class="p">)(</span>
-            <span class="n">class_</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">typecallable</span><span class="p">,</span> <span class="n">dispatch</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span>
+            <span class="n">class_</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dispatch</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="n">uselist</span><span class="p">:</span>
         <span class="n">impl</span> <span class="o">=</span> <span class="n">CollectionAttributeImpl</span><span class="p">(</span>
@@ -3315,7 +3316,7 @@
   <small>
     
       Last update:
-      Aug 18, 2023
+      Oct 23, 2023
     
   </small>
 </div>
