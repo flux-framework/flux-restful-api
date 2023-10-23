@@ -94,7 +94,7 @@ class FluxRestfulClient:
         attempts=None,
     ):
         """
-        Do a request. This is a wrapper around requests.
+        Do a request. This is a wrapper around httpx.
         """
         attempts = self.attempts if attempts is None else attempts
         timeout = self.timeout if timeout is None else timeout
