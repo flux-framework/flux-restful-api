@@ -1,5 +1,5 @@
 {
-    "name": "Flux Core Python 3.6",
+    "name": "Flux RESTFul Python 3.10",
     "dockerFile": "Dockerfile",
     "context": "../",
 
@@ -10,12 +10,12 @@
 
           // Ensure that Python autocomplete works out of the box
           "python.autoComplete.extraPaths": [
-            "/usr/lib/flux/python3.8",
-            "/usr/lib/python3.8/site-packages",
+            "/usr/lib/flux/python3.10",
+            "/usr/lib/python3.10/site-packages",
           ],
           "python.analysis.extraPaths": [
-            "/usr/lib/flux/python3.8",
-            "/usr/lib/python3.8/site-packages",
+            "/usr/lib/flux/python3.10",
+            "/usr/lib/python3.10/site-packages",
           ]
         },
         // Note to Flux Developers! We can add extensions here that you like
@@ -24,6 +24,7 @@
 		],
       },
     },
-    // Needed for git security feature, and flux config
-    "postStartCommand": "git config --global --add safe.directory /workspaces/flux-python-api && flux R encode --hosts=$(hostname) > /etc/flux/system/R && sed -i 's@HOSTNAME@'$(hostname)'@' /etc/flux/system/conf.d/broker.toml && sudo service munge start"
+    // Needed for git security feature, and flux config (not added / needed yet)
+    //"postStartCommand": "git config --global --add safe.directory /workspaces/flux-restful-api && flux R encode --hosts=$(hostname) > /etc/flux/system/R && sed -i 's@HOSTNAME@'$(hostname)'@' /etc/flux/system/conf.d/broker.toml && sudo service munge start"
+    "postStartCommand": "git config --global --add safe.directory /workspaces/flux-restful-api && flux R encode --hosts=$(hostname) > /etc/flux/system/R && sudo service munge start"
   }

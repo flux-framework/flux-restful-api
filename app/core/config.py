@@ -4,8 +4,8 @@ import re
 import secrets
 import shlex
 import string
-
-from pydantic import BaseSettings
+from typing import Optional
+from pydantic_settings import BaseSettings
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +85,8 @@ class Settings(BaseSettings):
 
     # If you change this, also change in alembic.ini
     db_file: str = "sqlite:///./flux-restful.db"
-    flux_user: str = os.environ.get("FLUX_USER")
-    flux_token: str = os.environ.get("FLUX_TOKEN")
+    flux_user: str = os.environ.get("FLUX_USER") or "fluxuser"
+    flux_token: Optional[str] = os.environ.get("FLUX_TOKEN")
     secret_key: str = os.environ.get("FLUX_SECRET_KEY") or generate_secret_key()
 
     # Expires in 10 hours
