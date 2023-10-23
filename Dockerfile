@@ -1,4 +1,4 @@
-FROM fluxrm/flux-sched:focal
+FROM fluxrm/flux-sched:jammy
 
 # docker build -t ghcr.io/flux-framework/flux-restful-api .
 
@@ -14,7 +14,7 @@ ENV HOST=${host:-0.0.0.0}
 ENV WORKERS=${workers:-1}
 
 USER root
-RUN apt-get update
+RUN apt-get update && apt-get install -y python3-pip
 COPY ./requirements.txt /requirements.txt
 
 EXPOSE ${port}
