@@ -15,7 +15,7 @@ LICENSE = "LICENSE"
 INSTALL_REQUIRES = (
     # Required to maintain comments in files
     ("ruamel.yaml", {"min_version": None}),
-    ("requests", {"min_version": None}),
+    ("httpx", {"min_version": None}),
     ("jsonschema", {"min_version": None}),
     ("python-jose[cryptography]", {"min_version": None}),
 )

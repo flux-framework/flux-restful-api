@@ -4,8 +4,8 @@ import time
 
 import flux_restful_client.main.schemas as schemas
 import flux_restful_client.utils as utils
+import httpx
 import jsonschema
-import requests
 from flux_restful_client.logger import logger
 from jose import jwt
 
@@ -53,7 +53,7 @@ class FluxRestfulClient:
         self.prefix = prefix
         self.attempts = attempts
         self.timeout = timeout
-        self.session = requests.Session()
+        self.session = httpx.Client()
 
     def set_header(self, name, value):
         self.headers.update({name: value})
@@ -107,14 +107,19 @@ class FluxRestfulClient:
 
         # Make the request and return to calling function, unless requires auth
         try:
-            response = self.session.request(
-                method,
-                url,
-                params=params,
-                json=data,
-                headers=headers,
-                stream=stream,
-            )
+            if method == "POST" and stream:
+                response = self.session.stream(
+                    method, url, json=data, params=params, headers=headers
+                )
+            if method == "POST":
+                response = self.session.post(url, params=data, headers=headers)
+            elif method == "GET" and stream:
+                response = self.session.stream(
+                    method, url, params=params, headers=headers
+                )
+            elif method == "GET":
+                response = self.session.get(url, params=params, headers=headers)
+
         except Exception as e:
             if attempts > 0:
                 time.sleep(timeout)
