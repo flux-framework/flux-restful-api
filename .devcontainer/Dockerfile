@@ -16,9 +16,7 @@ ENV PYTHONPATH=/usr/lib/flux/python3.10
 RUN python3 -m pip install IPython && \
     python3 -m pip install -r /requirements.txt && \
     python3 -m pip install -r /dev-requirements.txt && \
-    python3 -m pip install -r /docs-requirements.txt && \
-    python3 -m pip install pydantic==1.10.11 && \
-    python3 -m pip install pydantic-settings
+    python3 -m pip install -r /docs-requirements.txt
 
 RUN mkdir -p /run/flux /var/lib/flux mkdir /etc/flux/system/cron.d /mnt/curve && \
     flux keygen /mnt/curve/curve.cert && \
