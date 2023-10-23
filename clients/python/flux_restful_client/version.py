@@ -1,4 +1,4 @@
-__version__ = "0.1.14"
+__version__ = "0.2.0"
 AUTHOR = "Vanessa Sochat"
 EMAIL = "vsoch@users.noreply.github.com"
 NAME = "flux-restful-client"
@@ -15,7 +15,7 @@ LICENSE = "LICENSE"
 INSTALL_REQUIRES = (
     # Required to maintain comments in files
     ("ruamel.yaml", {"min_version": None}),
-    ("requests", {"min_version": None}),
+    ("httpx", {"min_version": None}),
     ("jsonschema", {"min_version": None}),
     ("python-jose[cryptography]", {"min_version": None}),
 )

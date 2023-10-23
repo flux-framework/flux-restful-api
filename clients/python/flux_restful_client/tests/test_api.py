@@ -1,7 +1,5 @@
 import time
 
-import jsonschema
-import pytest
 from flux_restful_client.main import get_client
 
 
@@ -30,6 +28,7 @@ def test_submit_list_job():
 
     # Now submit a job, ensure we get one job back
     response = client.submit("sleep 5")
+
     assert isinstance(response, dict)
     for key in ["Message", "id"]:
         assert key in response
@@ -85,9 +84,6 @@ def test_option_flags():
     Test adding valid and invalid option flags
     """
     client = get_client()
-
-    with pytest.raises(jsonschema.ValidationError):
-        client.submit("sleep 1", option_flags="invalid format")
 
     # The server should reject a key with -o
     result = client.submit("sleep 1", option_flags={"-ompi": "noodles"})

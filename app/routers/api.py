@@ -132,16 +132,16 @@ async def jobs_listing(request: Request, user=user_auth):
 
 
 @router.get("/jobs")
-async def list_jobs(request: Request, user=user_auth):
+async def list_jobs(
+    details: bool = False, limit=None, listing: bool = False, user=user_auth
+):
     """
     List flux jobs associated with the handle.
     """
-    try:
-        payload = await request.json()
-    except Exception:
-        payload = {}
+    payload = {"details": details, "limit": limit, "listing": listing}
 
     # Does the requester want details - in dict or listing form?
+    print(payload)
     if helpers.has_boolean_arg(payload, "details"):
         # Job limit (only relevant for details)
         limit = helpers.get_int_arg(payload, "limit")
@@ -182,7 +182,20 @@ async def cancel_job(jobid, user=user_auth):
 
 
 @router.post("/jobs/submit")
-async def submit_job(request: Request, user=user_auth):
+async def submit_job(
+    command=None,
+    num_tasks: int = None,
+    cores_per_task: int = None,
+    gpus_per_task: int = None,
+    num_nodes: int = None,
+    exclusive: bool = False,
+    option_flags: str = None,
+    envars: dict = None,
+    workdir: str = None,
+    runtime: int = None,
+    is_launcher: bool = False,
+    user=user_auth,
+):
     """
     Submit a job to our running cluster.
 
@@ -192,40 +205,28 @@ async def submit_job(request: Request, user=user_auth):
     """
     from app.main import app
 
-    print(f"User for submit is {user}")
-
     # This can bork if no payload is provided
-    try:
-        payload = await request.json()
-    except Exception:
+    if not command:
         return JSONResponse(
             content={"Message": "A 'command' is minimally required."}, status_code=400
         )
 
-    kwargs = {}
-
-    # Required arguments
-    for required in ["command"]:
-        kwargs[required] = payload.get(required)
-
-    # Optional arguments
-    as_int = ["num_tasks", "cores_per_task", "gpus_per_task", "num_nodes"]
-    as_bool = ["exclusive"]
-    as_is = ["option_flags"]
-
-    for optional in as_int + as_bool + as_is:
-        if optional in payload and payload[optional]:
-            if optional in as_bool:
-                kwargs[optional] = bool(payload[optional])
-            elif optional in as_int:
-                kwargs[optional] = int(payload[optional])
-            else:
-                kwargs[optional] = payload[optional]
+    kwargs = {
+        "command": command,
+        "num_tasks": num_tasks,
+        "cores_per_task": cores_per_task,
+        "gpus_per_task": gpus_per_task,
+        "num_nodes": num_nodes,
+        "exclusive": exclusive,
+        "option_flags": option_flags,
+    }
 
     # One off args not provided to JobspecV1
-    envars = payload.get("envars", {})
-    workdir = payload.get("workdir")
-    runtime = payload.get("runtime", 0) or 0
+    envars = envars or {}
+    runtime = runtime or 0
+
+    # Clean up submit arguments
+    kwargs = flux_cli.clean_submit_args(kwargs)
 
     # Validate the payload, return meaningful message if something is off
     invalid_messages = flux_cli.validate_submit_kwargs(
@@ -238,7 +239,6 @@ async def submit_job(request: Request, user=user_auth):
         )
 
     # Are we using a launcher instead?
-    is_launcher = payload.get("is_launcher", False)
     if is_launcher:
         message = launcher.launch(kwargs, workdir=workdir, envars=envars, user=user)
         result = jsonable_encoder({"Message": message, "id": "MANY"})

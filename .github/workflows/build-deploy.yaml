@@ -16,7 +16,7 @@ on:
 jobs:
   build:
     env:
-      container: ghcr.io/flux-framework/flux-restful-api
+      container: ghcr.io/flux-framework/flux-restful-api:test
     permissions:
       packages: write
 
