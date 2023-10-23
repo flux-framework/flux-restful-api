@@ -1,6 +1,3 @@
-import os
-from subprocess import PIPE, STDOUT, Popen
-
 def flatten_list(obj):
     """
     Flatten a dict to a list of comma separated strings

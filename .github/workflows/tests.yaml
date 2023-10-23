@@ -36,6 +36,7 @@ jobs:
 
     - name: Run tests
       run: |
+        pip freeze
         # Tests for the API with auth disabled
         flux start pytest -xs tests/test_api.py
 
