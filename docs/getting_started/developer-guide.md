@@ -84,13 +84,19 @@ After cloning the repository, install dependencies:
 ```bash
 $ python -m venv env
 $ source env/bin/activate
-$ pip install -r requirements.txt
 ```
 
 Install requirements (note that you also need Flux Python available, which isn't in these requirements as you cannot install from pip).
 
 ```bash
-$ pip install -r requirements.txt
+pip install -r requirements.txt
+```
+
+Note that there is a bug with fastapi so we need to do some installs outside of the requirements.txt:
+
+```bash
+pip install pydantic==1.10.11
+pip install pydantic-settings
 ```
 
 #### 2. Start Service

@@ -5,6 +5,7 @@ import secrets
 import shlex
 import string
 from typing import Optional
+
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger(__name__)

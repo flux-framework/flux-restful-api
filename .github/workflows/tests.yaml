@@ -29,7 +29,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install Dependencies (in case changes)
-      run: pip install -r requirements.txt
+      run: |
+        pip install -r requirements.txt
+        pip install pydantic==1.10.11
+        pip install pydantic-settings
+
     - name: Run tests
       run: |
         # Tests for the API with auth disabled

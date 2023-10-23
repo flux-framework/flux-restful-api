@@ -9,6 +9,8 @@ Markdown==3.3.6
 pytest==6.2.5
 pyaml
 sqlalchemy
+# needed by starlette
+httpx
 # install also provides alembic binary
 alembic
 pydantic

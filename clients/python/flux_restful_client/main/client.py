@@ -266,6 +266,8 @@ class FluxRestfulClient:
             "envars",
         ]:
             # Assume if it's provided, period, the user wants to set it!
+            if optional == "option_flags":
+                kwargs[optional] = utils.flatten_list(kwargs[optional])
             if optional in kwargs:
                 data[optional] = kwargs[optional]
 

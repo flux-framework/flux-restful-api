@@ -15,4 +15,5 @@ from .fileio import (
     write_json,
     write_yaml,
 )
+from .misc import flatten_list
 from .terminal import confirm_action, get_installdir, run_command

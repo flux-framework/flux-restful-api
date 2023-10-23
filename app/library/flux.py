@@ -72,6 +72,29 @@ def submit_job(handle, fluxjob, user):
     return job
 
 
+def clean_submit_args(kwargs):
+    """
+    Clean up submit arguments
+    """
+    # Clean up Nones
+    cleaned = {}
+    for k, v in kwargs.items():
+        if k == "option_flags" and v is not None:
+            option_flags = {}
+            flags = v.split(",")
+            for flag in flags:
+                if "=" not in flag:
+                    print('Warning: invalid flag {flag} missing "="')
+                    continue
+                option, value = flag.split("=", 1)
+                option_flags[option] = value
+            v = option_flags
+
+        if v is not None:
+            cleaned[k] = v
+    return cleaned
+
+
 def validate_submit_kwargs(kwargs, envars=None, runtime=None):
     """
     Shared function to validate submit, from API or web UI.
