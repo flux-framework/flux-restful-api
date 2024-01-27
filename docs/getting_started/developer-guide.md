@@ -196,7 +196,7 @@ The following variables are available (with their defaults):
 |FLUX_TOKEN| The token password to require for Basic Auth (if `FLUX_REQUIRE_AUTH` is set) | unset |
 |FLUX_USER| The username to require for Basic Auth (if `FLUX_REQUIRE_AUTH` is set) | unset |
 |FLUX_HAS_GPU | GPUs are available for the user to request | unset |
-|FLUX_NUMBER_NODES| The number of nodes available in the cluster | 1 |
+|FLUX_NUMBER_NODES| The number of nodes available (exposed) in the cluster | 1 |
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
 |FLUX_SECRET_KEY | secret key to be shared between user and server (required) | unset |
 |FLUX_ACCESS_TOKEN_EXPIRES_MINUTES| number of minutes to expire an access token | 600 |
