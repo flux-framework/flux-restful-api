@@ -14,6 +14,8 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+ - Fix bug with submit and POST needing params (0.2.1)
+ - New release with updated client (0.2.0)
  - Update to use newer versions of fastapi, etc (0.1.15)
    - option_flags is a flat string list of values
  - Expose host to environment and bug fix for logs (0.1.14)

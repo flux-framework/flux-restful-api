@@ -112,7 +112,7 @@ class FluxRestfulClient:
                     method, url, json=data, params=params, headers=headers
                 )
             if method == "POST":
-                response = self.session.post(url, params=data, headers=headers)
+                response = self.session.post(url, data=data, headers=headers)
             elif method == "GET" and stream:
                 response = self.session.stream(
                     method, url, params=params, headers=headers

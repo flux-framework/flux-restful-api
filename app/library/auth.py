@@ -28,6 +28,7 @@ def alert_auth():
         if settings.secret_key
         else "🍓   Secret key: unset"
     )
+    print("🍓  Server mode: %s" % settings.flux_server_mode)
     print(
         "🍓    Flux user: %s" % ("*" * len(settings.flux_user))
         if settings.flux_user

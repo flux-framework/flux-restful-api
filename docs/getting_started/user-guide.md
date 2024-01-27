@@ -17,6 +17,19 @@ There are two modes of interaction:
  - **multi-user mode**: requires authentication via the RESTful API with an encoded payload to request expiring tokens. When authentication is successful, the
    job is run as the same user on the system on behalf of the flux user.
 
+To control the user mode, you can export it to the environment where you are running the server:
+
+```bash
+# This is the default
+export FLUX_SERVER_MODE=single-user
+
+# This will have the flux user attempt to sign the payload with sudo
+export FLUX_SERVER_MODE=multi-user
+```
+
+Note that the majority of our use cases use single-user mode, so you can expect more bugs / work to be
+done with multi-user.
+
 ### Authentication
 
 If you choose to deploy without authentication, this is a ⚠️ proceed at your own risk ⚠️ sort of deal.
