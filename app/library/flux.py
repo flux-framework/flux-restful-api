@@ -33,8 +33,8 @@ def submit_job(handle, fluxjob, user):
     elif user and isinstance(user, str):
         print(f"User submitting job {user}")
 
-    # If we don't have auth enabled, submit in single-user mode
-    if not settings.require_auth:
+    # If we don't have auth enabled or request is for single-user mode
+    if not settings.require_auth or settings.flux_server_mode == "single-user":
         print("Submit in single-user mode.")
         return flux.job.submit_async(handle, fluxjob)
 

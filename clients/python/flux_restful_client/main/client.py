@@ -104,6 +104,7 @@ class FluxRestfulClient:
 
         headers = headers or self.headers
         url = f"{self.host}/{self.prefix}/{endpoint}"
+        method = method.upper()
 
         # Make the request and return to calling function, unless requires auth
         try:
@@ -111,7 +112,7 @@ class FluxRestfulClient:
                 response = self.session.stream(
                     method, url, json=data, params=params, headers=headers
                 )
-            if method == "POST":
+            elif method == "POST":
                 response = self.session.post(url, params=data, headers=headers)
             elif method == "GET" and stream:
                 response = self.session.stream(
