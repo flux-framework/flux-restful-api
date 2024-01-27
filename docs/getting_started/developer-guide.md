@@ -45,6 +45,7 @@ $ docker run --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
 ```
 ```console
 🍓 Require auth: True
+🍓  Server mode: single-user
 🍓   Secret key ***********
 🍓    Flux user: ********
 🍓   Flux token: *****
@@ -110,8 +111,8 @@ $ flux start uvicorn app.main:app --host=0.0.0.0 --port=5000
 Or do it separately (two commands):
 
 ```bash
-$ flux start --test-size=4
-$ uvicorn app.main:app --host=0.0.0.0 --port=5000
+flux start --test-size=4
+uvicorn app.main:app --host=0.0.0.0 --port=5000
 ```
 
 For the latter, you can also use the Makefile:

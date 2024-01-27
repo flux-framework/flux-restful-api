@@ -23,12 +23,12 @@ def not_authenticated(detail="Incorrect user or token."):
 
 def alert_auth():
     print("🍓 Require auth: %s" % settings.require_auth)
+    print("🍓  Server mode: %s" % settings.flux_server_mode)
     print(
         "🍓   Secret key %s" % ("*" * len(settings.secret_key))
         if settings.secret_key
         else "🍓   Secret key: unset"
     )
-    print("🍓  Server mode: %s" % settings.flux_server_mode)
     print(
         "🍓    Flux user: %s" % ("*" * len(settings.flux_user))
         if settings.flux_user
