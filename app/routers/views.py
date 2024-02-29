@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 import flux.job
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
@@ -66,6 +66,7 @@ async def home(request: Request):
         {
             "request": request,
             "data": data,
+            "user": None,
         },
     )
 
@@ -79,18 +80,28 @@ async def jobs_table(request: Request, user=user_auth):
         {
             "request": request,
             "jobs": jobs,
+            "user": user,
         },
     )
+
+
+app = FastAPI()
+
+
+@app.exception_handler(HTTPException)
+def logout_exception_handler(request: Request, e):
+    if e.status_code == 401:
+        return RedirectResponse(url="/")
+    else:
+        return e
 
 
 @router.get("/logout")
 async def logout(request: Request, response: Response):
     """
-    This isn't entirely working yet.
-
-    I usually open a new tab/window to reset basic auth. We likely
-    need a logout button to be handled somehow in javascript.
+    Raise HTTPException with 401 status code to clear out credentials.
     """
+    # TODO: Figure out how to redirect response
     raise HTTPException(
         status_code=401,
         detail="Logged out successfully",
@@ -126,6 +137,7 @@ async def job_info(request: Request, jobid, msg=None, user=user_auth):
             "request": request,
             "job": job,
             "info": info,
+            "user": user,
         },
     )
 
@@ -137,7 +149,12 @@ async def submit_job(request: Request, user=user_auth):
     form = SubmitForm(request)
     return templates.TemplateResponse(
         "jobs/submit.html",
-        {"request": request, "has_gpus": settings.has_gpus, "form": form},
+        {
+            "request": request,
+            "has_gpus": settings.has_gpus,
+            "form": form,
+            "user": user,
+        },
     )
 
 
@@ -180,6 +197,7 @@ async def submit_job_post(request: Request, user=user_auth):
             "form": form,
             "messages": messages,
             "has_gpus": settings.has_gpus,
+            "user": user,
             **form.__dict__,
         },
     )
@@ -206,6 +224,7 @@ def submit_job_helper(request, form, user):
             context={
                 "request": request,
                 "form": form,
+                "user": user,
                 "messages": [message],
             },
         )
@@ -218,7 +237,7 @@ def submit_job_helper(request, form, user):
             "request": request,
             "form": form,
             "has_gpus": settings.has_gpus,
-            **form.__dict__,
+            "user": user**form.__dict__,
         },
     )
 
