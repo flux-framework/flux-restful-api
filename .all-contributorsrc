@@ -42,6 +42,17 @@
             "avatar_url": [
                 "https://avatars.githubusercontent.com/u/47909147?v=4"
             ]
+        },
+        {
+            "login": "dupgit",
+            "name": "dupgit",
+            "contributions": [
+                "code"
+            ],
+            "profile": "http://blog.delhomme.org/",
+            "avatar_url": [
+                "https://avatars.githubusercontent.com/u/1001832?v=4"
+            ]
         }
     ],
     "contributorsPerLine": 7
