@@ -33,7 +33,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.af531f03affe68837.min.css?v=55799028" />
+        <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_immaterial_theme.359ec555e2989f00f.min.css?v=379f618b" />
         <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=84ccdeda" />
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -1011,12 +1011,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">instance_state</span><span class="p">(</span><span class="n">instance</span><span class="p">),</span> <span class="n">instance_dict</span><span class="p">(</span><span class="n">instance</span><span class="p">))</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">owner</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InstrumentedAttribute</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
-        <span class="o">...</span>
+    <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">owner</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InstrumentedAttribute</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">owner</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
-        <span class="o">...</span>
+    <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">owner</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span> <span class="n">owner</span><span class="p">:</span> <span class="n">Any</span>
@@ -2007,8 +2007,7 @@
         <span class="n">dict_</span><span class="p">:</span> <span class="n">_InstanceDict</span><span class="p">,</span>
         <span class="n">user_data</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">passive</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="n">PassiveFlag</span><span class="o">.</span><span class="n">PASSIVE_OFF</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CollectionAdapter</span><span class="p">:</span>
-        <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CollectionAdapter</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span>
@@ -2017,8 +2016,7 @@
         <span class="n">dict_</span><span class="p">:</span> <span class="n">_InstanceDict</span><span class="p">,</span>
         <span class="n">user_data</span><span class="p">:</span> <span class="n">_AdaptedCollectionProtocol</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">passive</span><span class="p">:</span> <span class="n">PassiveFlag</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CollectionAdapter</span><span class="p">:</span>
-        <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CollectionAdapter</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span>
@@ -2029,8 +2027,7 @@
         <span class="n">passive</span><span class="p">:</span> <span class="n">PassiveFlag</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">Literal</span><span class="p">[</span><span class="n">LoaderCallableStatus</span><span class="o">.</span><span class="n">PASSIVE_NO_RESULT</span><span class="p">],</span> <span class="n">CollectionAdapter</span>
-    <span class="p">]:</span>
-        <span class="o">...</span>
+    <span class="p">]:</span> <span class="o">...</span>
 
     <span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2061,8 +2058,7 @@
 
     <span class="k">def</span> <span class="nf">_is_collection_attribute_impl</span><span class="p">(</span>
         <span class="n">impl</span><span class="p">:</span> <span class="n">AttributeImpl</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">CollectionAttributeImpl</span><span class="p">]:</span>
-        <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">CollectionAttributeImpl</span><span class="p">]:</span> <span class="o">...</span>
 
 <span class="k">else</span><span class="p">:</span>
     <span class="n">_is_collection_attribute_impl</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="s2">&quot;collection&quot;</span><span class="p">)</span>
@@ -2518,8 +2514,7 @@
         <span class="n">dict_</span><span class="p">:</span> <span class="n">_InstanceDict</span><span class="p">,</span>
         <span class="n">user_data</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">passive</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="n">PassiveFlag</span><span class="o">.</span><span class="n">PASSIVE_OFF</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CollectionAdapter</span><span class="p">:</span>
-        <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CollectionAdapter</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span>
@@ -2528,8 +2523,7 @@
         <span class="n">dict_</span><span class="p">:</span> <span class="n">_InstanceDict</span><span class="p">,</span>
         <span class="n">user_data</span><span class="p">:</span> <span class="n">_AdaptedCollectionProtocol</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">passive</span><span class="p">:</span> <span class="n">PassiveFlag</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CollectionAdapter</span><span class="p">:</span>
-        <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CollectionAdapter</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span>
@@ -2540,8 +2534,7 @@
         <span class="n">passive</span><span class="p">:</span> <span class="n">PassiveFlag</span> <span class="o">=</span> <span class="n">PASSIVE_OFF</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">Literal</span><span class="p">[</span><span class="n">LoaderCallableStatus</span><span class="o">.</span><span class="n">PASSIVE_NO_RESULT</span><span class="p">],</span> <span class="n">CollectionAdapter</span>
-    <span class="p">]:</span>
-        <span class="o">...</span>
+    <span class="p">]:</span> <span class="o">...</span>
 
     <span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -3316,7 +3309,7 @@
   <small>
     
       Last update:
-      Jan 27, 2024
+      Mar 10, 2024
     
   </small>
 </div>
