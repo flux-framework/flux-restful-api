@@ -42,7 +42,7 @@ render data tables and similar.
 
  - data: the list of jobs
  - recordsTotal: the total number of jobs available
- - recordsFiltered: the total after fitlering by the query, length, start
+ - recordsFiltered: the total after filtering by the query, length, start
  - draw: an integer used by Jquery Datatables
 
 ### POST `/v1/jobs/submit`
