@@ -259,7 +259,7 @@ def get_job_output(jobid, user=None, delay=None):
 
     jobid = flux.job.JobID(jobid)
 
-    # If the submit is too close to the log reqest, it cannot find the file handle
+    # If the submit is too close to the log request, it cannot find the file handle
     # It could be also the jobid cannot be found.
     try:
         for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
