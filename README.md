@@ -47,6 +47,7 @@ tool to generate a contributors graphic below.
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
+Project interaction is governed by a Code of Conduct. Please see our [Code of Conduct](.github/CODE_OF_CONDUCT.md) for contributing.
 
 ## LICENSE
 
