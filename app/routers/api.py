@@ -7,7 +7,6 @@ import flux.resource
 from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.templating import Jinja2Templates
 from jose import jwt
 from sqlalchemy.orm import Session
 
@@ -25,8 +24,6 @@ alert_auth()
 router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
 no_auth_router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
 
-
-templates = Jinja2Templates(directory="templates/")
 user_auth = Depends(deps.get_current_active_user) if settings.require_auth else None
 
 denied_response = JSONResponse(content={"Message": "Denied"}, status_code=400)
@@ -41,17 +38,18 @@ async def login(request: Request, db: Session = Depends(deps.get_db)):
     is a jwt payload with user, pass, and scope (token) encoded
     with a shared secret.
     """
-    print(request.headers)
     if "Authorization" not in request.headers:
         return denied_response
 
     header = request.headers["Authorization"].split(" ")[-1].strip()
 
     # Decode with jwt and server secret
-    credentials = jwt.decode(
-        header, settings.secret_key, algorithms=[security.ALGORITHM]
-    )
-    print(credentials)
+    try:
+        credentials = jwt.decode(
+            header, settings.secret_key, algorithms=[security.ALGORITHM]
+        )
+    except jwt.JWTError:
+        return denied_response
 
     for required in ["user", "pass", "scope"]:
         if required not in credentials or not credentials[required]:

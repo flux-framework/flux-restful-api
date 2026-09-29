@@ -278,7 +278,7 @@ def list_jobs_detailed(user=None, limit=None, query=None):
     Get a detailed listing of jobs.
     """
     listing = list_jobs(user=user)
-    ids = listing.get()["jobs"]
+    ids = listing.get_jobs()
     jobs = {}
     for job in ids:
         # Stop if a limit is defined and we have hit it!

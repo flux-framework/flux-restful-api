@@ -1,6 +1,8 @@
+# Development, linting, and test dependencies (not needed at runtime)
 pre-commit
-black==23.3.0
-isort
-flake8
-pytest
-cffi
+black==26.5.1
+isort==5.13.2
+flake8==7.4.1
+pytest==9.1.1
+# Required by fastapi.testclient
+httpx==0.28.1

@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 
 import flux.job
@@ -20,7 +21,9 @@ from app.library.auth import check_auth
 # These views never have auth!
 router = APIRouter(tags=["views"])
 
-templates = Jinja2Templates(directory="templates/")
+here = os.path.dirname(os.path.abspath(__file__))
+root = os.path.dirname(os.path.dirname(here))
+templates = Jinja2Templates(directory=os.path.join(root, "templates"))
 
 # These views do :)
 auth_views_router = APIRouter(
@@ -28,7 +31,6 @@ auth_views_router = APIRouter(
     dependencies=[Depends(check_auth)] if settings.require_auth else [],
     responses={404: {"description": "Not found"}},
 )
-templates = Jinja2Templates(directory="templates/")
 
 # Require auth (and the user in the view)
 user_auth = Depends(check_auth) if settings.require_auth else None
@@ -62,6 +64,7 @@ async def home(request: Request):
     """
     data = helpers.get_page("index.md")
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
             "request": request,
@@ -75,6 +78,7 @@ async def home(request: Request):
 async def jobs_table(request: Request, user=user_auth):
     jobs = list(flux_cli.list_jobs_detailed(user=user).values())
     return templates.TemplateResponse(
+        request,
         "jobs/jobs.html",
         {
             "request": request,
@@ -96,6 +100,7 @@ async def logout(request: Request, response: Response):
     response.delete_cookie("access_token")
     data = helpers.get_page("index.md")
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
             "request": request,
@@ -125,6 +130,7 @@ async def job_info(request: Request, jobid, msg=None, user=user_auth):
     else:
         info = flux_cli.get_job_output(jobid, user=user, delay=1)
     return templates.TemplateResponse(
+        request,
         "jobs/job.html",
         {
             "title": f"Job {jobid}",
@@ -142,6 +148,7 @@ async def submit_job(request: Request, user=user_auth):
     print(user)
     form = SubmitForm(request)
     return templates.TemplateResponse(
+        request,
         "jobs/submit.html",
         {"request": request, "has_gpus": settings.has_gpus, "form": form},
     )
@@ -180,6 +187,7 @@ async def submit_job_post(request: Request, user=user_auth):
     else:
         print("🍒 Submit form is NOT valid!")
     return templates.TemplateResponse(
+        request,
         "jobs/submit.html",
         context={
             "request": request,
@@ -208,6 +216,7 @@ def submit_job_helper(request, form, user):
         intid = flux.job.JobID(jobid)
         message = f"Your job was successfully submit! 🦊 <a target='_blank' style='color:magenta' href='/job/{intid}'>{jobid}</a>"
         return templates.TemplateResponse(
+            request,
             "jobs/submit.html",
             context={
                 "request": request,
@@ -219,6 +228,7 @@ def submit_job_helper(request, form, user):
         form.errors.append("There was an issue submitting that job: %s" % str(e))
 
     return templates.TemplateResponse(
+        request,
         "jobs/submit.html",
         context={
             "request": request,
@@ -233,4 +243,6 @@ def submit_job_helper(request, form, user):
 @auth_views_router.get("/page/{page_name}", response_class=HTMLResponse)
 async def show_page(request: Request, page_name: str):
     data = helpers.get_page(page_name + ".md")
-    return templates.TemplateResponse("page.html", {"request": request, "data": data})
+    return templates.TemplateResponse(
+        request, "page.html", {"request": request, "data": data}
+    )

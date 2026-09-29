@@ -1,19 +1,19 @@
-requests
-fastapi
-uvicorn
-python-dotenv
-aiofiles
-python-multipart
-jinja2
-Markdown
-pytest
-pyaml
-sqlalchemy
-# needed by starlette
-httpx
-# install also provides alembic binary
-alembic
-pydantic
-pydantic-settings
-python-jose[cryptography]
-passlib[bcrypt]
+# Runtime dependencies for the Flux RESTful API server.
+# Pinned to versions verified together; bump deliberately and run the tests.
+# The container image (fluxrm/flux-sched:jammy) has Python 3.10, so every pin
+# must support 3.10: check Requires-Python before bumping.
+# Development and test tooling lives in .github/dev-requirements.txt.
+fastapi==0.142.0
+# fastapi has no upper bound on starlette, and starlette 1.x changed APIs
+starlette==1.7.0
+uvicorn==0.54.0
+python-multipart==0.0.32
+jinja2==3.1.6
+Markdown==3.10.3
+sqlalchemy==2.0.54
+alembic==1.20.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+# python-jose >= 3.4.0 contains the fixes for CVE-2024-33663 and CVE-2024-33664
+python-jose[cryptography]==3.5.0
+bcrypt==5.0.0

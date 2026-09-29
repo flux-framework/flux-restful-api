@@ -93,13 +93,6 @@ Install requirements (note that you also need Flux Python available, which isn't
 pip install -r requirements.txt
 ```
 
-Note that there is a bug with fastapi so we need to do some installs outside of the requirements.txt:
-
-```bash
-pip install pydantic==1.10.11
-pip install pydantic-settings
-```
-
 #### 2. Start Service
 
 There are two ways to start the app! You can either have it be the entry for flux start:
