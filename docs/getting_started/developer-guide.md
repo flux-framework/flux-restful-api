@@ -172,8 +172,20 @@ export FLUX_AUTH_BACKEND=pam
 export FLUX_ADMIN_USERS=$USER
 ```
 
-For multi-user mode (jobs run as the authenticated system user) flux needs to be started first
-(e.g., the instance or broker) and then the actual server needs to be started by root.
+For multi-user mode (`FLUX_SERVER_MODE=multi-user`) jobs run as the authenticated system
+user. The Flux instance is started first as the `flux` user with guest access and flux-imp
+configured (see [example/multi-user](https://github.com/flux-framework/flux-restful-api/tree/main/example/multi-user)),
+with `allow-root-owner = true`, which lets the root server act as the instance owner (read any
+jobspec, cancel any job), and the server is started by root: for each submission it becomes the user, whose own
+`flux python` signs and submits the jobspec, so no sudoers rules are needed. The server
+refuses to start in multi-user mode as any other user. PAM is the natural backend here,
+because every authenticated name is a system account; `database` works too if the database
+usernames match system accounts.
+
+Ownership is enforced for a job's details, output, and cancellation: in multi-user mode a
+job belongs to the uid it runs as, and in single-user mode (where every job runs as the
+server user) to the API user who submitted it, recorded in the jobspec. Superusers may act
+on any job. In single-user mode the job listing is shared.
 
 To accept tokens issued by an OpenID Connect provider:
 

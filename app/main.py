@@ -3,10 +3,13 @@ import os
 import sys
 
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 import app.auth as auth
+import app.library.flux as flux_cli
+from app.core.config import settings
 from app.core.logging import init_loggers
 from app.db.base import Base
 from app.db.session import engine
@@ -26,7 +29,21 @@ try:
 except Exception:
     pass
 
+# Multi-user mode becomes each user to submit their jobs, which only root can do
+if settings.require_auth and settings.flux_server_mode == "multi-user":
+    if os.getuid() != 0:
+        sys.exit(
+            "FLUX_SERVER_MODE=multi-user runs jobs as the authenticated user, "
+            f"which requires the server to run as root (it is uid {os.getuid()})."
+        )
+
 app = FastAPI()
+
+
+@app.exception_handler(flux_cli.JobAccessDenied)
+async def job_access_denied(request: Request, exc: flux_cli.JobAccessDenied):
+    return JSONResponse(status_code=403, content={"detail": str(exc)})
+
 
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.dirname(here)

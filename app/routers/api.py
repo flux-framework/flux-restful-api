@@ -327,5 +327,8 @@ async def get_job_stream_output(jobid, user=user_auth):
     """
     Non-blocking variant to stream output until control+c.
     """
-    stream = flux_cli.stream_job_output(jobid)
+    # Checked here, before the response starts: once the StreamingResponse
+    # has sent its 200, a denial inside the generator could not change it.
+    flux_cli.ensure_job_access(jobid, user)
+    stream = flux_cli.stream_job_output(jobid, user=user)
     return StreamingResponse(streamer(stream))

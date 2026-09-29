@@ -23,7 +23,7 @@ To control the user mode, you can export it to the environment where you are run
 # This is the default
 export FLUX_SERVER_MODE=single-user
 
-# This will have the flux user attempt to sign the payload with sudo
+# The server (running as root) becomes each user to sign and submit their jobs
 export FLUX_SERVER_MODE=multi-user
 ```
 

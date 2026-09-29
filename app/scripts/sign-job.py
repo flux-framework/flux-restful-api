@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
-# See https://github.com/flux-framework/flux-core/blob/master/t/t2404-job-exec-multiuser.t#L48
-# for an example of using this. This should be run with flux python, as done in library/flux.py
+# NOT USED BY THE SERVER. Kept as a reference for how flux-security wraps a
+# payload as another userid, which only works with the "none" signing
+# mechanism used in flux-core's tests (see t2404-job-exec-multiuser.t). With
+# munge, the credential is stamped with the real uid of the calling process,
+# so a server cannot sign a jobspec on another user's behalf. That is why
+# multi-user submission instead becomes the user (see app/library/runas.py)
+# and lets that user's own flux python sign and submit the jobspec.
 import sys
 
 from flux.security import SecurityContext
