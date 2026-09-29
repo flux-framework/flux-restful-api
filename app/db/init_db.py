@@ -66,7 +66,11 @@ def add_user(username, password, superuser=False, is_active=True) -> None:
             is_superuser=superuser,
             is_active=is_active,
         )
-        user = crud_user.create(db, obj_in=user_in)  # noqa: F841
+        try:
+            user = crud_user.create(db, obj_in=user_in)  # noqa: F841
+        except ValueError as e:
+            # e.g., a password longer than bcrypt's 72 byte limit
+            sys.exit(f"Cannot create user {username}: {e}")
         logger.info(f"User {username} has been created.")
 
 

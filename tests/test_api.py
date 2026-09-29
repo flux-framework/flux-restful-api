@@ -98,6 +98,15 @@ def authenticate(endpoint, method="get", json=None, params=None, expected_status
     return response
 
 
+def test_token_endpoint_rejects_malformed_header():
+    """
+    A garbage bearer token on the token endpoint is denied, not a 500.
+    """
+    response = client.post("/v1/token", headers={"Authorization": "Bearer not-a-jwt"})
+    assert response.status_code == 400
+    assert response.json() == {"Message": "Denied"}
+
+
 def test_submit_list_job():
     """
     Test a manual submission
