@@ -54,6 +54,10 @@ jobs:
         mv _build/html $root
         cd $root
         touch .nojekyll
+        # gh-pages is checked out here, and the deploy action checks out
+        # gh-pages again in a worktree, which git >= 2.44 refuses while the
+        # branch is in use. Detach HEAD (same commit, files untouched).
+        git checkout --detach
         ls
 
     - name: Deploy 🚀
