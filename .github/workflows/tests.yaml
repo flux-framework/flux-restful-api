@@ -1,7 +1,7 @@
 name: Test flux-restful-api
 
 on:
-  pull_request: []
+  pull_request:
 
 jobs:
   prepare-container:
@@ -35,7 +35,7 @@ jobs:
       run: |
         pip freeze
         # Tests for the API with auth disabled
-        flux start pytest -xs tests/test_api.py
+        flux start pytest -xs tests/
 
         # Create main user in database
         export FLUX_USER=fluxuser
@@ -52,6 +52,6 @@ jobs:
 
         # This needs to be run as the flux instance owner
         # E.g., if it's flux
-        # sudo -u flux flux start pytest -xs tests/test_api.py
+        # sudo -u flux flux start pytest -xs tests/
         whoami
-        sudo -u fluxuser flux start pytest -xs tests/test_api.py
+        sudo -u fluxuser flux start pytest -xs tests/
