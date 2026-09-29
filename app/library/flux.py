@@ -3,15 +3,16 @@ import os
 import pwd
 import re
 import shlex
-import subprocess
 import time
 
 import flux
 import flux.job
+import flux.job.kvslookup
 
 from app.auth.base import is_system_user
 from app.core.config import settings
-from app.library.env import build_helper_environment, build_job_environment
+from app.library.env import build_job_environment
+from app.library.runas import run_as_user
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 submit_script = os.path.join(root, "scripts", "submit-job.py")
@@ -25,55 +26,102 @@ class FakeJob:
         return self.jobid
 
 
+class JobAccessDenied(Exception):
+    """
+    The authenticated user does not own the job (and is not a superuser).
+    """
+
+
+def user_name(user):
+    """
+    The username of a principal (or plain string), or None if anonymous.
+    """
+    if user is None:
+        return None
+    if hasattr(user, "user_name"):
+        return user.user_name
+    return str(user)
+
+
+def multi_user():
+    """
+    Multi-user mode: jobs run as the authenticated system user.
+    """
+    return settings.require_auth and settings.flux_server_mode == "multi-user"
+
+
 def submit_job(handle, fluxjob, user):
     """
     Submit the job on behalf of user.
     """
-    if user and hasattr(user, "user_name"):
-        print(f"User submitting job {user.user_name}")
-        user = user.user_name
-    elif user and isinstance(user, str):
-        print(f"User submitting job {user}")
+    name = user_name(user)
 
-    # If we don't have auth enabled or request is for single-user mode
-    if not settings.require_auth or settings.flux_server_mode == "single-user":
-        print("Submit in single-user mode.")
+    # Single-user mode (or no auth): submit as the server user
+    if not multi_user():
         return flux.job.submit_async(handle, fluxjob)
 
-    # Never become a privileged or unknown account, whatever produced the name
-    if not is_system_user(user):
-        raise ValueError(f"{user} is not an allowed system account on this server.")
-    pw_record = pwd.getpwnam(user)
-    user_name = pw_record.pw_name
-    # user_uid = pw_record.pw_uid
-    # user_gid = pw_record.pw_gid
-
-    # Update the payload for the correct user
-    fluxjob.environment["HOME"] = pw_record.pw_dir
-    fluxjob.environment["LOGNAME"] = user_name
-    fluxjob.environment["USER"] = pw_record.pw_name
+    # Multi-user: become the user, whose own flux python signs and submits the
+    # jobspec. The user's identity variables are set by run_as_user; the job
+    # itself gets them from the jobspec environment.
+    if not is_system_user(name):
+        raise ValueError(f"{name} is not an allowed system account on this server.")
+    record = pwd.getpwnam(name)
+    fluxjob.environment["HOME"] = record.pw_dir
+    fluxjob.environment["LOGNAME"] = record.pw_name
+    fluxjob.environment["USER"] = record.pw_name
     payload = json.dumps(fluxjob.jobspec)
+    output = run_as_user(["flux", "python", submit_script], name, input=payload)
+    # The helper prints the id in F58; return an integer like submit_async does
+    return FakeJob(int(flux.job.JobID(output.strip())))
 
-    # Pipe the payload into flux python, run as the user, with only the
-    # environment needed to reach the Flux instance (not the server's secrets)
+
+def job_owner(jobid):
+    """
+    Who owns a job: the (uid, jobspec user attribute) pair, or None if unknown.
+
+    The uid is the system user the job runs as. The user attribute is the API
+    user who submitted it, which is what distinguishes users in single-user
+    mode where every job runs as the server user.
+    """
+    from app.main import app
+
+    jobid = flux.job.JobID(jobid)
     try:
-        output = subprocess.check_output(
-            ("sudo", "-E", "-u", user, "flux", "python", submit_script),
-            input=payload.encode("utf-8"),
-            env=build_helper_environment(),
-        )
+        info = flux.job.job_list_id(app.handle, jobid, attrs=["userid"]).get_jobinfo()
+    except FileNotFoundError:
+        return None
+    if multi_user():
+        # Only the uid decides ownership; skip the jobspec RPC
+        return info.userid, None
+    spec = flux.job.kvslookup.job_kvs_lookup(app.handle, jobid, keys=["jobspec"])
+    attribute = None
+    if spec and spec.get("jobspec"):
+        attribute = spec["jobspec"].get("attributes", {}).get("system", {}).get("user")
+    return info.userid, attribute
 
-    # A flux start without sudo -u flux can cause this
-    # This will be caught and returned to the user
-    except PermissionError as e:
-        raise ValueError(
-            f"Permission error: {e}! Are you running the instance as the flux user?"
-        )
 
-    jobid = output.decode("utf-8").strip()
-    print(f"Submit job {jobid}")
-    job = FakeJob(jobid)
-    return job
+def ensure_job_access(jobid, user):
+    """
+    Raise JobAccessDenied unless the user may act on the job.
+
+    Anonymous requests (no auth backend) and superusers may act on any job.
+    In multi-user mode the job must run as the user's uid; otherwise the job
+    must have been submitted by the same API user. Unknown jobs pass, so the
+    caller reports them as missing.
+    """
+    name = user_name(user)
+    if name is None or getattr(user, "is_superuser", False):
+        return
+    owner = job_owner(jobid)
+    if owner is None:
+        return
+    uid, attribute = owner
+    if multi_user():
+        allowed = uid == pwd.getpwnam(name).pw_uid
+    else:
+        allowed = attribute == name
+    if not allowed:
+        raise JobAccessDenied(f"{name} does not own job {jobid}")
 
 
 def clean_submit_args(kwargs):
@@ -173,12 +221,9 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
         print(f"⭐️ Setting shell option: {option}={value}")
         fluxjob.setattr_shell_option(option, value)
 
-    # Set an attribute about the owning user
-    if user and hasattr(user, "user_name"):
-        fluxjob.setattr("user", user.user_name)
-        user = user.user_name
-
-    fluxjob.setattr("user", user)
+    # Record the submitting API user; this is how ownership is decided in
+    # single-user mode, where every job runs as the server user
+    fluxjob.setattr("user", user_name(user))
 
     # Set a provided working directory
     print(f"⭐️ Workdir provided: {workdir}")
@@ -214,12 +259,15 @@ def query_jobs(contenders, query):
     return jobs
 
 
-def stream_job_output(jobid):
+def stream_job_output(jobid, user=None):
     """
-    Given a jobid, stream the output
+    Given a jobid, stream the output.
+
+    Callers must check ensure_job_access() before the response starts.
     """
     from app.main import app
 
+    ensure_job_access(jobid, user)
     try:
         for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
             if "data" in line.context:
@@ -234,9 +282,9 @@ def cancel_job(jobid, user):
 
     Returns a message to the user and a return code.
     """
-    # TODO need to validate the user owns the job here
     from app.main import app
 
+    ensure_job_access(jobid, user)
     try:
         flux.job.cancel(app.handle, jobid)
     # This is usually FileNotFoundError
@@ -251,11 +299,11 @@ def get_job_output(jobid, user=None, delay=None):
 
     If there is a delay, we are requesting on demand, so we want to return early.
     """
-    # TODO need to validate the user owns the job here
     lines = []
     start = time.time()
     from app.main import app
 
+    ensure_job_access(jobid, user)
     jobid = flux.job.JobID(jobid)
 
     # If the submit is too close to the log request, it cannot find the file handle
@@ -305,11 +353,17 @@ def list_jobs_detailed(user=None, limit=None, query=None):
 
 def list_jobs(user=None):
     """
-    Get a simple listing of jobs (just the ids)
+    Get a simple listing of jobs (just the ids).
+
+    In multi-user mode a non-superuser only sees jobs running as their uid.
+    In single-user mode every job runs as the server user, so the listing is
+    shared; access to a job's details and output is still per user.
     """
-    # TODO need to validate the user owns the job here
     from app.main import app
 
+    name = user_name(user)
+    if multi_user() and name and not getattr(user, "is_superuser", False):
+        return flux.job.job_list(app.handle, userid=pwd.getpwnam(name).pw_uid)
     return flux.job.job_list(app.handle)
 
 
@@ -327,9 +381,9 @@ def get_job(jobid, user=None):
     """
     Get details for a job
     """
-    # TODO need to validate the user owns the job here
     from app.main import app
 
+    ensure_job_access(jobid, user)
     jobid = flux.job.JobID(jobid)
 
     payload = {"id": jobid, "attrs": ["all"]}

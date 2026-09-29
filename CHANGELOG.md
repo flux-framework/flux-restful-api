@@ -22,6 +22,7 @@ The versions coincide with releases on pip. Only major versions will be released
    - a failed login at a token endpoint is 400, not 401, so clients do not loop re-requesting a token
    - FLUX_ADMIN_USERS grants superuser with any backend; GET /v1/auth describes how to log in
    - FLUX_REQUIRE_AUTH=false now disables auth (previously any value enabled it)
+ - Multi-user mode becomes the user directly (no sudo); jobs are owned by their user, others get 403 (unreleased)
  - Pin dependencies; hash passwords with bcrypt directly; fix views and job listing on current FastAPI/Flux (unreleased)
  - Ensure we update flux environment for user (0.1.13)
  - Add better multi-user mode - running jobs on behalf of user (0.1.12)
