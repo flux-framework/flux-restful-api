@@ -71,7 +71,10 @@
                   </tr>
                   {% if job.state != "INACTIVE" %}<tr>
                     <td scope="row">Actions</td>
-                    <td><a href="/job/{{ job.id }}/cancel" type="button" class="btn-warning btn">Request Cancel</a></td>
+                    <td><form method="POST" action="/job/{{ job.id }}/cancel" style="display:inline">
+                      <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+                      <button type="submit" class="btn-warning btn">Request Cancel</button>
+                    </form></td>
                   </tr>{% endif %}
                 </tbody>
               </table>

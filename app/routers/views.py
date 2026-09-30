@@ -1,9 +1,11 @@
 import os
+from urllib.parse import urlencode
 
 import flux.job
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from markupsafe import Markup
 
 import app.library.flux as flux_cli
 import app.library.helpers as helpers
@@ -11,6 +13,7 @@ import app.library.launcher as launcher
 import app.routers.depends as deps
 from app.core.config import settings
 from app.forms import SubmitForm
+from app.library import csrf
 
 # These views never have auth!
 router = APIRouter(tags=["views"])
@@ -70,8 +73,10 @@ async def logout(request: Request, response: Response):
 )
 async def job_info(request: Request, jobid, msg=None, user=user_auth):
     job = flux_cli.get_job(jobid, user=user)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
 
-    # If we have a message, add to messages
+    # If we have a message, add to messages (the template escapes it)
     messages = [msg] if msg else []
 
     # If not completed, ask info to return after a second of waiting
@@ -104,14 +109,15 @@ async def submit_job(request: Request, user=user_auth):
     )
 
 
-# Button to cancel a job
-@auth_views_router.get("/job/{jobid}/cancel", response_class=HTMLResponse)
+# Button to cancel a job: a POST form with a CSRF token, never a GET link
+@auth_views_router.post("/job/{jobid}/cancel", response_class=HTMLResponse)
 async def cancel_job(request: Request, jobid, user=user_auth):
     from app.main import app
 
+    await csrf.verify_form(request)
     message, _ = flux_cli.cancel_job(jobid, user=user)
-    url = app.url_path_for(name="job_info", jobid=jobid) + "?msg=" + message
-    return RedirectResponse(url=url)
+    url = app.url_path_for("job_info", jobid=jobid) + "?" + urlencode({"msg": message})
+    return RedirectResponse(url=url, status_code=303)
 
 
 @auth_views_router.post("/jobs/submit")
@@ -122,6 +128,7 @@ async def submit_job_post(request: Request, user=user_auth):
     messages = []
     form = SubmitForm(request)
     await form.load_data()
+    csrf.verify(request, form.csrf_token)
     if form.is_valid():
         if form.kwargs.get("is_launcher") is True:
             messages.append(
@@ -156,7 +163,11 @@ def submit_job_helper(request, form, user):
         flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         jobid = flux_future.get_id()
         intid = flux.job.JobID(jobid)
-        message = f"Your job was successfully submit! 🦊 <a target='_blank' style='color:magenta' href='/job/{intid}'>{jobid}</a>"
+        # Markup.format escapes the values; the template escapes everything else
+        message = Markup(
+            "Your job was successfully submit! 🦊 "
+            "<a target='_blank' style='color:magenta' href='/job/{}'>{}</a>"
+        ).format(intid, jobid)
         return templates.TemplateResponse(
             request,
             "jobs/submit.html",

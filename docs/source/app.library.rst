@@ -4,6 +4,14 @@ app.library package
 Submodules
 ----------
 
+app.library.csrf module
+-----------------------
+
+.. automodule:: app.library.csrf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.library.env module
 ----------------------
 

@@ -11,6 +11,7 @@ import flux.job
 
 from app.auth.base import is_system_user
 from app.core.config import settings
+from app.library.env import build_helper_environment, build_job_environment
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 submit_script = os.path.join(root, "scripts", "submit-job.py")
@@ -53,15 +54,14 @@ def submit_job(handle, fluxjob, user):
     fluxjob.environment["USER"] = pw_record.pw_name
     payload = json.dumps(fluxjob.jobspec)
 
-    # We ideally need to pipe the payload into flux python
+    # Pipe the payload into flux python, run as the user, with only the
+    # environment needed to reach the Flux instance (not the server's secrets)
     try:
-        ps = subprocess.Popen(("echo", payload), stdout=subprocess.PIPE)
         output = subprocess.check_output(
             ("sudo", "-E", "-u", user, "flux", "python", submit_script),
-            stdin=ps.stdout,
-            env=os.environ,
+            input=payload.encode("utf-8"),
+            env=build_helper_environment(),
         )
-        ps.wait()
 
     # A flux start without sudo -u flux can cause this
     # This will be caught and returned to the user
@@ -188,14 +188,9 @@ def prepare_job(user, kwargs, runtime=0, workdir=None, envars=None):
     # A duration of zero (the default) means unlimited
     fluxjob.duration = runtime
 
-    # If we are running as the user, we don't want the current (root) environment
-    # However, if we don't provide it, flux stops working.
-    # We need to test different ideas for this.
-    environment = dict(os.environ)
-
-    # Additional envars in the payload?
-    environment.update(envars)
-    fluxjob.environment = environment
+    # Only an allowlist of the server environment, plus the user's envars.
+    # The job shell provides FLUX_URI and the FLUX_JOB_* variables itself.
+    fluxjob.environment = build_job_environment(envars)
     return fluxjob
 
 

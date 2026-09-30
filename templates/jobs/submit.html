@@ -16,6 +16,7 @@
                 <p class="alert alert-danger alert-dismissible">{{ error }}</p>{% endfor %}
             </div></div>{% endif %}
             <form id="submitform" method="POST">
+              <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
                 <button type="submit" class="btn btn-info" style="float:right; margin-bottom:5px">Submit</button>
                 <a href="/jobs" type="button" class="btn btn-info" style="float:right; margin-bottom:5px; margin-right:5px">View Jobs</a>
                 <div class="mb-3">

@@ -10,6 +10,7 @@ import app.auth as auth
 from app.core.logging import init_loggers
 from app.db.base import Base
 from app.db.session import engine
+from app.library import csrf
 from app.routers import api, views
 
 init_loggers()
@@ -38,6 +39,8 @@ templates = Jinja2Templates(directory=template_root)
 
 app.mount("/static", StaticFiles(directory=static_root), name="static")
 app.mount("/data", StaticFiles(directory=data_root), name="data")
+
+app.middleware("http")(csrf.middleware)
 
 app.include_router(views.router)
 app.include_router(views.auth_views_router)

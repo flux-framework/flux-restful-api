@@ -226,10 +226,27 @@ The following variables are available (with their defaults):
 |FLUX_HAS_GPU | GPUs are available for the user to request | unset |
 |FLUX_NUMBER_NODES| The number of nodes available (exposed) in the cluster | 1 |
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
+|FLUX_JOB_ENV_PASSTHROUGH | Extra server environment variables (comma separated names or patterns, e.g. `CUDA_*,OMP_NUM_THREADS`) to pass to jobs and launchers | unset |
 |FLUX_SECRET_KEY | Secret shared with clients to encode the `/v1/token` handshake (required for `shared-secret`) | unset |
 |FLUX_ACCESS_TOKEN_EXPIRES_MINUTES| number of minutes to expire an access token | 600 |
 |FLUX_RESTFUL_HOST| Host for command line client | http://127.0.0.1:5000 |
 
+
+### Job Environment
+
+Jobs do not inherit the server's environment. They get a fixed allowlist (PATH, HOME, locale
+variables, PYTHONPATH, LD_LIBRARY_PATH, and the Flux paths exported by `flux start`) plus any
+variables in the submit request, and the job shell provides FLUX_URI and the FLUX_JOB_* variables
+itself. This keeps server settings and secrets such as FLUX_TOKEN out of jobs. If your deployment
+relies on other variables reaching jobs, for example CUDA_*, OMP_*, or a CONDA or SPACK
+environment, list them in `FLUX_JOB_ENV_PASSTHROUGH`:
+
+```bash
+export FLUX_JOB_ENV_PASSTHROUGH="CUDA_*,OMP_NUM_THREADS,CONDA_PREFIX"
+```
+
+Launchers (nextflow, snakemake) run on the server rather than inside a job, so they get the same
+allowlist plus FLUX_URI in order to submit their jobs to this instance.
 
 ### Flux Option Flags
 
