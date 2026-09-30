@@ -573,21 +573,23 @@
   
 
 <h1>Source code for app.routers.depends</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span>
+<span></span><code><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">status</span>
-<span class="kn">from</span> <span class="nn">fastapi.security</span> <span class="kn">import</span> <span class="n">OAuth2PasswordBearer</span>
-<span class="kn">from</span> <span class="nn">jose</span> <span class="kn">import</span> <span class="n">jwt</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span> <span class="nn">fastapi.security</span> <span class="kn">import</span> <span class="n">HTTPBasic</span><span class="p">,</span> <span class="n">HTTPBasicCredentials</span><span class="p">,</span> <span class="n">OAuth2PasswordBearer</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Session</span>
 
-<span class="kn">from</span> <span class="nn">app</span> <span class="kn">import</span> <span class="n">crud</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">schemas</span>
-<span class="kn">from</span> <span class="nn">app.core</span> <span class="kn">import</span> <span class="n">security</span>
+<span class="kn">from</span> <span class="nn">app.auth</span> <span class="kn">import</span> <span class="n">Principal</span><span class="p">,</span> <span class="n">get_backend</span>
+<span class="kn">from</span> <span class="nn">app.auth.base</span> <span class="kn">import</span> <span class="n">is_system_user</span>
 <span class="kn">from</span> <span class="nn">app.core.config</span> <span class="kn">import</span> <span class="n">settings</span>
 <span class="kn">from</span> <span class="nn">app.db.session</span> <span class="kn">import</span> <span class="n">SessionLocal</span>
 
 <span class="n">login_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">api_version</span><span class="si">}</span><span class="s2">/login/access-token&quot;</span>
-<span class="n">reusable_oauth2</span> <span class="o">=</span> <span class="n">OAuth2PasswordBearer</span><span class="p">(</span><span class="n">tokenUrl</span><span class="o">=</span><span class="n">login_url</span><span class="p">)</span>
+
+<span class="c1"># auto_error is off so the &quot;none&quot; backend can serve anonymous requests and so</span>
+<span class="c1"># we control the 401 response (clients rely on the WWW-Authenticate header).</span>
+<span class="n">oauth2_scheme</span> <span class="o">=</span> <span class="n">OAuth2PasswordBearer</span><span class="p">(</span><span class="n">tokenUrl</span><span class="o">=</span><span class="n">login_url</span><span class="p">,</span> <span class="n">auto_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">basic_scheme</span> <span class="o">=</span> <span class="n">HTTPBasic</span><span class="p">(</span><span class="n">auto_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_db"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.get_db">[docs]</a><span class="k">def</span> <span class="nf">get_db</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
@@ -601,52 +603,107 @@
         <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_current_user"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.get_current_user">[docs]</a><span class="k">def</span> <span class="nf">get_current_user</span><span class="p">(</span>
-    <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">),</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">reusable_oauth2</span><span class="p">)</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">User</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the current user (via the token from the jwt)</span>
+<div class="viewcode-block" id="unauthorized"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.unauthorized">[docs]</a><span class="k">def</span> <span class="nf">unauthorized</span><span class="p">(</span><span class="n">detail</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Bearer&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HTTPException</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">HTTPException</span><span class="p">(</span>
+        <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span>
+        <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="n">scheme</span><span class="p">},</span>
+    <span class="p">)</span></div>
 
-<span class="sd">    And fail if not authenticated or expired.</span>
+
+<span class="k">def</span> <span class="nf">_accept</span><span class="p">(</span><span class="n">principal</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Principal</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Principal</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Final checks on an authenticated principal, whatever backend produced it.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
-            <span class="n">token</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">algorithms</span><span class="o">=</span><span class="p">[</span><span class="n">security</span><span class="o">.</span><span class="n">ALGORITHM</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">token_data</span> <span class="o">=</span> <span class="n">schemas</span><span class="o">.</span><span class="n">TokenPayload</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
-    <span class="k">except</span> <span class="p">(</span><span class="n">jwt</span><span class="o">.</span><span class="n">JWTError</span><span class="p">,</span> <span class="n">ValidationError</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">principal</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">unauthorized</span><span class="p">(</span><span class="s2">&quot;Could not validate credentials&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">principal</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Inactive user&quot;</span><span class="p">)</span>
+    <span class="c1"># In multi-user mode the server becomes this user to run their jobs, so</span>
+    <span class="c1"># the name must be a real, unprivileged system account (FLUX_MIN_UID).</span>
+    <span class="c1"># Backends may check earlier for a better message; this is authoritative.</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">flux_server_mode</span> <span class="o">==</span> <span class="s2">&quot;multi-user&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_system_user</span><span class="p">(</span>
+        <span class="n">principal</span><span class="o">.</span><span class="n">user_name</span>
+    <span class="p">):</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
-            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Could not validate credentials&quot;</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">principal</span><span class="o">.</span><span class="n">user_name</span><span class="si">}</span><span class="s2"> is not an allowed system account on this server.&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="n">user</span> <span class="o">=</span> <span class="n">crud</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">token_data</span><span class="o">.</span><span class="n">sub</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;User not found&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">principal</span>
+
+
+<span class="k">def</span> <span class="nf">_verify</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Principal</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">_accept</span><span class="p">(</span><span class="n">get_backend</span><span class="p">()</span><span class="o">.</span><span class="n">verify_token</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">token</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="current_user"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.current_user">[docs]</a><span class="k">def</span> <span class="nf">current_user</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">),</span> <span class="n">token</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">oauth2_scheme</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Principal</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The authenticated API user, or None when the auth backend is &quot;none&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">get_backend</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">unauthorized</span><span class="p">(</span><span class="s2">&quot;Not authenticated&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_verify</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="current_superuser"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.current_superuser">[docs]</a><span class="k">def</span> <span class="nf">current_superuser</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Principal</span><span class="p">]</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">current_user</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">Principal</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The authenticated user, who must be a superuser.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;This action requires a superuser, but the auth backend is &#39;none&#39;.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;The user doesn&#39;t have enough privileges&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">user</span></div>
 
 
-<div class="viewcode-block" id="get_current_active_user"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.get_current_active_user">[docs]</a><span class="k">def</span> <span class="nf">get_current_active_user</span><span class="p">(</span>
-    <span class="n">current_user</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">User</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">User</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_bearer_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the currently active user.</span>
+<span class="sd">    A bearer token from the Authorization header, if any.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">crud</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_active</span><span class="p">(</span><span class="n">current_user</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Inactive user&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">current_user</span></div>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">scheme</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">token</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scheme</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;bearer&quot;</span> <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="get_current_active_superuser"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.get_current_active_superuser">[docs]</a><span class="k">def</span> <span class="nf">get_current_active_superuser</span><span class="p">(</span>
-    <span class="n">current_user</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">User</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">User</span><span class="p">:</span>
+<div class="viewcode-block" id="current_user_views"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.current_user_views">[docs]</a><span class="k">def</span> <span class="nf">current_user_views</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">),</span>
+    <span class="n">credentials</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HTTPBasicCredentials</span><span class="p">]</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">basic_scheme</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Principal</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the currently active superuser.</span>
+<span class="sd">    The authenticated web UI user, or None when the auth backend is &quot;none&quot;.</span>
+
+<span class="sd">    A bearer token header is accepted for every backend. Password backends</span>
+<span class="sd">    additionally accept HTTP Basic auth, which is what browsers use.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">crud</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">(</span><span class="n">current_user</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
-            <span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;The user doesn&#39;t have enough privileges&quot;</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">current_user</span></div>
+    <span class="n">backend</span> <span class="o">=</span> <span class="n">get_backend</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">backend</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">token</span> <span class="o">=</span> <span class="n">_bearer_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">token</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_verify</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">backend</span><span class="o">.</span><span class="n">supports_password</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">unauthorized</span><span class="p">(</span><span class="s2">&quot;Not authenticated&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">credentials</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">unauthorized</span><span class="p">(</span><span class="s2">&quot;Not authenticated&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;Basic&quot;</span><span class="p">)</span>
+    <span class="n">principal</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">credentials</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">principal</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">unauthorized</span><span class="p">(</span><span class="s2">&quot;Incorrect user or password&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;Basic&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_accept</span><span class="p">(</span><span class="n">principal</span><span class="p">)</span></div>
 </code></pre></div>
 
 
@@ -668,7 +725,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    Sep 29, 2026
+    Sep 30, 2026
   </span>
 
     

@@ -15,7 +15,7 @@
         <link rel="prev" href="modules.html">
       
       
-        <link rel="next" href="app.core.html">
+        <link rel="next" href="app.auth.html">
       
       
       <link rel="icon" href="../_static/favicon.ico">
@@ -646,6 +646,16 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="app.auth.html" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/source/app.auth.rst (reference label)"><span>app.<wbr>auth package</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="app.core.html" class="md-nav__link">
     
     <span class="md-ellipsis">
@@ -710,6 +720,16 @@
     
     <span class="md-ellipsis">
       <span title="/source/app.schemas.rst (reference label)"><span>app.<wbr>schemas package</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="app.scripts.html" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/source/app.scripts.rst (reference label)"><span>app.<wbr>scripts package</span></span>
     </span>
   </a>
   
@@ -809,13 +829,107 @@
 <h2 id="subpackages">Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="app.auth.html">app.auth package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.auth.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.auth.html#module-app.auth.base">app.auth.base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend">app.auth.base.AuthBackend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend.authenticate">authenticate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend.issue_token">issue_token</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend.issues_tokens">issues_tokens</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend.name">name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend.resolve">resolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend.supports_password">supports_password</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend.validate">validate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.AuthBackend.verify_token">verify_token</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.base.AuthError">app.auth.base.AuthError</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.base.Principal">app.auth.base.Principal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.Principal.backend">backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.Principal.is_active">is_active</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.Principal.is_superuser">is_superuser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.base.Principal.user_name">user_name</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.base.is_admin">app.auth.base.is_admin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.base.is_system_user">app.auth.base.is_system_user</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.auth.html#module-app.auth.database">app.auth.database module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.database.DatabaseBackend">app.auth.database.DatabaseBackend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.database.DatabaseBackend.authenticate">authenticate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.database.DatabaseBackend.name">name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.database.DatabaseBackend.resolve">resolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.database.DatabaseBackend.supports_password">supports_password</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.database.SharedSecretBackend">app.auth.database.SharedSecretBackend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.database.SharedSecretBackend.name">name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.database.SharedSecretBackend.validate">validate</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.auth.html#module-app.auth.none">app.auth.none module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.none.NoAuthBackend">app.auth.none.NoAuthBackend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.none.NoAuthBackend.issues_tokens">issues_tokens</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.none.NoAuthBackend.name">name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.none.NoAuthBackend.supports_password">supports_password</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.auth.html#module-app.auth.oidc">app.auth.oidc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend">app.auth.oidc.OidcBackend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.issue_token">issue_token</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.issues_tokens">issues_tokens</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.jwks">jwks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.multi_user">multi_user</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.name">name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.supports_password">supports_password</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.username_claim">username_claim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.validate">validate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.oidc.OidcBackend.verify_token">verify_token</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.auth.html#module-app.auth.pam">app.auth.pam module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.pam.PamBackend">app.auth.pam.PamBackend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.pam.PamBackend.authenticate">authenticate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.pam.PamBackend.name">name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.pam.PamBackend.resolve">resolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.pam.PamBackend.supports_password">supports_password</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.auth.html#app.auth.pam.PamBackend.validate">validate</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.auth.html#module-app.auth.tokens">app.auth.tokens module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.tokens.TokenError">app.auth.tokens.TokenError</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.tokens.create_access_token">app.auth.tokens.create_access_token</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.tokens.decode_access_token">app.auth.tokens.decode_access_token</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.auth.html#module-app.auth">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.create_backend">app.auth.create_backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.describe">app.auth.describe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.get_backend">app.auth.get_backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.handshake_enabled">app.auth.handshake_enabled</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.auth.html#app.auth.reset_backend">app.auth.reset_backend</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="app.core.html">app.core package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="app.core.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.core.html#module-app.core.config">app.core.config module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.Settings">app.core.config.Settings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.access_token_expires_minutes">access_token_expires_minutes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.admin_users">admin_users</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.api_version">api_version</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.app_name">app_name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.auth_backend">auth_backend</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.db_file">db_file</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.flux_nodes">flux_nodes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.flux_server_mode">flux_server_mode</a></li>
@@ -823,15 +937,24 @@
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.flux_user">flux_user</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.has_gpus">has_gpus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.known_launchers">known_launchers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.min_uid">min_uid</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.model_config">model_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.oidc_audience">oidc_audience</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.oidc_issuer">oidc_issuer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.oidc_jwks_url">oidc_jwks_url</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.oidc_username_claim">oidc_username_claim</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.option_flags">option_flags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.pam_service">pam_service</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.require_auth">require_auth</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.secret_key">secret_key</a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.core.html#app.core.config.Settings.token_signing_key">token_signing_key</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.generate_secret_key">app.core.config.generate_secret_key</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.get_auth_backend">app.core.config.get_auth_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.get_bool_envar">app.core.config.get_bool_envar</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.get_int_envar">app.core.config.get_int_envar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.get_list_envar">app.core.config.get_list_envar</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.get_option_flags">app.core.config.get_option_flags</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.config.parse_option_flags">app.core.config.parse_option_flags</a></li>
 </ul>
@@ -841,7 +964,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.core.html#module-app.core.security">app.core.security module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.security.create_access_token">app.core.security.create_access_token</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.security.get_password_hash">app.core.security.get_password_hash</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.core.html#app.core.security.verify_password">app.core.security.verify_password</a></li>
 </ul>
@@ -895,13 +1017,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="app.library.html">app.library package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="app.library.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.library.html#module-app.library.auth">app.library.auth module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.alert_auth">app.library.auth.alert_auth</a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.check_auth">app.library.auth.check_auth</a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.get_basic_header">app.library.auth.get_basic_header</a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.library.html#app.library.auth.not_authenticated">app.library.auth.not_authenticated</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="app.library.html#module-app.library.env">app.library.env module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.library.html#app-library-flux-module">app.library.flux module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.library.html#module-app.library.helpers">app.library.helpers module</a><ul>
@@ -951,10 +1066,11 @@
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#app-routers-api-module">app.routers.api module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.depends">app.routers.depends module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.depends.get_current_active_superuser">app.routers.depends.get_current_active_superuser</a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.depends.get_current_active_user">app.routers.depends.get_current_active_user</a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.depends.get_current_user">app.routers.depends.get_current_user</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.depends.current_superuser">app.routers.depends.current_superuser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.depends.current_user">app.routers.depends.current_user</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.depends.current_user_views">app.routers.depends.current_user_views</a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.depends.get_db">app.routers.depends.get_db</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.depends.unauthorized">app.routers.depends.unauthorized</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#app-routers-views-module">app.routers.views module</a></li>
@@ -1003,6 +1119,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.token.TokenPayload">app.schemas.token.TokenPayload</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.token.TokenPayload.backend">backend</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.token.TokenPayload.model_config">model_config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.token.TokenPayload.sub">sub</a></li>
 </ul>
@@ -1046,6 +1163,13 @@
 <li class="toctree-l2"><a class="reference internal" href="app.schemas.html#module-app.schemas">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="app.scripts.html">app.scripts package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.scripts.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.scripts.html#app-scripts-sign-job-module">app.scripts.sign-job module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.scripts.html#app-scripts-submit-job-module">app.scripts.submit-job module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.scripts.html#module-app.scripts">Module contents</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <h2 id="submodules">Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
@@ -1072,7 +1196,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    Sep 29, 2026
+    Sep 30, 2026
   </span>
 
     

@@ -530,10 +530,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#api-oauth2-style-authentication" class="md-nav__link">
+  <a href="#api-token-handshake" class="md-nav__link">
     
     <span class="md-ellipsis">
-      <span title="/getting_started/user-guide.md#api-oauth2-style-authentication (reference label)"><span>API OAuth2 Style Authentication</span></span>
+      <span title="/getting_started/user-guide.md#api-token-handshake (reference label)"><span>API Token Handshake</span></span>
     </span>
   </a>
   
@@ -1001,34 +1001,71 @@ job is run as the same user on the system on behalf of the flux user.</p></li>
 <p>Note that the majority of our use cases use single-user mode, so you can expect more bugs / work to be
 done with multi-user.</p>
 <h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading">¶</a></h3>
-<p>If you choose to deploy without authentication, this is a ⚠️ proceed at your own risk ⚠️ sort of deal.
-We call this the “single-user” case, and it means that you are submitting jobs as the instance owner,
-typically a user named “flux.” If it’s just you that owns the cluster, or a small group of trusted friends,
-this is probably OK. When you enable authentication, the following happens:</p>
+<p>Authentication is pluggable: the server is started with one backend, chosen
+with <code class="docutils literal notranslate"><span class="pre">FLUX_AUTH_BACKEND</span></code>, and clients can ask <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/v1/auth</span></code> how to log in.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Backend</th>
+<th>Who can log in</th>
+<th>How the API is used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>none</code> (default)</td>
+<td>Everyone, anonymously</td>
+<td>No credentials. ⚠️ Only for isolated deployments.</td>
+</tr>
+<tr>
+<td><code>database</code></td>
+<td>Users created with <code>python3 app/db/init_db.py</code></td>
+<td>Post username and password to <code>/v1/login/access-token</code> to get a token.</td>
+</tr>
+<tr>
+<td><code>shared-secret</code></td>
+<td>Database users</td>
+<td>As above, plus the token handshake used by the Python client (below). Requires <code>FLUX_SECRET_KEY</code>.</td>
+</tr>
+<tr>
+<td><code>pam</code></td>
+<td>System accounts, via the host's PAM stack</td>
+<td>Same as <code>database</code>. Requires the <code>python-pam</code> package and the server running as root (otherwise only the server user's own password can be checked); service name is <code>FLUX_PAM_SERVICE</code> (default <code>login</code>).</td>
+</tr>
+<tr>
+<td><code>oidc</code></td>
+<td>Users of an OpenID Connect provider</td>
+<td>Obtain a token from the provider and present it as a bearer token. Requires <code>FLUX_OIDC_ISSUER</code> and <code>FLUX_OIDC_AUDIENCE</code>. The username is the token's <code>sub</code> claim unless <code>FLUX_OIDC_USERNAME_CLAIM</code> says otherwise.</td>
+</tr>
+</tbody>
+</table>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">FLUX_REQUIRE_AUTH=true</span></code> (the option from earlier releases) is the same as
+<code class="docutils literal notranslate"><span class="pre">FLUX_AUTH_BACKEND=shared-secret</span></code>.</p>
+<p>With every backend:</p>
 <ul class="simple">
-<li><p>A server secret that you export via <code class="docutils literal notranslate"><span class="pre">FLUX_SECREY_KEY</span></code> is used to encode payloads. You’ll need to provide this to users.</p></li>
-<li><p>The server is created adding users with names and passwords, so every user known to Flux Restful is known to the server.</p>
-<ul>
-<li><p>Passwords are hashed</p></li>
-<li><p>We don’t currently check authentication here with PAM (but we could).</p></li>
+<li><p>Access tokens issued by the server are signed with <code class="docutils literal notranslate"><span class="pre">FLUX_TOKEN_SIGNING_KEY</span></code>, which is
+only known to the server and is required whenever a backend issues tokens (all but <code class="docutils literal notranslate"><span class="pre">none</span></code>
+and <code class="docutils literal notranslate"><span class="pre">oidc</span></code>). It must be the same for every worker; the container entrypoint generates one
+per container start if it is not provided.</p></li>
+<li><p>Usernames listed in <code class="docutils literal notranslate"><span class="pre">FLUX_ADMIN_USERS</span></code> (comma separated) are superusers, which is
+required to stop the service. Database users can also be flagged as superusers directly.
+For <code class="docutils literal notranslate"><span class="pre">oidc</span></code> these are claim values, so subjects by default.</p></li>
+<li><p>A request without valid credentials gets a 401 response with a <code class="docutils literal notranslate"><span class="pre">WWW-Authenticate</span></code> header.
+A failed login at a token endpoint is a 400, so clients do not retry it.</p></li>
+<li><p>Any password backend offers the token handshake below when <code class="docutils literal notranslate"><span class="pre">FLUX_SECRET_KEY</span></code> is set;
+<code class="docutils literal notranslate"><span class="pre">shared-secret</span></code> is <code class="docutils literal notranslate"><span class="pre">database</span></code> with the secret required, so the two behave the same
+whenever the secret is set (the container entrypoint always sets one).</p></li>
 </ul>
-</li>
-<li><p>A user making a request provided an encoded payload (first) with the encoded username and password</p></li>
-<li><p>The server decodes the payload, authenticates, and (given a valid username and password) generates an expiring token.</p></li>
-<li><p>The user adds the token header to subsequent requests.</p></li>
-</ul>
-<p>To require this authentication, we set a few environment variables to turn it on and define credentials
-and a secret (e.g., a driver that is running the API might randomly generate these accounts and secret) and then all interactions
-with the API or interface require authenticating. As an example, the Flux Operator will make both the server user
-accounts and the Flux Restful database accounts when you spin up a MiniCluster.</p>
 <h4 id="web-interface-basic-authentication">Web Interface Basic Authentication<a class="headerlink" href="#web-interface-basic-authentication" title="Permalink to this heading">¶</a></h4>
-<p>In the case of the web interface (which does not necessarily need to be exposed, e.g., the Flux Operator requires a port forward)
-we fall back to basic auth, and the user needs to enter a username and password.</p>
-<h4 id="api-oauth2-style-authentication">API OAuth2 Style Authentication<a class="headerlink" href="#api-oauth2-style-authentication" title="Permalink to this heading">¶</a></h4>
-<p>In the case of the API, we taken an OAuth2 based approach, where a request will originally
-return with a 401 status and the “www-authenticate” header, and the calling client needs to then prepare an encoded
-payload to request a token. A successful receipt of the payload will return the token,
-which can be added to an Authorization header for subsequent requests (up until it expires).</p>
+<p>For the <code class="docutils literal notranslate"><span class="pre">database</span></code>, <code class="docutils literal notranslate"><span class="pre">shared-secret</span></code>, and <code class="docutils literal notranslate"><span class="pre">pam</span></code> backends the web interface uses HTTP Basic
+auth, so the browser will prompt for a username and password. For <code class="docutils literal notranslate"><span class="pre">oidc</span></code>, present the
+provider’s token as a bearer <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header or an <code class="docutils literal notranslate"><span class="pre">access_token</span></code> cookie.</p>
+<h4 id="api-token-handshake">API Token Handshake<a class="headerlink" href="#api-token-handshake" title="Permalink to this heading">¶</a></h4>
+<p>With <code class="docutils literal notranslate"><span class="pre">shared-secret</span></code> (or any password backend when <code class="docutils literal notranslate"><span class="pre">FLUX_SECRET_KEY</span></code> is set), the Python client
+encodes the username, password, and scope <code class="docutils literal notranslate"><span class="pre">token</span></code> into a JWT with the shared secret and posts it to
+<code class="docutils literal notranslate"><span class="pre">/v1/token</span></code>. The server decodes it, checks the credentials, and returns an expiring access token
+for the <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Bearer</span></code> header of subsequent requests. The shared secret is only used to
+decode that handshake; it cannot be used to create access tokens.</p>
 <p>You largely don’t need to worry about the complexity of the above because the SDKs will
 handle these interactions for you, given that you’ve provided some credentials and secret key.
 If you are using the Flux Operator, you largely don’t need to do anything, as it will
@@ -1301,7 +1338,7 @@ example!</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    Sep 29, 2026
+    Sep 30, 2026
   </span>
 
     

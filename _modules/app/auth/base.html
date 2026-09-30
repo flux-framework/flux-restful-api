@@ -18,7 +18,7 @@
     
     
       
-        <title>app.library.auth - Flux RESTful API</title>
+        <title>app.auth.base - Flux RESTful API</title>
       
     
     
@@ -142,7 +142,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              app.library.auth
+              app.auth.base
             
           </span>
         </div>
@@ -572,74 +572,143 @@
   
   
 
-<h1>Source code for app.library.auth</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">import</span> <span class="nn">logging</span>
+<h1>Source code for app.auth.base</h1><div class="highlight"><pre>
+<span></span><code><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The authentication backend interface.</span>
 
-<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">status</span>
-<span class="kn">from</span> <span class="nn">fastapi.security</span> <span class="kn">import</span> <span class="n">HTTPBasic</span><span class="p">,</span> <span class="n">HTTPBasicCredentials</span>
+<span class="sd">A backend answers two questions: &quot;are these credentials valid?&quot; and &quot;who does</span>
+<span class="sd">this bearer token belong to?&quot; Everything else in the server (routers, the web</span>
+<span class="sd">views, job submission) only ever sees a Principal, so backends can be swapped</span>
+<span class="sd">by setting FLUX_AUTH_BACKEND without touching the rest of the code.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pwd</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
 <span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Session</span>
 
-<span class="kn">import</span> <span class="nn">app.routers.depends</span> <span class="k">as</span> <span class="nn">deps</span>
+<span class="kn">from</span> <span class="nn">app.auth</span> <span class="kn">import</span> <span class="n">tokens</span>
 <span class="kn">from</span> <span class="nn">app.core.config</span> <span class="kn">import</span> <span class="n">settings</span>
-<span class="kn">from</span> <span class="nn">app.crud</span> <span class="kn">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">crud_user</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-<span class="n">security</span> <span class="o">=</span> <span class="n">HTTPBasic</span><span class="p">()</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;flux-restful&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="not_authenticated"><a class="viewcode-back" href="../../../source/app.library.html#app.library.auth.not_authenticated">[docs]</a><span class="k">def</span> <span class="nf">not_authenticated</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Incorrect user or token.&quot;</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
-        <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span>
-        <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">,</span>
-        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Basic&quot;</span><span class="p">},</span>
-    <span class="p">)</span></div>
+<div class="viewcode-block" id="AuthError"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.AuthError">[docs]</a><span class="k">class</span> <span class="nc">AuthError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A backend is misconfigured or cannot perform the requested operation.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="alert_auth"><a class="viewcode-back" href="../../../source/app.library.html#app.library.auth.alert_auth">[docs]</a><span class="k">def</span> <span class="nf">alert_auth</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🍓 Require auth: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">require_auth</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🍓  Server mode: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">settings</span><span class="o">.</span><span class="n">flux_server_mode</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">&quot;🍓   Secret key </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;*&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">secret_key</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">secret_key</span>
-        <span class="k">else</span> <span class="s2">&quot;🍓   Secret key: unset&quot;</span>
-    <span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">&quot;🍓    Flux user: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;*&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">flux_user</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">flux_user</span>
-        <span class="k">else</span> <span class="s2">&quot;🍓    Flux user: unset&quot;</span>
-    <span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">&quot;🍓   Flux token: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;*&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">flux_token</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">flux_token</span>
-        <span class="k">else</span> <span class="s2">&quot;🍓   Flux token: unset&quot;</span>
-    <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="check_auth"><a class="viewcode-back" href="../../../source/app.library.html#app.library.auth.check_auth">[docs]</a><span class="k">def</span> <span class="nf">check_auth</span><span class="p">(</span>
-    <span class="n">credentials</span><span class="p">:</span> <span class="n">HTTPBasicCredentials</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">security</span><span class="p">),</span>
-    <span class="n">db</span><span class="p">:</span> <span class="n">Session</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">get_db</span><span class="p">),</span>
-<span class="p">):</span>
+<div class="viewcode-block" id="Principal"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.Principal">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Principal</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check base64 encoded auth (this is HTTP Basic auth.)</span>
+<span class="sd">    An authenticated identity, independent of the backend that produced it.</span>
+
+<span class="sd">    user_name is the login name and, in multi-user mode, the system account that</span>
+<span class="sd">    jobs are submitted as.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">user</span> <span class="o">=</span> <span class="n">crud_user</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
-        <span class="n">db</span><span class="p">,</span> <span class="n">user_name</span><span class="o">=</span><span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">credentials</span><span class="o">.</span><span class="n">password</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
-            <span class="n">status_code</span><span class="o">=</span><span class="mi">401</span><span class="p">,</span>
-            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Incorrect email or password&quot;</span><span class="p">,</span>
-            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Basic&quot;</span><span class="p">},</span>
+
+    <span class="n">user_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">is_superuser</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="is_admin"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.is_admin">[docs]</a><span class="k">def</span> <span class="nf">is_admin</span><span class="p">(</span><span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Users listed in FLUX_ADMIN_USERS are superusers regardless of backend.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">username</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">admin_users</span></div>
+
+
+<div class="viewcode-block" id="is_system_user"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.is_system_user">[docs]</a><span class="k">def</span> <span class="nf">is_system_user</span><span class="p">(</span><span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Whether a name is a system account that a backend may map to.</span>
+
+<span class="sd">    Accounts below FLUX_MIN_UID (root, daemons) are never acceptable, so a</span>
+<span class="sd">    bad claim mapping or a misconfigured PAM stack cannot yield them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">.</span><span class="n">getpwnam</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">pw_uid</span> <span class="o">&lt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">min_uid</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Refusing system account </span><span class="si">%s</span><span class="s2"> (uid </span><span class="si">%s</span><span class="s2"> below FLUX_MIN_UID=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">username</span><span class="p">,</span>
+            <span class="n">record</span><span class="o">.</span><span class="n">pw_uid</span><span class="p">,</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">min_uid</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="n">crud_user</span><span class="o">.</span><span class="n">is_active</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Inactive user&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span></div>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
 
 
-<div class="viewcode-block" id="get_basic_header"><a class="viewcode-back" href="../../../source/app.library.html#app.library.auth.get_basic_header">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_basic_header</span><span class="p">(</span><span class="n">authentication</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">authentication</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Authentication header invalid&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="AuthBackend"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.AuthBackend">[docs]</a><span class="k">class</span> <span class="nc">AuthBackend</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for authentication backends.</span>
+
+<span class="sd">    Subclasses set ``name`` (the value used in FLUX_AUTH_BACKEND) and override</span>
+<span class="sd">    ``authenticate`` and/or ``resolve``. Token issuing and verification default</span>
+<span class="sd">    to server-signed JWTs and only need overriding when tokens come from</span>
+<span class="sd">    somewhere else (for example an OIDC provider).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;base&quot;</span>
+
+    <span class="c1"># Whether authenticate(username, password) is meaningful for this backend.</span>
+    <span class="c1"># Password backends get HTTP Basic auth for the web views, the OAuth2</span>
+    <span class="c1"># password form login, and (with FLUX_SECRET_KEY set) the shared-secret</span>
+    <span class="c1"># token handshake used by the Python client.</span>
+    <span class="n">supports_password</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Whether the server issues access tokens for this backend (and therefore</span>
+    <span class="c1"># needs FLUX_TOKEN_SIGNING_KEY). False when tokens come from elsewhere.</span>
+    <span class="n">issues_tokens</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="AuthBackend.validate"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.AuthBackend.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check configuration at startup. Raise AuthError if unusable.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="AuthBackend.authenticate"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.AuthBackend.authenticate">[docs]</a>    <span class="k">def</span> <span class="nf">authenticate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Principal</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate a username and password. Return a Principal, or None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="AuthBackend.resolve"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.AuthBackend.resolve">[docs]</a>    <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Principal</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resolve a username (typically a token subject) to a Principal.</span>
+
+<span class="sd">        Return None if the user is unknown or inactive.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="AuthBackend.issue_token"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.AuthBackend.issue_token">[docs]</a>    <span class="k">def</span> <span class="nf">issue_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">principal</span><span class="p">:</span> <span class="n">Principal</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Issue an access token for an authenticated principal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">tokens</span><span class="o">.</span><span class="n">create_access_token</span><span class="p">(</span><span class="n">principal</span><span class="o">.</span><span class="n">user_name</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthBackend.verify_token"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.base.AuthBackend.verify_token">[docs]</a>    <span class="k">def</span> <span class="nf">verify_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Principal</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify a bearer token and return its Principal, or None if invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">decode_access_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">tokens</span><span class="o">.</span><span class="n">TokenError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># A token issued under a different backend is not valid here, even</span>
+        <span class="c1"># if the signing key is the same.</span>
+        <span class="k">if</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;backend&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">subject</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sub&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">subject</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">subject</span><span class="p">)</span></div></div>
 </code></pre></div>
 
 
@@ -661,7 +730,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    Sep 29, 2026
+    Sep 30, 2026
   </span>
 
     

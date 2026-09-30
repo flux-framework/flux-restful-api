@@ -4,14 +4,6 @@ app.library package
 Submodules
 ----------
 
-app.library.auth module
------------------------
-
-.. automodule:: app.library.auth
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 app.library.env module
 ----------------------
 

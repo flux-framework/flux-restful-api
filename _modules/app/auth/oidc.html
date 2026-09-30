@@ -18,7 +18,7 @@
     
     
       
-        <title>app.models.user - Flux RESTful API</title>
+        <title>app.auth.oidc - Flux RESTful API</title>
       
     
     
@@ -142,7 +142,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              app.models.user
+              app.auth.oidc
             
           </span>
         </div>
@@ -572,24 +572,167 @@
   
   
 
-<h1>Source code for app.models.user</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Boolean</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">relationship</span>
+<h1>Source code for app.auth.oidc</h1><div class="highlight"><pre>
+<span></span><code><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">app.db.base_class</span> <span class="kn">import</span> <span class="n">Base</span>
+<span class="kn">from</span> <span class="nn">jose</span> <span class="kn">import</span> <span class="n">jwt</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">Session</span>
+
+<span class="kn">from</span> <span class="nn">app.auth.base</span> <span class="kn">import</span> <span class="n">AuthBackend</span><span class="p">,</span> <span class="n">AuthError</span><span class="p">,</span> <span class="n">Principal</span><span class="p">,</span> <span class="n">is_admin</span><span class="p">,</span> <span class="n">is_system_user</span>
+<span class="kn">from</span> <span class="nn">app.core.config</span> <span class="kn">import</span> <span class="n">settings</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;flux-restful&quot;</span><span class="p">)</span>
+
+<span class="n">ALGORITHMS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;RS256&quot;</span><span class="p">,</span> <span class="s2">&quot;RS384&quot;</span><span class="p">,</span> <span class="s2">&quot;RS512&quot;</span><span class="p">,</span> <span class="s2">&quot;ES256&quot;</span><span class="p">,</span> <span class="s2">&quot;ES384&quot;</span><span class="p">,</span> <span class="s2">&quot;ES512&quot;</span><span class="p">]</span>
+
+<span class="c1"># Minimum time between JWKS refreshes triggered by an unknown key id, so that</span>
+<span class="c1"># unauthenticated requests cannot make the server hammer the provider.</span>
+<span class="n">JWKS_REFRESH_MIN_SECONDS</span> <span class="o">=</span> <span class="mi">60</span>
 
 
-<div class="viewcode-block" id="User"><a class="viewcode-back" href="../../../source/app.models.html#app.models.user.User">[docs]</a><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
-    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">user_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">hashed_password</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="viewcode-block" id="OidcBackend"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.oidc.OidcBackend">[docs]</a><span class="k">class</span> <span class="nc">OidcBackend</span><span class="p">(</span><span class="n">AuthBackend</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Accept tokens issued by an OpenID Connect / OAuth2 provider.</span>
 
-    <span class="c1"># These are only used to encode and validate payloads, and</span>
-    <span class="c1"># can be reset at any time. Not related to the hashed password</span>
-    <span class="n">secret_key</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">is_active</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Boolean</span><span class="p">(),</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">is_superuser</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Boolean</span><span class="p">(),</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">jobs</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Job&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;owner&quot;</span><span class="p">)</span></div>
+<span class="sd">    Clients obtain a token from the provider themselves and present it as a</span>
+<span class="sd">    bearer token. The server verifies the signature against the provider&#39;s</span>
+<span class="sd">    JWKS, plus the issuer (FLUX_OIDC_ISSUER) and audience (FLUX_OIDC_AUDIENCE,</span>
+<span class="sd">    normally the client id). The username is the &quot;sub&quot; claim by default: it is</span>
+<span class="sd">    the only claim OIDC guarantees to be stable and unique for an issuer, and</span>
+<span class="sd">    claims like preferred_username or email may be user-chosen. Superusers are</span>
+<span class="sd">    the usernames (claim values) in FLUX_ADMIN_USERS.</span>
+
+<span class="sd">    FLUX_OIDC_USERNAME_CLAIM selects another claim. In multi-user mode, where</span>
+<span class="sd">    the username is the system account jobs run as, it must be set explicitly</span>
+<span class="sd">    and the value must be an existing account.</span>
+
+<span class="sd">    The server never issues tokens for this backend and password login is not</span>
+<span class="sd">    available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;oidc&quot;</span>
+    <span class="n">supports_password</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">issues_tokens</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jwks_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Callable returning a JWK set dict. Injectable for tests.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_jwks_loader</span> <span class="o">=</span> <span class="n">jwks_loader</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_jwks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_jwks</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_refresh</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="c1"># Requests are verified from a thread pool, so loads are serialized</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">username_claim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">settings</span><span class="o">.</span><span class="n">oidc_username_claim</span> <span class="ow">or</span> <span class="s2">&quot;sub&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">multi_user</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">settings</span><span class="o">.</span><span class="n">flux_server_mode</span> <span class="o">==</span> <span class="s2">&quot;multi-user&quot;</span>
+
+<div class="viewcode-block" id="OidcBackend.validate"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.oidc.OidcBackend.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">oidc_issuer</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">oidc_audience</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AuthError</span><span class="p">(</span>
+                <span class="s2">&quot;The oidc auth backend requires FLUX_OIDC_ISSUER and FLUX_OIDC_AUDIENCE.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">oidc_username_claim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AuthError</span><span class="p">(</span>
+                <span class="s2">&quot;In multi-user mode jobs run as the authenticated user, so the oidc &quot;</span>
+                <span class="s2">&quot;backend needs FLUX_OIDC_USERNAME_CLAIM set to a claim that maps &quot;</span>
+                <span class="s2">&quot;identities to system accounts.&quot;</span>
+            <span class="p">)</span></div>
+
+    <span class="c1"># JWKS retrieval</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_json</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https://&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">AuthError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OIDC endpoints must use https, got </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_jwks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">oidc_jwks_url</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
+            <span class="n">discovery</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">oidc_issuer</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/.well-known/openid-configuration&quot;</span>
+            <span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_json</span><span class="p">(</span><span class="n">discovery</span><span class="p">)[</span><span class="s2">&quot;jwks_uri&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_json</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OidcBackend.jwks"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.oidc.OidcBackend.jwks">[docs]</a>    <span class="k">def</span> <span class="nf">jwks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jwks</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">refresh</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jwks</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">refresh</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_jwks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jwks_loader</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_last_refresh</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jwks</span></div>
+
+    <span class="k">def</span> <span class="nf">_maybe_refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Refresh keys for an unknown key id (rotation), at most once per</span>
+<span class="sd">        JWKS_REFRESH_MIN_SECONDS, so junk tokens cannot trigger fetches.</span>
+
+<span class="sd">        The slot is claimed under the lock before fetching, so concurrent</span>
+<span class="sd">        requests that arrive during a fetch do not each start their own.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kid</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_key</span><span class="p">(</span><span class="n">kid</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_refresh</span> <span class="o">&lt;</span> <span class="n">JWKS_REFRESH_MIN_SECONDS</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_refresh</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jwks</span><span class="p">(</span><span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_has_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kid&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">kid</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jwks</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+
+    <span class="c1"># Backend interface</span>
+
+<div class="viewcode-block" id="OidcBackend.issue_token"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.oidc.OidcBackend.issue_token">[docs]</a>    <span class="k">def</span> <span class="nf">issue_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">principal</span><span class="p">:</span> <span class="n">Principal</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">AuthError</span><span class="p">(</span>
+            <span class="s2">&quot;Tokens for the oidc backend are issued by the identity provider.&quot;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="OidcBackend.verify_token"><a class="viewcode-back" href="../../../source/app.auth.html#app.auth.oidc.OidcBackend.verify_token">[docs]</a>    <span class="k">def</span> <span class="nf">verify_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Principal</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">get_unverified_header</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">jwt</span><span class="o">.</span><span class="n">JWTError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_refresh</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kid&quot;</span><span class="p">))</span>
+            <span class="n">claims</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="n">token</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jwks</span><span class="p">(),</span>
+                <span class="n">algorithms</span><span class="o">=</span><span class="n">ALGORITHMS</span><span class="p">,</span>
+                <span class="n">audience</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">oidc_audience</span><span class="p">,</span>
+                <span class="n">issuer</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">oidc_issuer</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;verify_at_hash&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">jwt</span><span class="o">.</span><span class="n">JWTError</span><span class="p">,</span> <span class="n">AuthError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;OIDC token rejected: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">username</span> <span class="o">=</span> <span class="n">claims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username_claim</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">username</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_user</span><span class="p">:</span>
+            <span class="c1"># The username is the account jobs run as: it must exist and</span>
+            <span class="c1"># must not be a privileged account (see FLUX_MIN_UID)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_system_user</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;OIDC user </span><span class="si">%s</span><span class="s2"> is not an allowed system account&quot;</span><span class="p">,</span> <span class="n">username</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">Principal</span><span class="p">(</span>
+            <span class="n">user_name</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">is_superuser</span><span class="o">=</span><span class="n">is_admin</span><span class="p">(</span><span class="n">username</span><span class="p">),</span> <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span></div></div>
 </code></pre></div>
 
 

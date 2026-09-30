@@ -1073,20 +1073,41 @@ $<span class="w"> </span>sudo<span class="w"> </span>-E<span class="w"> </span>m
 </code></pre></div>
 </div>
 <h3 id="authentication">3. Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading">¶</a></h3>
-<p>If you want to require authentication for the user, export the user and token and
-a variable that tells the server to use auth:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_USER</span><span class="o">=</span><span class="nv">$USER</span>
+<p>Authentication is off by default (<code class="docutils literal notranslate"><span class="pre">FLUX_AUTH_BACKEND=none</span></code>). To require it, choose a backend
+and provide what it needs. For database users, which is what the Python client and the Flux
+Operator use, export the superuser credentials and the keys, then initialize the database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_AUTH_BACKEND</span><span class="o">=</span>shared-secret
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_USER</span><span class="o">=</span><span class="nv">$USER</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_TOKEN</span><span class="o">=</span><span class="m">123456</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_REQUIRE_AUTH</span><span class="o">=</span><span class="nb">true</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_SECRET_KEY</span><span class="o">=</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span><span class="k">)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_TOKEN_SIGNING_KEY</span><span class="o">=</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span><span class="k">)</span>
+make<span class="w"> </span>init
 </code></pre></div>
 </div>
-<p>As an alternative, you can enable PAM authentication to use user accounts on the running server:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_ENABLE_PAM</span><span class="o">=</span><span class="nb">true</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_REQUIRE_AUTH</span><span class="o">=</span><span class="nb">true</span>
+<p><code class="docutils literal notranslate"><span class="pre">FLUX_REQUIRE_AUTH=true</span></code> is still accepted and means the same as <code class="docutils literal notranslate"><span class="pre">FLUX_AUTH_BACKEND=shared-secret</span></code>.</p>
+<p>To authenticate against system accounts instead, install <code class="docutils literal notranslate"><span class="pre">python-pam</span></code> and use the <code class="docutils literal notranslate"><span class="pre">pam</span></code> backend.
+PAM can only check other users’ passwords when the server runs as root. Superusers are listed
+explicitly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_AUTH_BACKEND</span><span class="o">=</span>pam
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_ADMIN_USERS</span><span class="o">=</span><span class="nv">$USER</span>
 </code></pre></div>
 </div>
-<p>Authentication must be enabled for PAM to work too - you can’t just enable the first. For the latter (multi-user)
-flux needs to be started first (e.g., the instance or broker) and then the actual server needs to be started by root.</p>
+<p>For multi-user mode (jobs run as the authenticated system user) flux needs to be started first
+(e.g., the instance or broker) and then the actual server needs to be started by root.</p>
+<p>To accept tokens issued by an OpenID Connect provider:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_AUTH_BACKEND</span><span class="o">=</span>oidc
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_OIDC_ISSUER</span><span class="o">=</span>https://accounts.example.com
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_OIDC_AUDIENCE</span><span class="o">=</span>my-client-id
+</code></pre></div>
+</div>
+<p>The username is the token’s <code class="docutils literal notranslate"><span class="pre">sub</span></code> claim, the only claim OIDC guarantees to be stable and
+unique, so <code class="docutils literal notranslate"><span class="pre">FLUX_ADMIN_USERS</span></code> should list subjects. Claims such as <code class="docutils literal notranslate"><span class="pre">preferred_username</span></code> or
+<code class="docutils literal notranslate"><span class="pre">email</span></code> can be chosen with <code class="docutils literal notranslate"><span class="pre">FLUX_OIDC_USERNAME_CLAIM</span></code>, but only if your provider guarantees
+they are unique and not user-editable. In multi-user mode, where the username is the system
+account jobs run as, that variable must be set to a claim that maps to local accounts, and
+accounts below <code class="docutils literal notranslate"><span class="pre">FLUX_MIN_UID</span></code> (root, daemons) are refused whatever the claim says.</p>
+<p>See the <a class="reference external" href="https://flux-framework.org/flux-restful-api/getting_started/user-guide.html">User Guide</a>
+for how clients log in with each backend, and the environment table below for every variable.</p>
 <h2 id="interactions">Interactions<a class="headerlink" href="#interactions" title="Permalink to this heading">¶</a></h2>
 <p>Regardless of how you install, you can open your host to <a class="reference external" href="http://127.0.0.1:5000">http://127.0.0.1:5000</a>
 to see the very simple interface! This currently has API documentation (<a class="reference external" href="https://fastapi.tiangolo.com/advanced/extending-openapi/">openapi</a>)
@@ -1107,19 +1128,64 @@ The following variables are available (with their defaults):</p>
 </thead>
 <tbody>
 <tr>
-<td>FLUX_REQUIRE_AUTH</td>
-<td>The server should require basic auth for API and authenticated endpoints</td>
-<td>False (unset)</td>
+<td>FLUX_AUTH_BACKEND</td>
+<td>Authentication backend: <code>none</code>, <code>database</code>, <code>shared-secret</code>, <code>pam</code>, or <code>oidc</code></td>
+<td>none</td>
 </tr>
 <tr>
-<td>FLUX_TOKEN</td>
-<td>The token password to require for Basic Auth (if <code>FLUX_REQUIRE_AUTH</code> is set)</td>
+<td>FLUX_REQUIRE_AUTH</td>
+<td>Deprecated: <code>true</code> is the same as <code>FLUX_AUTH_BACKEND=shared-secret</code></td>
 <td>unset</td>
 </tr>
 <tr>
 <td>FLUX_USER</td>
-<td>The username to require for Basic Auth (if <code>FLUX_REQUIRE_AUTH</code> is set)</td>
+<td>Username of the database superuser created by <code>init_db.py init</code></td>
+<td>fluxuser</td>
+</tr>
+<tr>
+<td>FLUX_TOKEN</td>
+<td>Password of the database superuser created by <code>init_db.py init</code></td>
 <td>unset</td>
+</tr>
+<tr>
+<td>FLUX_ADMIN_USERS</td>
+<td>Comma separated usernames that are superusers with any backend</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>FLUX_TOKEN_SIGNING_KEY</td>
+<td>Server-only key that signs access tokens; required for backends that issue tokens and shared by all workers</td>
+<td>unset (entrypoint.sh generates one per container start)</td>
+</tr>
+<tr>
+<td>FLUX_PAM_SERVICE</td>
+<td>PAM service name for the <code>pam</code> backend</td>
+<td>login</td>
+</tr>
+<tr>
+<td>FLUX_MIN_UID</td>
+<td>Lowest uid a backend may map a login to (<code>pam</code>, and <code>oidc</code> in multi-user mode); root and daemons are refused</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>FLUX_OIDC_ISSUER</td>
+<td>OpenID Connect issuer URL (<code>oidc</code> backend, required)</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>FLUX_OIDC_AUDIENCE</td>
+<td>Expected token audience, usually the client id (<code>oidc</code> backend, required)</td>
+<td>unset</td>
+</tr>
+<tr>
+<td>FLUX_OIDC_JWKS_URL</td>
+<td>JWKS URL, if it cannot be discovered from the issuer</td>
+<td>discovered</td>
+</tr>
+<tr>
+<td>FLUX_OIDC_USERNAME_CLAIM</td>
+<td>Token claim used as the username (<code>oidc</code> backend); required in multi-user mode</td>
+<td>sub</td>
 </tr>
 <tr>
 <td>FLUX_HAS_GPU</td>
@@ -1138,7 +1204,7 @@ The following variables are available (with their defaults):</p>
 </tr>
 <tr>
 <td>FLUX_SECRET_KEY</td>
-<td>secret key to be shared between user and server (required)</td>
+<td>Secret shared with clients to encode the <code>/v1/token</code> handshake (required for <code>shared-secret</code>)</td>
 <td>unset</td>
 </tr>
 <tr>
@@ -1317,7 +1383,7 @@ functions from oras-py source code.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    Sep 29, 2026
+    Sep 30, 2026
   </span>
 
     

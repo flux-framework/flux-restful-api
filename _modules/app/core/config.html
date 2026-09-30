@@ -579,11 +579,16 @@
 <span class="kn">import</span> <span class="nn">secrets</span>
 <span class="kn">import</span> <span class="nn">shlex</span>
 <span class="kn">import</span> <span class="nn">string</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">pydantic_settings</span> <span class="kn">import</span> <span class="n">BaseSettings</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">TRUE_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">)</span>
+
+<span class="c1"># Authentication backends known to the server (implemented in app/auth)</span>
+<span class="n">KNOWN_AUTH_BACKENDS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="s2">&quot;shared-secret&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">,</span> <span class="s2">&quot;oidc&quot;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="get_int_envar"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_int_envar">[docs]</a><span class="k">def</span> <span class="nf">get_int_envar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -602,9 +607,40 @@
 
 <div class="viewcode-block" id="get_bool_envar"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_bool_envar">[docs]</a><span class="k">def</span> <span class="nf">get_bool_envar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get a boolean from the environment, meaning the value is set.</span>
+<span class="sd">    Get a boolean environment variable. Accepts 1/0, true/false, yes/no, on/off.</span>
+
+<span class="sd">    An unset or empty variable returns the default.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">default</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">else</span> <span class="ow">not</span> <span class="n">default</span></div>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">default</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">TRUE_VALUES</span></div>
+
+
+<div class="viewcode-block" id="get_list_envar"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_list_envar">[docs]</a><span class="k">def</span> <span class="nf">get_list_envar</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a comma separated list from the environment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="get_auth_backend"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_auth_backend">[docs]</a><span class="k">def</span> <span class="nf">get_auth_backend</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine the auth backend from FLUX_AUTH_BACKEND.</span>
+
+<span class="sd">    FLUX_REQUIRE_AUTH predates FLUX_AUTH_BACKEND: it meant database users plus</span>
+<span class="sd">    the shared-secret token handshake, so it maps to &quot;shared-secret&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">backend</span> <span class="o">=</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_AUTH_BACKEND&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">backend</span><span class="p">:</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;shared-secret&quot;</span> <span class="k">if</span> <span class="n">get_bool_envar</span><span class="p">(</span><span class="s2">&quot;FLUX_REQUIRE_AUTH&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;none&quot;</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">KNOWN_AUTH_BACKENDS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;FLUX_AUTH_BACKEND must be one of </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">KNOWN_AUTH_BACKENDS</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;got &#39;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">backend</span></div>
 
 
 <div class="viewcode-block" id="get_option_flags"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.get_option_flags">[docs]</a><span class="k">def</span> <span class="nf">get_option_flags</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;-o&quot;</span><span class="p">):</span>
@@ -638,7 +674,7 @@
 
 <div class="viewcode-block" id="generate_secret_key"><a class="viewcode-back" href="../../../source/app.core.html#app.core.config.generate_secret_key">[docs]</a><span class="k">def</span> <span class="nf">generate_secret_key</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate a secret key to encrypt, if one not provided.</span>
+<span class="sd">    Generate a random key, if one is not provided.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">alphabet</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span>
     <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">secrets</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">))</span></div>
@@ -657,7 +693,38 @@
 
     <span class="c1"># Assume there is at least one node!</span>
     <span class="n">flux_nodes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">get_int_envar</span><span class="p">(</span><span class="s2">&quot;FLUX_NUMBER_NODES&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">require_auth</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">get_bool_envar</span><span class="p">(</span><span class="s2">&quot;FLUX_REQUIRE_AUTH&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Authentication. See app/auth for the backends.</span>
+    <span class="n">auth_backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">get_auth_backend</span><span class="p">()</span>
+    <span class="n">require_auth</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">auth_backend</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span>
+
+    <span class="c1"># Usernames that are superusers regardless of backend (comma separated)</span>
+    <span class="n">admin_users</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_list_envar</span><span class="p">(</span><span class="s2">&quot;FLUX_ADMIN_USERS&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Shared with clients so they can encode the /v1/token handshake payload.</span>
+    <span class="c1"># It is never used to sign access tokens.</span>
+    <span class="n">secret_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_SECRET_KEY&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Server-only key that signs access tokens. Required by every backend that</span>
+    <span class="c1"># issues tokens, so that all workers sign with the same key (see</span>
+    <span class="c1"># entrypoint.sh, which generates one per container start if unset).</span>
+    <span class="n">token_signing_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_TOKEN_SIGNING_KEY&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Lowest uid that may be mapped to a system account by a backend (pam, or</span>
+    <span class="c1"># oidc in multi-user mode). Keeps root and daemon accounts out of reach</span>
+    <span class="c1"># of a bad claim mapping.</span>
+    <span class="n">min_uid</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">get_int_envar</span><span class="p">(</span><span class="s2">&quot;FLUX_MIN_UID&quot;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+    <span class="c1"># pam backend</span>
+    <span class="n">pam_service</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_PAM_SERVICE&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;login&quot;</span>
+
+    <span class="c1"># oidc backend</span>
+    <span class="n">oidc_issuer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_OIDC_ISSUER&quot;</span><span class="p">)</span>
+    <span class="n">oidc_audience</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_OIDC_AUDIENCE&quot;</span><span class="p">)</span>
+    <span class="n">oidc_jwks_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_OIDC_JWKS_URL&quot;</span><span class="p">)</span>
+    <span class="c1"># Claim used as the username. Defaults to &quot;sub&quot;, the only claim OIDC</span>
+    <span class="c1"># guarantees to be stable and unique for an issuer.</span>
+    <span class="n">oidc_username_claim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_OIDC_USERNAME_CLAIM&quot;</span><span class="p">)</span>
 
     <span class="c1"># If you change this, also change in alembic.ini</span>
     <span class="n">db_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sqlite:///./flux-restful.db&quot;</span>
@@ -666,7 +733,6 @@
     <span class="n">flux_server_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_SERVER_MODE&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;single-user&quot;</span>
     <span class="p">)</span>
-    <span class="n">secret_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLUX_SECRET_KEY&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">generate_secret_key</span><span class="p">()</span>
 
     <span class="c1"># Validate the server mode provided.</span>
     <span class="k">if</span> <span class="n">flux_server_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;single-user&quot;</span><span class="p">,</span> <span class="s2">&quot;multi-user&quot;</span><span class="p">]:</span>
@@ -707,7 +773,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    Sep 29, 2026
+    Sep 30, 2026
   </span>
 
     
