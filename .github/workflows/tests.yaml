@@ -29,7 +29,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install Dependencies (in case changes)
-      run: pip install -r requirements.txt -r .github/dev-requirements.txt
+      run: |
+        pip install -r requirements.txt -r .github/dev-requirements.txt
+        # tests/test_client.py runs the Python client from this checkout
+        pip install ./clients/python
 
     - name: Run tests
       run: |
@@ -47,6 +50,7 @@ jobs:
 
         # Require auth and shared secret key
         export FLUX_SECRET_KEY=notsosecrethoo
+        export FLUX_TOKEN_SIGNING_KEY=signingkeyfortests
         export FLUX_REQUIRE_AUTH=true
         export TEST_AUTH=true
 
@@ -54,4 +58,7 @@ jobs:
         # E.g., if it's flux
         # sudo -u flux flux start pytest -xs tests/
         whoami
+        # The tests create users, so the database (and the directory, for
+        # the sqlite journal) must be writable by that user
+        chown -R fluxuser .
         sudo -u fluxuser flux start pytest -xs tests/

@@ -102,9 +102,18 @@ def test_token_endpoint_rejects_malformed_header():
     """
     A garbage bearer token on the token endpoint is denied, not a 500.
     """
+    import app.auth as auth
+
     response = client.post("/v1/token", headers={"Authorization": "Bearer not-a-jwt"})
-    assert response.status_code == 400
-    assert response.json() == {"Message": "Denied"}
+    if auth.handshake_enabled():
+        # Handshake on: an undecodable payload is a failed login, which is 400
+        # and never 401 (a 401 would tell clients to go fetch a token)
+        assert response.status_code == 400
+        assert "www-authenticate" not in response.headers
+    else:
+        # Handshake off (no shared secret or no password backend): disabled
+        assert response.status_code == 400
+        assert "not enabled" in response.json()["detail"]
 
 
 def test_submit_list_job():

@@ -4,11 +4,16 @@ import re
 import secrets
 import shlex
 import string
-from typing import Optional
+from typing import List, Optional
 
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger(__name__)
+
+TRUE_VALUES = ("1", "true", "yes", "on")
+
+# Authentication backends known to the server (implemented in app/auth)
+KNOWN_AUTH_BACKENDS = ["none", "database", "shared-secret", "pam", "oidc"]
 
 
 def get_int_envar(key, default=None):
@@ -27,9 +32,40 @@ def get_int_envar(key, default=None):
 
 def get_bool_envar(key, default=False):
     """
-    Get a boolean from the environment, meaning the value is set.
+    Get a boolean environment variable. Accepts 1/0, true/false, yes/no, on/off.
+
+    An unset or empty variable returns the default.
     """
-    return default if not os.environ.get(key) else not default
+    value = os.environ.get(key)
+    if value is None or not value.strip():
+        return default
+    return value.strip().lower() in TRUE_VALUES
+
+
+def get_list_envar(key) -> List[str]:
+    """
+    Get a comma separated list from the environment.
+    """
+    value = os.environ.get(key) or ""
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def get_auth_backend() -> str:
+    """
+    Determine the auth backend from FLUX_AUTH_BACKEND.
+
+    FLUX_REQUIRE_AUTH predates FLUX_AUTH_BACKEND: it meant database users plus
+    the shared-secret token handshake, so it maps to "shared-secret".
+    """
+    backend = (os.environ.get("FLUX_AUTH_BACKEND") or "").strip().lower()
+    if not backend:
+        backend = "shared-secret" if get_bool_envar("FLUX_REQUIRE_AUTH") else "none"
+    if backend not in KNOWN_AUTH_BACKENDS:
+        raise ValueError(
+            f"FLUX_AUTH_BACKEND must be one of {', '.join(KNOWN_AUTH_BACKENDS)}, "
+            f"got '{backend}'"
+        )
+    return backend
 
 
 def get_option_flags(key, prefix="-o"):
@@ -63,7 +99,7 @@ def parse_option_flags(flags, prefix="-o"):
 
 def generate_secret_key(length=32):
     """
-    Generate a secret key to encrypt, if one not provided.
+    Generate a random key, if one is not provided.
     """
     alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for i in range(length))
@@ -82,7 +118,38 @@ class Settings(BaseSettings):
 
     # Assume there is at least one node!
     flux_nodes: int = get_int_envar("FLUX_NUMBER_NODES", 1)
-    require_auth: bool = get_bool_envar("FLUX_REQUIRE_AUTH")
+
+    # Authentication. See app/auth for the backends.
+    auth_backend: str = get_auth_backend()
+    require_auth: bool = auth_backend != "none"
+
+    # Usernames that are superusers regardless of backend (comma separated)
+    admin_users: List[str] = get_list_envar("FLUX_ADMIN_USERS")
+
+    # Shared with clients so they can encode the /v1/token handshake payload.
+    # It is never used to sign access tokens.
+    secret_key: Optional[str] = os.environ.get("FLUX_SECRET_KEY")
+
+    # Server-only key that signs access tokens. Required by every backend that
+    # issues tokens, so that all workers sign with the same key (see
+    # entrypoint.sh, which generates one per container start if unset).
+    token_signing_key: Optional[str] = os.environ.get("FLUX_TOKEN_SIGNING_KEY")
+
+    # Lowest uid that may be mapped to a system account by a backend (pam, or
+    # oidc in multi-user mode). Keeps root and daemon accounts out of reach
+    # of a bad claim mapping.
+    min_uid: int = get_int_envar("FLUX_MIN_UID", 1000)
+
+    # pam backend
+    pam_service: str = os.environ.get("FLUX_PAM_SERVICE") or "login"
+
+    # oidc backend
+    oidc_issuer: Optional[str] = os.environ.get("FLUX_OIDC_ISSUER")
+    oidc_audience: Optional[str] = os.environ.get("FLUX_OIDC_AUDIENCE")
+    oidc_jwks_url: Optional[str] = os.environ.get("FLUX_OIDC_JWKS_URL")
+    # Claim used as the username. Defaults to "sub", the only claim OIDC
+    # guarantees to be stable and unique for an issuer.
+    oidc_username_claim: Optional[str] = os.environ.get("FLUX_OIDC_USERNAME_CLAIM")
 
     # If you change this, also change in alembic.ini
     db_file: str = "sqlite:///./flux-restful.db"
@@ -91,7 +158,6 @@ class Settings(BaseSettings):
     flux_server_mode: Optional[str] = (
         os.environ.get("FLUX_SERVER_MODE") or "single-user"
     )
-    secret_key: str = os.environ.get("FLUX_SECRET_KEY") or generate_secret_key()
 
     # Validate the server mode provided.
     if flux_server_mode not in ["single-user", "multi-user"]:

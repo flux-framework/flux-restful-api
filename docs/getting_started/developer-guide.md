@@ -148,24 +148,50 @@ $ sudo -E make
 
 #### 3. Authentication
 
-If you want to require authentication for the user, export the user and token and
-a variable that tells the server to use auth:
+Authentication is off by default (`FLUX_AUTH_BACKEND=none`). To require it, choose a backend
+and provide what it needs. For database users, which is what the Python client and the Flux
+Operator use, export the superuser credentials and the keys, then initialize the database:
 
 ```bash
+export FLUX_AUTH_BACKEND=shared-secret
 export FLUX_USER=$USER
 export FLUX_TOKEN=123456
-export FLUX_REQUIRE_AUTH=true
+export FLUX_SECRET_KEY=$(openssl rand -hex 32)
+export FLUX_TOKEN_SIGNING_KEY=$(openssl rand -hex 32)
+make init
 ```
 
-As an alternative, you can enable PAM authentication to use user accounts on the running server:
+`FLUX_REQUIRE_AUTH=true` is still accepted and means the same as `FLUX_AUTH_BACKEND=shared-secret`.
+
+To authenticate against system accounts instead, install `python-pam` and use the `pam` backend.
+PAM can only check other users' passwords when the server runs as root. Superusers are listed
+explicitly:
 
 ```bash
-export FLUX_ENABLE_PAM=true
-export FLUX_REQUIRE_AUTH=true
+export FLUX_AUTH_BACKEND=pam
+export FLUX_ADMIN_USERS=$USER
 ```
 
-Authentication must be enabled for PAM to work too - you can't just enable the first. For the latter (multi-user)
-flux needs to be started first (e.g., the instance or broker) and then the actual server needs to be started by root.
+For multi-user mode (jobs run as the authenticated system user) flux needs to be started first
+(e.g., the instance or broker) and then the actual server needs to be started by root.
+
+To accept tokens issued by an OpenID Connect provider:
+
+```bash
+export FLUX_AUTH_BACKEND=oidc
+export FLUX_OIDC_ISSUER=https://accounts.example.com
+export FLUX_OIDC_AUDIENCE=my-client-id
+```
+
+The username is the token's `sub` claim, the only claim OIDC guarantees to be stable and
+unique, so `FLUX_ADMIN_USERS` should list subjects. Claims such as `preferred_username` or
+`email` can be chosen with `FLUX_OIDC_USERNAME_CLAIM`, but only if your provider guarantees
+they are unique and not user-editable. In multi-user mode, where the username is the system
+account jobs run as, that variable must be set to a claim that maps to local accounts, and
+accounts below `FLUX_MIN_UID` (root, daemons) are refused whatever the claim says.
+
+See the [User Guide](https://flux-framework.org/flux-restful-api/getting_started/user-guide.html)
+for how clients log in with each backend, and the environment table below for every variable.
 
 ### Interactions
 
@@ -185,13 +211,22 @@ The following variables are available (with their defaults):
 
 | Name | Description | Default |
 |------|-------------|---------|
-|FLUX_REQUIRE_AUTH| The server should require basic auth for API and authenticated endpoints | False (unset) |
-|FLUX_TOKEN| The token password to require for Basic Auth (if `FLUX_REQUIRE_AUTH` is set) | unset |
-|FLUX_USER| The username to require for Basic Auth (if `FLUX_REQUIRE_AUTH` is set) | unset |
+|FLUX_AUTH_BACKEND| Authentication backend: `none`, `database`, `shared-secret`, `pam`, or `oidc` | none |
+|FLUX_REQUIRE_AUTH| Deprecated: `true` is the same as `FLUX_AUTH_BACKEND=shared-secret` | unset |
+|FLUX_USER| Username of the database superuser created by `init_db.py init` | fluxuser |
+|FLUX_TOKEN| Password of the database superuser created by `init_db.py init` | unset |
+|FLUX_ADMIN_USERS| Comma separated usernames that are superusers with any backend | unset |
+|FLUX_TOKEN_SIGNING_KEY| Server-only key that signs access tokens; required for backends that issue tokens and shared by all workers | unset (entrypoint.sh generates one per container start) |
+|FLUX_PAM_SERVICE| PAM service name for the `pam` backend | login |
+|FLUX_MIN_UID| Lowest uid a backend may map a login to (`pam`, and `oidc` in multi-user mode); root and daemons are refused | 1000 |
+|FLUX_OIDC_ISSUER| OpenID Connect issuer URL (`oidc` backend, required) | unset |
+|FLUX_OIDC_AUDIENCE| Expected token audience, usually the client id (`oidc` backend, required) | unset |
+|FLUX_OIDC_JWKS_URL| JWKS URL, if it cannot be discovered from the issuer | discovered |
+|FLUX_OIDC_USERNAME_CLAIM| Token claim used as the username (`oidc` backend); required in multi-user mode | sub |
 |FLUX_HAS_GPU | GPUs are available for the user to request | unset |
 |FLUX_NUMBER_NODES| The number of nodes available (exposed) in the cluster | 1 |
 |FLUX_OPTION_FLAGS | Option flags to give to flux, in the same format you'd give on the command line | unset |
-|FLUX_SECRET_KEY | secret key to be shared between user and server (required) | unset |
+|FLUX_SECRET_KEY | Secret shared with clients to encode the `/v1/token` handshake (required for `shared-secret`) | unset |
 |FLUX_ACCESS_TOKEN_EXPIRES_MINUTES| number of minutes to expire an access token | 600 |
 |FLUX_RESTFUL_HOST| Host for command line client | http://127.0.0.1:5000 |
 
