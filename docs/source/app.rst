@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   app.auth
    app.core
    app.crud
    app.db
@@ -14,6 +15,7 @@ Subpackages
    app.models
    app.routers
    app.schemas
+   app.scripts
 
 Submodules
 ----------

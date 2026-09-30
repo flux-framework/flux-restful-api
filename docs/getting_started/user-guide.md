@@ -32,35 +32,48 @@ done with multi-user.
 
 ### Authentication
 
-If you choose to deploy without authentication, this is a ⚠️ proceed at your own risk ⚠️ sort of deal.
-We call this the "single-user" case, and it means that you are submitting jobs as the instance owner,
-typically a user named "flux." If it's just you that owns the cluster, or a small group of trusted friends,
-this is probably OK. When you enable authentication, the following happens:
+Authentication is pluggable: the server is started with one backend, chosen
+with `FLUX_AUTH_BACKEND`, and clients can ask `GET /v1/auth` how to log in.
 
- - A server secret that you export via `FLUX_SECREY_KEY` is used to encode payloads. You'll need to provide this to users.
- - The server is created adding users with names and passwords, so every user known to Flux Restful is known to the server.
-   - Passwords are hashed
-   - We don't currently check authentication here with PAM (but we could).
- - A user making a request provided an encoded payload (first) with the encoded username and password
- - The server decodes the payload, authenticates, and (given a valid username and password) generates an expiring token.
- - The user adds the token header to subsequent requests.
+| Backend | Who can log in | How the API is used |
+|---------|----------------|---------------------|
+| `none` (default) | Everyone, anonymously | No credentials. ⚠️ Only for isolated deployments. |
+| `database` | Users created with `python3 app/db/init_db.py` | Post username and password to `/v1/login/access-token` to get a token. |
+| `shared-secret` | Database users | As above, plus the token handshake used by the Python client (below). Requires `FLUX_SECRET_KEY`. |
+| `pam` | System accounts, via the host's PAM stack | Same as `database`. Requires the `python-pam` package and the server running as root (otherwise only the server user's own password can be checked); service name is `FLUX_PAM_SERVICE` (default `login`). |
+| `oidc` | Users of an OpenID Connect provider | Obtain a token from the provider and present it as a bearer token. Requires `FLUX_OIDC_ISSUER` and `FLUX_OIDC_AUDIENCE`. The username is the token's `sub` claim unless `FLUX_OIDC_USERNAME_CLAIM` says otherwise. |
 
-To require this authentication, we set a few environment variables to turn it on and define credentials
-and a secret (e.g., a driver that is running the API might randomly generate these accounts and secret) and then all interactions
-with the API or interface require authenticating. As an example, the Flux Operator will make both the server user
-accounts and the Flux Restful database accounts when you spin up a MiniCluster.
+Setting `FLUX_REQUIRE_AUTH=true` (the option from earlier releases) is the same as
+`FLUX_AUTH_BACKEND=shared-secret`.
+
+With every backend:
+
+ - Access tokens issued by the server are signed with `FLUX_TOKEN_SIGNING_KEY`, which is
+   only known to the server and is required whenever a backend issues tokens (all but `none`
+   and `oidc`). It must be the same for every worker; the container entrypoint generates one
+   per container start if it is not provided.
+ - Usernames listed in `FLUX_ADMIN_USERS` (comma separated) are superusers, which is
+   required to stop the service. Database users can also be flagged as superusers directly.
+   For `oidc` these are claim values, so subjects by default.
+ - A request without valid credentials gets a 401 response with a `WWW-Authenticate` header.
+   A failed login at a token endpoint is a 400, so clients do not retry it.
+ - Any password backend offers the token handshake below when `FLUX_SECRET_KEY` is set;
+   `shared-secret` is `database` with the secret required, so the two behave the same
+   whenever the secret is set (the container entrypoint always sets one).
 
 #### Web Interface Basic Authentication
 
-In the case of the web interface (which does not necessarily need to be exposed, e.g., the Flux Operator requires a port forward)
-we fall back to basic auth, and the user needs to enter a username and password.
+For the `database`, `shared-secret`, and `pam` backends the web interface uses HTTP Basic
+auth, so the browser will prompt for a username and password. For `oidc`, present the
+provider's token as a bearer `Authorization` header or an `access_token` cookie.
 
-#### API OAuth2 Style Authentication
+#### API Token Handshake
 
-In the case of the API, we taken an OAuth2 based approach, where a request will originally
-return with a 401 status and the "www-authenticate" header, and the calling client needs to then prepare an encoded
-payload to request a token. A successful receipt of the payload will return the token,
-which can be added to an Authorization header for subsequent requests (up until it expires).
+With `shared-secret` (or any password backend when `FLUX_SECRET_KEY` is set), the Python client
+encodes the username, password, and scope `token` into a JWT with the shared secret and posts it to
+`/v1/token`. The server decodes it, checks the credentials, and returns an expiring access token
+for the `Authorization: Bearer` header of subsequent requests. The shared secret is only used to
+decode that handshake; it cannot be used to create access tokens.
 
 You largely don't need to worry about the complexity of the above because the SDKs will
 handle these interactions for you, given that you've provided some credentials and secret key.

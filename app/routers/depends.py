@@ -1,18 +1,20 @@
-from typing import Generator
+from typing import Generator, Optional
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
-from pydantic import ValidationError
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
-from app.core import security
+from app.auth import Principal, get_backend
+from app.auth.base import is_system_user
 from app.core.config import settings
 from app.db.session import SessionLocal
 
 login_url = f"{settings.api_version}/login/access-token"
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=login_url)
+
+# auto_error is off so the "none" backend can serve anonymous requests and so
+# we control the 401 response (clients rely on the WWW-Authenticate header).
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=login_url, auto_error=False)
+basic_scheme = HTTPBasic(auto_error=False)
 
 
 def get_db() -> Generator:
@@ -26,49 +28,104 @@ def get_db() -> Generator:
         db.close()
 
 
-def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
-) -> models.User:
-    """
-    Get the current user (via the token from the jwt)
+def unauthorized(detail: str, scheme: str = "Bearer") -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=detail,
+        headers={"WWW-Authenticate": scheme},
+    )
 
-    And fail if not authenticated or expired.
+
+def _accept(principal: Optional[Principal]) -> Principal:
     """
-    try:
-        payload = jwt.decode(
-            token, settings.secret_key, algorithms=[security.ALGORITHM]
-        )
-        token_data = schemas.TokenPayload(**payload)
-    except (jwt.JWTError, ValidationError):
+    Final checks on an authenticated principal, whatever backend produced it.
+    """
+    if principal is None:
+        raise unauthorized("Could not validate credentials")
+    if not principal.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    # In multi-user mode the server becomes this user to run their jobs, so
+    # the name must be a real, unprivileged system account (FLUX_MIN_UID).
+    # Backends may check earlier for a better message; this is authoritative.
+    if settings.flux_server_mode == "multi-user" and not is_system_user(
+        principal.user_name
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
+            detail=f"{principal.user_name} is not an allowed system account on this server.",
         )
-    user = crud.user.get(db, id=token_data.sub)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+    return principal
+
+
+def _verify(db: Session, token: str) -> Principal:
+    return _accept(get_backend().verify_token(db, token))
+
+
+def current_user(
+    db: Session = Depends(get_db), token: Optional[str] = Depends(oauth2_scheme)
+) -> Optional[Principal]:
+    """
+    The authenticated API user, or None when the auth backend is "none".
+    """
+    if get_backend().name == "none":
+        return None
+    if not token:
+        raise unauthorized("Not authenticated")
+    return _verify(db, token)
+
+
+def current_superuser(user: Optional[Principal] = Depends(current_user)) -> Principal:
+    """
+    The authenticated user, who must be a superuser.
+    """
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This action requires a superuser, but the auth backend is 'none'.",
+        )
+    if not user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The user doesn't have enough privileges",
+        )
     return user
 
 
-def get_current_active_user(
-    current_user: models.User = Depends(get_current_user),
-) -> models.User:
+def _bearer_token(request: Request) -> Optional[str]:
     """
-    Get the currently active user.
+    A bearer token from the Authorization header, if any.
     """
-    if not crud.user.is_active(current_user):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
+    header = request.headers.get("Authorization", "")
+    scheme, _, token = header.partition(" ")
+    if scheme.lower() == "bearer" and token.strip():
+        return token.strip()
+    return None
 
 
-def get_current_active_superuser(
-    current_user: models.User = Depends(get_current_user),
-) -> models.User:
+def current_user_views(
+    request: Request,
+    db: Session = Depends(get_db),
+    credentials: Optional[HTTPBasicCredentials] = Depends(basic_scheme),
+) -> Optional[Principal]:
     """
-    Get the currently active superuser.
+    The authenticated web UI user, or None when the auth backend is "none".
+
+    A bearer token header is accepted for every backend. Password backends
+    additionally accept HTTP Basic auth, which is what browsers use.
     """
-    if not crud.user.is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
-    return current_user
+    backend = get_backend()
+    if backend.name == "none":
+        return None
+
+    token = _bearer_token(request)
+    if token:
+        return _verify(db, token)
+
+    if not backend.supports_password:
+        raise unauthorized("Not authenticated")
+    if credentials is None:
+        raise unauthorized("Not authenticated", scheme="Basic")
+    principal = backend.authenticate(db, credentials.username, credentials.password)
+    if principal is None:
+        raise unauthorized("Incorrect user or password", scheme="Basic")
+    return _accept(principal)

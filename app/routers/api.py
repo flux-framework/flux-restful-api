@@ -1,90 +1,114 @@
 import asyncio
+import logging
 import os
-from datetime import timedelta
 
 import flux.job
 import flux.resource
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 from sqlalchemy.orm import Session
 
-import app.core.security as security
+import app.auth as auth
 import app.library.flux as flux_cli
 import app.library.helpers as helpers
 import app.library.launcher as launcher
 import app.routers.depends as deps
 from app.core.config import settings
-from app.crud import user as crud_user
-from app.library.auth import alert_auth
 
-# Print (hidden message) to give status of auth
-alert_auth()
+logger = logging.getLogger("flux-restful")
+
 router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
-no_auth_router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
 
-user_auth = Depends(deps.get_current_active_user) if settings.require_auth else None
+# The authenticated user, or None when the auth backend is "none"
+user_auth = Depends(deps.current_user)
 
-denied_response = JSONResponse(content={"Message": "Denied"}, status_code=400)
+
+def denied(detail="Incorrect user or password"):
+    """
+    A failed login at a token endpoint.
+
+    This is 400 (OAuth2 invalid_grant), not 401: a 401 tells clients to go and
+    authenticate, and the Python client would loop forever re-requesting a token.
+    """
+    return HTTPException(status_code=400, detail=detail)
+
+
+@router.get("/auth")
+async def auth_info():
+    """
+    Describe how to authenticate against this server (public).
+    """
+    return auth.describe()
 
 
 @router.post("/token")
-async def login(request: Request, db: Session = Depends(deps.get_db)):
+async def login_handshake(request: Request, db: Session = Depends(deps.get_db)):
     """
-    This is the API endpoint to request an authentication token.
+    The shared-secret token handshake used by the Python client.
 
-    The Authorization header should have an encoded bearer token that
-    is a jwt payload with user, pass, and scope (token) encoded
-    with a shared secret.
+    The Authorization header carries a JWT with user, pass, and scope "token",
+    encoded with the shared FLUX_SECRET_KEY. A valid username and password
+    yields an access token signed with the server-only signing key.
     """
-    if "Authorization" not in request.headers:
-        return denied_response
-
-    header = request.headers["Authorization"].split(" ")[-1].strip()
-
-    # Decode with jwt and server secret
-    try:
-        credentials = jwt.decode(
-            header, settings.secret_key, algorithms=[security.ALGORITHM]
+    if not auth.handshake_enabled():
+        raise HTTPException(
+            status_code=400,
+            detail="The shared-secret token handshake is not enabled on this server.",
         )
+
+    header = request.headers.get("Authorization", "")
+    encoded = header.split(" ")[-1].strip()
+    if not encoded:
+        raise denied("Missing Authorization header")
+
+    try:
+        credentials = jwt.decode(encoded, settings.secret_key, algorithms=["HS256"])
     except jwt.JWTError:
-        return denied_response
+        raise denied("Could not decode credentials")
 
     for required in ["user", "pass", "scope"]:
-        if required not in credentials or not credentials[required]:
-            return denied_response
-
+        if not credentials.get(required):
+            raise denied(f"Credentials are missing '{required}'")
     if credentials["scope"] != "token":
-        return denied_response
+        raise denied("Invalid scope")
 
-    user = crud_user.authenticate(
-        db, user_name=credentials["user"], password=credentials["pass"]
-    )
-    if not user:
-        print("cannot find user")
-        return denied_response
-    elif not crud_user.is_active(user):
-        print("user is not active")
-        return denied_response
+    backend = auth.get_backend()
+    principal = backend.authenticate(db, credentials["user"], credentials["pass"])
+    if principal is None:
+        raise denied()
+    return {"access_token": backend.issue_token(principal), "token_type": "Bearer"}
 
-    # Generate a new access token
-    access_token_expires = timedelta(minutes=settings.access_token_expires_minutes)
-    return {
-        "access_token": security.create_access_token(
-            user.id, expires_delta=access_token_expires
-        ),
-        "token_type": "Bearer",
-    }
+
+@router.post("/login/access-token")
+async def login_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(deps.get_db)
+):
+    """
+    OAuth2 password flow: post username and password as a form to get a token.
+    """
+    backend = auth.get_backend()
+    if not backend.supports_password:
+        raise HTTPException(
+            status_code=400,
+            detail=f"The {backend.name} auth backend does not support password login.",
+        )
+    principal = backend.authenticate(db, form_data.username, form_data.password)
+    if principal is None:
+        raise denied()
+    return {"access_token": backend.issue_token(principal), "token_type": "Bearer"}
 
 
 @router.post("/service/stop")
-async def service_stop(user=Depends(deps.get_current_active_superuser)):
+async def service_stop(user=Depends(deps.current_superuser)):
     """
     Raise an error to stop (kill) the service.
 
     We need a good way to deal this - ideally we can pass a flux start PID?
     """
+    logger.info("Service stop requested by %s", user.user_name)
     print("Goodbye my friends! It was a pleasure, see you next time! 👋")
     os.system("flux shutdown")
 
@@ -139,7 +163,6 @@ async def list_jobs(
     payload = {"details": details, "limit": limit, "listing": listing}
 
     # Does the requester want details - in dict or listing form?
-    print(payload)
     if helpers.has_boolean_arg(payload, "details"):
         # Job limit (only relevant for details)
         limit = helpers.get_int_arg(payload, "limit")
@@ -243,11 +266,9 @@ async def submit_job(
     else:
         # Prepare and submit the job and return the ID, but allow for error
         try:
-            print(f"Preparing flux job with {kwargs}")
             fluxjob = flux_cli.prepare_job(
                 user, kwargs, runtime=runtime, workdir=workdir, envars=envars
             )
-            print(f"Prepared flux job {fluxjob}")
             # This handles either a single/multi user case
             flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
         except Exception as e:
@@ -302,7 +323,7 @@ async def streamer(generator):
 
 
 @router.get("/jobs/{jobid}/output/stream")
-async def get_job_stream_output(jobid):
+async def get_job_stream_output(jobid, user=user_auth):
     """
     Non-blocking variant to stream output until control+c.
     """

@@ -9,6 +9,7 @@ import time
 import flux
 import flux.job
 
+from app.auth.base import is_system_user
 from app.core.config import settings
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,6 +39,9 @@ def submit_job(handle, fluxjob, user):
         print("Submit in single-user mode.")
         return flux.job.submit_async(handle, fluxjob)
 
+    # Never become a privileged or unknown account, whatever produced the name
+    if not is_system_user(user):
+        raise ValueError(f"{user} is not an allowed system account on this server.")
     pw_record = pwd.getpwnam(user)
     user_name = pw_record.pw_name
     # user_uid = pw_record.pw_uid
