@@ -136,11 +136,12 @@ class FluxRestfulClient:
                 )
             raise e
 
-        # A 401 response is a request for authentication
-        if response.status_code != 401:
+        # A 401 response is a request for authentication, unless it came from
+        # the token endpoint itself: re-authenticating would loop forever.
+        if response.status_code != 401 or endpoint == "token":
             return response
 
-        # Otherwise, authenticate the request and retry
+        # Otherwise, authenticate the request and retry once
         if self.authenticate_request(response):
             return self.session.request(method, url, json=data, headers=self.headers)
         return response
@@ -166,7 +167,9 @@ class FluxRestfulClient:
         }
         response = self.do_request("token", method="post", headers=headers)
         if response.status_code != 200:
-            logger.error(f"Issue requesting token: {response.reason}")
+            logger.error(
+                f"Issue requesting token ({response.status_code}): {response.text}"
+            )
             return False
 
         token = response.json()
