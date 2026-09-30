@@ -668,13 +668,18 @@
 
 <span class="k">def</span> <span class="nf">_bearer_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A bearer token from the Authorization header, if any.</span>
+<span class="sd">    A bearer token from the Authorization header or the access_token cookie.</span>
+
+<span class="sd">    The cookie is how a browser can use the web UI with backends that have</span>
+<span class="sd">    no password (oidc). Form posts are protected against cross-site requests</span>
+<span class="sd">    by app.library.csrf, so a cookie-authenticated browser cannot be made to</span>
+<span class="sd">    submit or cancel jobs from another site.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">header</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">scheme</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">token</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">scheme</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;bearer&quot;</span> <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;access_token&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="current_user_views"><a class="viewcode-back" href="../../../source/app.routers.html#app.routers.depends.current_user_views">[docs]</a><span class="k">def</span> <span class="nf">current_user_views</span><span class="p">(</span>
@@ -685,8 +690,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The authenticated web UI user, or None when the auth backend is &quot;none&quot;.</span>
 
-<span class="sd">    A bearer token header is accepted for every backend. Password backends</span>
-<span class="sd">    additionally accept HTTP Basic auth, which is what browsers use.</span>
+<span class="sd">    A bearer token (header or access_token cookie) is accepted for every</span>
+<span class="sd">    backend. Password backends additionally accept HTTP Basic auth, which is</span>
+<span class="sd">    what browsers use.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">backend</span> <span class="o">=</span> <span class="n">get_backend</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">backend</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>

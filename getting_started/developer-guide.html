@@ -599,6 +599,16 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#job-environment" class="md-nav__link">
+    
+    <span class="md-ellipsis">
+      <span title="/getting_started/developer-guide.md#job-environment (reference label)"><span>Job Environment</span></span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#flux-option-flags" class="md-nav__link">
     
     <span class="md-ellipsis">
@@ -1203,6 +1213,11 @@ The following variables are available (with their defaults):</p>
 <td>unset</td>
 </tr>
 <tr>
+<td>FLUX_JOB_ENV_PASSTHROUGH</td>
+<td>Extra server environment variables (comma separated names or patterns, e.g. <code>CUDA_*,OMP_NUM_THREADS</code>) to pass to jobs and launchers</td>
+<td>unset</td>
+</tr>
+<tr>
 <td>FLUX_SECRET_KEY</td>
 <td>Secret shared with clients to encode the <code>/v1/token</code> handshake (required for <code>shared-secret</code>)</td>
 <td>unset</td>
@@ -1219,6 +1234,18 @@ The following variables are available (with their defaults):</p>
 </tr>
 </tbody>
 </table>
+<h3 id="job-environment">Job Environment<a class="headerlink" href="#job-environment" title="Permalink to this heading">¶</a></h3>
+<p>Jobs do not inherit the server’s environment. They get a fixed allowlist (PATH, HOME, locale
+variables, PYTHONPATH, LD_LIBRARY_PATH, and the Flux paths exported by <code class="docutils literal notranslate"><span class="pre">flux</span> <span class="pre">start</span></code>) plus any
+variables in the submit request, and the job shell provides FLUX_URI and the FLUX_JOB_* variables
+itself. This keeps server settings and secrets such as FLUX_TOKEN out of jobs. If your deployment
+relies on other variables reaching jobs, for example CUDA_<em>, OMP_</em>, or a CONDA or SPACK
+environment, list them in <code class="docutils literal notranslate"><span class="pre">FLUX_JOB_ENV_PASSTHROUGH</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_JOB_ENV_PASSTHROUGH</span><span class="o">=</span><span class="s2">&quot;CUDA_*,OMP_NUM_THREADS,CONDA_PREFIX&quot;</span>
+</code></pre></div>
+</div>
+<p>Launchers (nextflow, snakemake) run on the server rather than inside a job, so they get the same
+allowlist plus FLUX_URI in order to submit their jobs to this instance.</p>
 <h3 id="flux-option-flags">Flux Option Flags<a class="headerlink" href="#flux-option-flags" title="Permalink to this heading">¶</a></h3>
 <p>Option flags can be set server-wide or on the fly by a user in the interface
 (or restful API). An option set by a user will over-ride the server setting.

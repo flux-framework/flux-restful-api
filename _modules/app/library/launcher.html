@@ -573,11 +573,11 @@
   
 
 <h1>Source code for app.library.launcher</h1><div class="highlight"><pre>
-<span></span><code><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shlex</span>
+<span></span><code><span class="kn">import</span> <span class="nn">shlex</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 
 <span class="kn">from</span> <span class="nn">app.core.config</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">app.library.env</span> <span class="kn">import</span> <span class="n">build_helper_environment</span>
 
 
 <div class="viewcode-block" id="launch"><a class="viewcode-back" href="../../../source/app.library.html#app.library.launcher.launch">[docs]</a><span class="k">def</span> <span class="nf">launch</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">envars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -600,9 +600,10 @@
     <span class="c1"># Delete command from the kwargs (we added because is required and validated that way)</span>
     <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;command&quot;</span><span class="p">]</span>
 
-    <span class="c1"># Additional envars in the payload?</span>
-    <span class="n">environment</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
-    <span class="n">environment</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">envars</span><span class="p">)</span>
+    <span class="c1"># Allowlisted server environment plus the user&#39;s envars. The launcher runs</span>
+    <span class="c1"># on the server, outside any job shell, and submits jobs itself, so it</span>
+    <span class="c1"># also needs FLUX_URI to reach this instance.</span>
+    <span class="n">environment</span> <span class="o">=</span> <span class="n">build_helper_environment</span><span class="p">(</span><span class="n">envars</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;⭐️ Workdir provided: </span><span class="si">{</span><span class="n">workdir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
