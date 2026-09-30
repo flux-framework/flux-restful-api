@@ -93,13 +93,18 @@ def current_superuser(user: Optional[Principal] = Depends(current_user)) -> Prin
 
 def _bearer_token(request: Request) -> Optional[str]:
     """
-    A bearer token from the Authorization header, if any.
+    A bearer token from the Authorization header or the access_token cookie.
+
+    The cookie is how a browser can use the web UI with backends that have
+    no password (oidc). Form posts are protected against cross-site requests
+    by app.library.csrf, so a cookie-authenticated browser cannot be made to
+    submit or cancel jobs from another site.
     """
     header = request.headers.get("Authorization", "")
     scheme, _, token = header.partition(" ")
     if scheme.lower() == "bearer" and token.strip():
         return token.strip()
-    return None
+    return request.cookies.get("access_token")
 
 
 def current_user_views(
@@ -110,8 +115,9 @@ def current_user_views(
     """
     The authenticated web UI user, or None when the auth backend is "none".
 
-    A bearer token header is accepted for every backend. Password backends
-    additionally accept HTTP Basic auth, which is what browsers use.
+    A bearer token (header or access_token cookie) is accepted for every
+    backend. Password backends additionally accept HTTP Basic auth, which is
+    what browsers use.
     """
     backend = get_backend()
     if backend.name == "none":

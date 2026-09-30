@@ -34,6 +34,7 @@ class SubmitForm:
         self.gpus_per_task = form.get("gpus_per_task")
         self.exclusive = True if form.get("exclusive") == "on" else False
         self.is_launcher = True if form.get("is_launcher") == "on" else False
+        self.csrf_token = form.get("csrf_token")
 
     @property
     def kwargs(self):

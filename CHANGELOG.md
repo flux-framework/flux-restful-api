@@ -14,6 +14,9 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+ - Jobs and launchers get an allowlist of the server environment instead of all of it (unreleased)
+   - server settings and secrets no longer reach jobs; add variables with FLUX_JOB_ENV_PASSTHROUGH (names or patterns)
+   - web UI: messages and job table cells are escaped, forms carry a CSRF token, cancel is a POST
  - Pluggable authentication backends via FLUX_AUTH_BACKEND: none, database, shared-secret, pam, oidc (unreleased)
    - access tokens are signed with a server-only FLUX_TOKEN_SIGNING_KEY (required; entrypoint generates one), never the client shared secret
    - a failed login at a token endpoint is 400, not 401, so clients do not loop re-requesting a token

@@ -1,7 +1,12 @@
 import json
 import os.path
+import re
 
 import markdown
+from fastapi import HTTPException
+
+# Pages are simple names, so no path separators or dots
+PAGE_NAME = re.compile(r"^[A-Za-z0-9_-]+\.md$")
 
 
 def has_boolean_arg(payload, key):
@@ -36,7 +41,11 @@ def get_page(name):
     """
     from app.main import root
 
+    if not PAGE_NAME.match(name):
+        raise HTTPException(status_code=404, detail="Page not found")
     filepath = os.path.join(root, "app", "pages", name)
+    if not os.path.isfile(filepath):
+        raise HTTPException(status_code=404, detail="Page not found")
     with open(filepath, "r", encoding="utf-8") as input_file:
         text = input_file.read()
     html = markdown.markdown(text)

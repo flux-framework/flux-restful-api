@@ -188,11 +188,16 @@ def test_oidc_backend_api(client, db, use_backend, rsa_keypair):
         == 401
     )
 
-    # Views: basic auth is not possible, a bearer header is
+    # Views: basic auth is not possible, a bearer header or cookie is
     response = client.get("/jobs", auth=("alice", "x"))
     assert response.status_code == 401
     assert response.headers["www-authenticate"] == "Bearer"
     assert client.get("/jobs", headers=bearer(token)).status_code == 200
+    client.cookies.set("access_token", token)
+    assert client.get("/jobs").status_code == 200
+    # Cookie-authenticated form posts still need the CSRF token
+    assert client.post("/jobs/submit", data={"command": "sleep 1"}).status_code == 403
+    client.cookies.clear()
 
 
 def test_multi_user_mode_requires_a_system_account(client, db, use_backend, make_user):

@@ -78,6 +78,10 @@ td, th {
 <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
 <script>
 
+function escapeHtml(value) {
+    return $('<div>').text(value == null ? '' : String(value)).html();
+}
+
 $(document).ready(function() {
 
     $('#jobs').DataTable({
@@ -91,17 +95,20 @@ $(document).ready(function() {
         "type": 'get',
         "dataType": 'json'
     },
+    // Job fields (name, nodelist, exception notes...) are user controlled,
+    // so every cell is rendered as text and custom renderers escape their input.
     columnDefs: [
              { // id
                 render: function (data, type, row) {
-                    return "<a style='color:darkmagenta' href='/job/" + data +"'>" + data + "</a>"
+                    var id = escapeHtml(data);
+                    return "<a style='color:darkmagenta' href='/job/" + id +"'>" + id + "</a>"
                 },
                 targets: 0,
             },
              { // exception
                 render: function (data, type, row) {
-                    if (data['occurred'] == true) {
-                        return "<span class='badge badge-warning'>" + data['note'] + "</span>"
+                    if (data && data['occurred'] == true) {
+                        return "<span class='badge badge-warning'>" + escapeHtml(data['note']) + "</span>"
                     }
                     return "no exceptions"
                 },
@@ -143,20 +150,20 @@ $(document).ready(function() {
         ],
         "columns": [
         { "data": "id" },
-        { "data": "returncode" },
-        { "data": "runtime" },
-        { "data": "result" },
-        { "data": "urgency" },
-        { "data": "priority" },
-        { "data": "state" },
-        { "data": "name" },
-        { "data": "ntasks" },
-        { "data": "duration" },
-        { "data": "nnodes" },
-        { "data": "ranks" },
-        { "data": "nodelist" },
-        { "data": "expiration" },
-        { "data": "waitstatus" },
+        { "data": "returncode", "render": $.fn.dataTable.render.text() },
+        { "data": "runtime", "render": $.fn.dataTable.render.text() },
+        { "data": "result", "render": $.fn.dataTable.render.text() },
+        { "data": "urgency", "render": $.fn.dataTable.render.text() },
+        { "data": "priority", "render": $.fn.dataTable.render.text() },
+        { "data": "state", "render": $.fn.dataTable.render.text() },
+        { "data": "name", "render": $.fn.dataTable.render.text() },
+        { "data": "ntasks", "render": $.fn.dataTable.render.text() },
+        { "data": "duration", "render": $.fn.dataTable.render.text() },
+        { "data": "nnodes", "render": $.fn.dataTable.render.text() },
+        { "data": "ranks", "render": $.fn.dataTable.render.text() },
+        { "data": "nodelist", "render": $.fn.dataTable.render.text() },
+        { "data": "expiration", "render": $.fn.dataTable.render.text() },
+        { "data": "waitstatus", "render": $.fn.dataTable.render.text() },
         { "data": "exception" },
     ]
   });

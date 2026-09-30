@@ -1,8 +1,8 @@
-import os
 import shlex
 import subprocess
 
 from app.core.config import settings
+from app.library.env import build_helper_environment
 
 
 def launch(kwargs, workdir=None, envars=None, user=None):
@@ -25,9 +25,10 @@ def launch(kwargs, workdir=None, envars=None, user=None):
     # Delete command from the kwargs (we added because is required and validated that way)
     del kwargs["command"]
 
-    # Additional envars in the payload?
-    environment = dict(os.environ)
-    environment.update(envars)
+    # Allowlisted server environment plus the user's envars. The launcher runs
+    # on the server, outside any job shell, and submits jobs itself, so it
+    # also needs FLUX_URI to reach this instance.
+    environment = build_helper_environment(envars)
 
     print(f"⭐️ Workdir provided: {workdir}")
 
