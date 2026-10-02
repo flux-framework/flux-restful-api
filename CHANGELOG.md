@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+ - Requests no longer block on running jobs: output is read as a snapshot, Flux calls run off the event loop with per-thread handles; bad job ids are 400, missing jobs 404 (unreleased)
  - Jobs and launchers get an allowlist of the server environment instead of all of it (unreleased)
    - server settings and secrets no longer reach jobs; add variables with FLUX_JOB_ENV_PASSTHROUGH (names or patterns)
    - web UI: messages and job table cells are escaped, forms carry a CSRF token, cancel is a POST

@@ -204,9 +204,15 @@ def test_job_output():
     # First try, often we won't have output yet
     if "Message" in lines:
         assert "not exist yet" in lines["Message"]
-    time.sleep(3)
+    # Wait for the job to finish (on a small machine it may queue behind
+    # the sleep jobs earlier tests submitted) rather than sleeping a fixed time
+    deadline = time.time() + 120
+    while time.time() < deadline:
+        if authenticate(f"/v1/jobs/{jobid}").json()["state"] == "INACTIVE":
+            break
+        time.sleep(0.5)
 
-    # Try again - we should have it after a sleep
+    # Now we should have it
     res = authenticate(f"/v1/jobs/{jobid}/output")
     lines = res.json()
     assert "Output" in lines

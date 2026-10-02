@@ -1,10 +1,10 @@
-import asyncio
 import logging
 import os
 
 import flux.job
 import flux.resource
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -17,6 +17,7 @@ import app.library.helpers as helpers
 import app.library.launcher as launcher
 import app.routers.depends as deps
 from app.core.config import settings
+from app.library.handle import get_handle
 
 logger = logging.getLogger("flux-restful")
 
@@ -24,6 +25,10 @@ router = APIRouter(prefix=f"/{settings.api_version}", tags=["jobs"])
 
 # The authenticated user, or None when the auth backend is "none"
 user_auth = Depends(deps.current_user)
+
+# Routes that talk to Flux are plain (sync) functions: the Flux bindings
+# block, so FastAPI runs them in its thread pool instead of on the event
+# loop, and each thread uses its own handle (app.library.handle).
 
 
 def denied(detail="Incorrect user or password"):
@@ -45,7 +50,7 @@ async def auth_info():
 
 
 @router.post("/token")
-async def login_handshake(request: Request, db: Session = Depends(deps.get_db)):
+def login_handshake(request: Request, db: Session = Depends(deps.get_db)):
     """
     The shared-secret token handshake used by the Python client.
 
@@ -83,7 +88,7 @@ async def login_handshake(request: Request, db: Session = Depends(deps.get_db)):
 
 
 @router.post("/login/access-token")
-async def login_access_token(
+def login_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(deps.get_db)
 ):
     """
@@ -102,7 +107,7 @@ async def login_access_token(
 
 
 @router.post("/service/stop")
-async def service_stop(user=Depends(deps.current_superuser)):
+def service_stop(user=Depends(deps.current_superuser)):
     """
     Raise an error to stop (kill) the service.
 
@@ -114,7 +119,7 @@ async def service_stop(user=Depends(deps.current_superuser)):
 
 
 @router.get("/jobs/search")
-async def jobs_listing(request: Request, user=user_auth):
+def jobs_listing(request: Request, user=user_auth):
     """
     Jobslist is intended to be used by the server to render data tables
 
@@ -136,12 +141,14 @@ async def jobs_listing(request: Request, user=user_auth):
         jobs = flux_cli.query_jobs(jobs, query)
 
     # If we are filtering to a range
-    if start and int(start) < len(jobs):
-        jobs = jobs[int(start) :]
+    start = helpers.get_int_arg({"start": start}, "start")
+    length = helpers.get_int_arg({"length": length}, "length")
+    if start and start < len(jobs):
+        jobs = jobs[start:]
 
     # Do we have a length?
-    if length and int(length) < len(jobs):
-        jobs = jobs[0 : int(length)]
+    if length and length < len(jobs):
+        jobs = jobs[0:length]
     return JSONResponse(
         content={
             "data": jobs,
@@ -154,9 +161,7 @@ async def jobs_listing(request: Request, user=user_auth):
 
 
 @router.get("/jobs")
-async def list_jobs(
-    details: bool = False, limit=None, listing: bool = False, user=user_auth
-):
+def list_jobs(details: bool = False, limit=None, listing: bool = False, user=user_auth):
     """
     List flux jobs associated with the handle.
     """
@@ -177,13 +182,11 @@ async def list_jobs(
 
 
 @router.get("/nodes")
-async def list_nodes(user=user_auth):
+def list_nodes(user=user_auth):
     """
     List nodes known to the Flux handle.
     """
-    from app.main import app
-
-    rpc = flux.resource.list.resource_list(app.handle)
+    rpc = flux.resource.list.resource_list(get_handle())
     listing = rpc.get()
     nodes = jsonable_encoder(
         {"nodes": list({str(node) for node in listing.up.nodelist})}
@@ -192,7 +195,7 @@ async def list_nodes(user=user_auth):
 
 
 @router.post("/jobs/{jobid}/cancel")
-async def cancel_job(jobid, user=user_auth):
+def cancel_job(jobid, user=user_auth):
     """
     Cancel a running flux job
     """
@@ -203,7 +206,7 @@ async def cancel_job(jobid, user=user_auth):
 
 
 @router.post("/jobs/submit")
-async def submit_job(
+def submit_job(
     command=None,
     num_tasks: int = None,
     cores_per_task: int = None,
@@ -224,8 +227,6 @@ async def submit_job(
     include everything in this function instead of having separate
     functions.
     """
-    from app.main import app
-
     # This can bork if no payload is provided
     if not command:
         return JSONResponse(
@@ -270,7 +271,7 @@ async def submit_job(
                 user, kwargs, runtime=runtime, workdir=workdir, envars=envars
             )
             # This handles either a single/multi user case
-            flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
+            flux_future = flux_cli.submit_job(get_handle(), fluxjob, user=user)
         except Exception as e:
             result = jsonable_encoder(
                 {"Message": "There was an issue submitting that job.", "Error": str(e)}
@@ -284,17 +285,18 @@ async def submit_job(
 
 
 @router.get("/jobs/{jobid}")
-async def get_job(jobid, user=user_auth):
+def get_job(jobid, user=user_auth):
     """
     Get job info based on id.
     """
     info = flux_cli.get_job(jobid, user=user)
-    info = jsonable_encoder(info)
-    return JSONResponse(content=info, status_code=200)
+    if info is None:
+        raise HTTPException(status_code=404, detail=f"Job {jobid} not found")
+    return JSONResponse(content=jsonable_encoder(info), status_code=200)
 
 
 @router.get("/jobs/{jobid}/output")
-async def get_job_output(jobid, user=user_auth):
+def get_job_output(jobid, user=user_auth):
     """
     Get job output based on id.
     """
@@ -311,24 +313,14 @@ async def get_job_output(jobid, user=user_auth):
     return JSONResponse(content=info, status_code=200)
 
 
-async def streamer(generator):
-    """
-    Helper function to stream output lines, break if cancelled.
-    """
-    try:
-        for line in generator:
-            yield line
-    except asyncio.CancelledError:
-        print("caught cancelled error")
-
-
 @router.get("/jobs/{jobid}/output/stream")
 async def get_job_stream_output(jobid, user=user_auth):
     """
-    Non-blocking variant to stream output until control+c.
+    Stream output as it is produced, until the job ends or the client leaves.
     """
     # Checked here, before the response starts: once the StreamingResponse
     # has sent its 200, a denial inside the generator could not change it.
-    flux_cli.ensure_job_access(jobid, user)
-    stream = flux_cli.stream_job_output(jobid, user=user)
-    return StreamingResponse(streamer(stream))
+    await run_in_threadpool(flux_cli.ensure_job_access, jobid, user)
+    # A sync generator: Starlette iterates it in the thread pool, so the
+    # blocking event watch never runs on the event loop.
+    return StreamingResponse(flux_cli.stream_job_output(jobid, user=user))

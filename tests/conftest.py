@@ -74,6 +74,42 @@ def use_backend(monkeypatch):
     auth.reset_backend()
 
 
+@pytest.fixture(scope="session")
+def live_server():
+    """
+    The app served by uvicorn in a background thread, for tests that need
+    real HTTP behavior (the test client runs each request to completion
+    before returning, so streaming responses cannot be observed through it).
+    Yields the base URL.
+    """
+    import socket
+    import threading
+    import time
+
+    import httpx
+    import uvicorn
+
+    from app.main import app
+
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        port = sock.getsockname()[1]
+    config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")
+    server = uvicorn.Server(config)
+    thread = threading.Thread(target=server.run, daemon=True)
+    thread.start()
+    base = f"http://127.0.0.1:{port}"
+    for _ in range(50):
+        try:
+            httpx.get(base + "/v1/auth", timeout=1)
+            break
+        except Exception:
+            time.sleep(0.1)
+    yield base
+    server.should_exit = True
+    thread.join(timeout=5)
+
+
 @pytest.fixture
 def client():
     """
