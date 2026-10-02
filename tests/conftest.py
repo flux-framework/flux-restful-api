@@ -9,12 +9,12 @@ root = os.path.dirname(here)
 if root not in sys.path:
     sys.path.insert(0, root)
 
-import app.auth as auth  # noqa: E402
-from app.core.config import settings  # noqa: E402
-from app.crud import user as crud_user  # noqa: E402
-from app.db.base import Base  # noqa: E402
-from app.db.session import SessionLocal, engine  # noqa: E402
-from app.schemas.user import UserCreate  # noqa: E402
+import flux_restful.auth as auth  # noqa: E402
+from flux_restful.core.config import settings  # noqa: E402
+from flux_restful.crud import user as crud_user  # noqa: E402
+from flux_restful.db.base import Base  # noqa: E402
+from flux_restful.db.session import SessionLocal, engine  # noqa: E402
+from flux_restful.schemas.user import UserCreate  # noqa: E402
 
 
 @pytest.fixture
@@ -89,7 +89,7 @@ def live_server():
     import httpx
     import uvicorn
 
-    from app.main import app
+    from flux_restful.main import app
 
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
@@ -117,7 +117,7 @@ def client():
     """
     from fastapi.testclient import TestClient
 
-    from app.main import app
+    from flux_restful.main import app
 
     return TestClient(app, raise_server_exceptions=False)
 

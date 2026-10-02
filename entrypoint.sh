@@ -10,16 +10,15 @@ if [[ ! -z ${install_branch} ]]; then
     printf "Custom install of https://github.com:${install_repo}@${install_branch}"
     rm -rf /code
     git clone -b ${install_branch} https://github.com/${install_repo} /code
+    pip install --no-deps /code
 fi
 
 # We always need to start in this PWD
 cd /code
 
 # prepare the database - we always start from scratch, it's ephemeral
-alembic revision --autogenerate -m "Create intital tables"
-alembic upgrade head
-python3 app/db/init_db.py init
-# python3 app/db/init_db.py add-user myuser mypass
+flux-restful init
+# flux-restful add-user myuser mypass
 
 # Access tokens are signed with a server-only key that every uvicorn worker
 # must share. Generate one for this container if not provided.
@@ -31,4 +30,4 @@ export FLUX_USER
 export FLUX_TOKEN
 
 # And start the webserver
-flux start uvicorn app.main:app --host=${HOST} --port=${PORT} --workers=${WORKERS}
+flux start flux-restful serve --host=${HOST} --port=${PORT} --workers=${WORKERS}

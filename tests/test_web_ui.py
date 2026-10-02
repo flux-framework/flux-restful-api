@@ -9,8 +9,8 @@ import time
 import pytest
 from fastapi import HTTPException
 
-from app.library import helpers
-from app.library.csrf import COOKIE
+from flux_restful.library import helpers
+from flux_restful.library.csrf import COOKIE
 
 
 def submit_via_api(client, command):

@@ -38,7 +38,7 @@ with `FLUX_AUTH_BACKEND`, and clients can ask `GET /v1/auth` how to log in.
 | Backend | Who can log in | How the API is used |
 |---------|----------------|---------------------|
 | `none` (default) | Everyone, anonymously | No credentials. ⚠️ Only for isolated deployments. |
-| `database` | Users created with `python3 app/db/init_db.py` | Post username and password to `/v1/login/access-token` to get a token. |
+| `database` | Users created with `flux-restful` | Post username and password to `/v1/login/access-token` to get a token. |
 | `shared-secret` | Database users | As above, plus the token handshake used by the Python client (below). Requires `FLUX_SECRET_KEY`. |
 | `pam` | System accounts, via the host's PAM stack | Same as `database`. Requires the `python-pam` package and the server running as root (otherwise only the server user's own password can be checked); service name is `FLUX_PAM_SERVICE` (default `login`). |
 | `oidc` | Users of an OpenID Connect provider | Obtain a token from the provider and present it as a bearer token. Requires `FLUX_OIDC_ISSUER` and `FLUX_OIDC_AUDIENCE`. The username is the token's `sub` claim unless `FLUX_OIDC_USERNAME_CLAIM` says otherwise. |

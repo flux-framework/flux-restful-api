@@ -4,7 +4,7 @@ Unit tests for password hashing (no Flux needed).
 
 import pytest
 
-from app.core import security
+from flux_restful.core import security
 
 
 def test_hash_and_verify_roundtrip():

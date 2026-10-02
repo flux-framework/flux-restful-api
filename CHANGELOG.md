@@ -14,6 +14,10 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+- Published on PyPI as `flux-restful` (1.0.0)
+  - the package is `flux_restful` (was `app`); templates and static files ship inside it
+  - `flux-restful serve|init|add-user|list-users` replaces `uvicorn app.main:app` and `app/db/init_db.py`
+  - the container entrypoint and `make init` no longer run alembic autogenerate at every start
 - Requests no longer block on running jobs: output is read as a snapshot, Flux calls run off the event loop with per-thread handles; bad job ids are 400, missing jobs 404 (1.0.0)
 - Multi-user mode becomes the user directly (no sudo); jobs are owned by their user, others get 403 (1.0.0)
 - Jobs and launchers get an allowlist of the server environment instead of all of it (1.0.0)

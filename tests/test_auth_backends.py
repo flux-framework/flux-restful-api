@@ -11,13 +11,13 @@ import pytest
 from conftest import make_rsa_keypair, oidc_token, unprivileged_user
 from jose import jwt
 
-import app.auth as auth
-from app.auth import tokens
-from app.auth.base import AuthError
-from app.auth.oidc import JWKS_REFRESH_MIN_SECONDS, OidcBackend
-from app.auth.pam import PamBackend
-from app.core import config
-from app.core.config import settings
+import flux_restful.auth as auth
+from flux_restful.auth import tokens
+from flux_restful.auth.base import AuthError
+from flux_restful.auth.oidc import JWKS_REFRESH_MIN_SECONDS, OidcBackend
+from flux_restful.auth.pam import PamBackend
+from flux_restful.core import config
+from flux_restful.core.config import settings
 
 OIDC_SETTINGS = {
     "oidc_issuer": "https://issuer.example.com",
@@ -295,7 +295,7 @@ def test_oidc_backend_refreshes_keys_once_on_unknown_kid(
         return sets[min(len(loads), len(sets)) - 1]
 
     now = [1000.0]
-    monkeypatch.setattr("app.auth.oidc.time.monotonic", lambda: now[0])
+    monkeypatch.setattr("flux_restful.auth.oidc.time.monotonic", lambda: now[0])
 
     backend = OidcBackend(jwks_loader=loader)
     assert backend.verify_token(db, oidc_token(pem, kid="test-key-1")) is not None
@@ -365,7 +365,7 @@ def test_oidc_concurrent_requests_share_one_refresh(
 
     # Junk tokens with unknown key ids, all at once, after the interval
     now = [time.monotonic() + JWKS_REFRESH_MIN_SECONDS + 1]
-    monkeypatch.setattr("app.auth.oidc.time.monotonic", lambda: now[0])
+    monkeypatch.setattr("flux_restful.auth.oidc.time.monotonic", lambda: now[0])
     verify_many(lambda i: oidc_token(pem, kid=f"random-{i}"))
     assert len(loads) == 2
 

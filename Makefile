@@ -1,7 +1,6 @@
 all:
-	flux start uvicorn app.main:app --host=0.0.0.0 --port=5000 --workers=2
+	flux start flux-restful serve --host=0.0.0.0 --port=5000 --workers=2
 
+# Create the tables and the FLUX_USER / FLUX_TOKEN superuser
 init:
-	alembic revision --autogenerate -m "Create intital tables"
-	alembic upgrade head
-	/bin/bash ./init_db.sh
+	flux-restful init

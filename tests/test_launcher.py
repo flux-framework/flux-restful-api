@@ -4,7 +4,7 @@ Unit tests for launching workflow tools (no Flux needed).
 
 import subprocess
 
-from app.library import launcher
+from flux_restful.library import launcher
 
 
 def test_unknown_launcher_is_refused(monkeypatch):

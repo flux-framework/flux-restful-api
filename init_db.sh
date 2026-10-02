@@ -5,5 +5,5 @@
 FLUX_USER=${FLUX_USER:-fluxuser}
 FLUX_TOKEN=${FLUX_USER:-12345}
 
-python3 app/db/init_db.py init || python app/db/init_db.py init
-# python app/db/init_db.py add-user peenut peenut
+flux-restful init || flux-restful init
+# flux-restful add-user peenut peenut

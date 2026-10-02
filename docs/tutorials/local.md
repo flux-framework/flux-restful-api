@@ -34,14 +34,8 @@ pip install -r requirements.txt
 
 ## Database
 
-Prepare the database. Note that this can also be done with `make init`.
-
-```bash
-alembic revision --autogenerate -m "Create intital tables"
-alembic upgrade head
-```
-
-Export your desired flux token and user, and create the database.
+Export your desired flux token and user, and create the database (tables and the
+superuser; `make init` does the same):
 
 ```bash
 export FLUX_USER=dinosaur
@@ -56,7 +50,7 @@ And run! This can also be done by running `make` (and inspect the Makefile first
 for port variables, etc):
 
 ```bash
-$ flux start uvicorn app.main:app --host=0.0.0.0 --port=16798 --workers=2
+$ flux start uvicorn flux_restful.main:app --host=0.0.0.0 --port=16798 --workers=2
 ```
 
 Note that we are using a very large port number.
