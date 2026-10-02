@@ -1102,8 +1102,19 @@ explicitly:</p>
 <span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_ADMIN_USERS</span><span class="o">=</span><span class="nv">$USER</span>
 </code></pre></div>
 </div>
-<p>For multi-user mode (jobs run as the authenticated system user) flux needs to be started first
-(e.g., the instance or broker) and then the actual server needs to be started by root.</p>
+<p>For multi-user mode (<code class="docutils literal notranslate"><span class="pre">FLUX_SERVER_MODE=multi-user</span></code>) jobs run as the authenticated system
+user. The Flux instance is started first as the <code class="docutils literal notranslate"><span class="pre">flux</span></code> user with guest access and flux-imp
+configured (see <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/tree/main/example/multi-user">example/multi-user</a>),
+with <code class="docutils literal notranslate"><span class="pre">allow-root-owner</span> <span class="pre">=</span> <span class="pre">true</span></code>, which lets the root server act as the instance owner (read any
+jobspec, cancel any job), and the server is started by root: for each submission it becomes the user, whose own
+<code class="docutils literal notranslate"><span class="pre">flux</span> <span class="pre">python</span></code> signs and submits the jobspec, so no sudoers rules are needed. The server
+refuses to start in multi-user mode as any other user. PAM is the natural backend here,
+because every authenticated name is a system account; <code class="docutils literal notranslate"><span class="pre">database</span></code> works too if the database
+usernames match system accounts.</p>
+<p>Ownership is enforced for a job’s details, output, and cancellation: in multi-user mode a
+job belongs to the uid it runs as, and in single-user mode (where every job runs as the
+server user) to the API user who submitted it, recorded in the jobspec. Superusers may act
+on any job. In single-user mode the job listing is shared.</p>
 <p>To accept tokens issued by an OpenID Connect provider:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_AUTH_BACKEND</span><span class="o">=</span>oidc
 <span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_OIDC_ISSUER</span><span class="o">=</span>https://accounts.example.com
@@ -1410,7 +1421,7 @@ functions from oras-py source code.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    Sep 30, 2026
+    Oct 02, 2026
   </span>
 
     
