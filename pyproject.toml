@@ -1,5 +1,82 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flux-restful"
+dynamic = ["version"]
+description = "A RESTful API and web interface for submitting and monitoring jobs on a Flux Framework instance"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Vanessa Sochat", email = "vsoch@users.noreply.github.com" }]
+keywords = ["flux", "hpc", "scheduler", "rest", "fastapi"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Web Environment",
+  "Framework :: FastAPI",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: System :: Clustering",
+  "Topic :: System :: Distributed Computing",
+]
+# The Flux Python bindings (import flux) come with flux-core, not from PyPI.
+# Exact, tested versions of these are pinned in requirements.txt for the
+# container image.
+dependencies = [
+  "fastapi>=0.115",
+  "starlette>=0.46",
+  "uvicorn>=0.30",
+  "python-multipart>=0.0.9",
+  "jinja2>=3.1",
+  "Markdown>=3.5",
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "pydantic>=2.5",
+  "pydantic-settings>=2.2",
+  "python-jose[cryptography]>=3.4",
+  "bcrypt>=4.0",
+]
+
+[project.optional-dependencies]
+pam = ["python-pam>=2.0"]
+dev = ["pytest", "httpx", "black", "isort", "flake8", "pre-commit"]
+
+[project.urls]
+Homepage = "https://github.com/flux-framework/flux-restful-api"
+Documentation = "https://flux-framework.github.io/flux-restful-api"
+Repository = "https://github.com/flux-framework/flux-restful-api"
+Changelog = "https://github.com/flux-framework/flux-restful-api/blob/main/CHANGELOG.md"
+
+[project.scripts]
+flux-restful = "flux_restful.cli:main"
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.setuptools.packages.find]
+include = ["flux_restful*"]
+
+# Templates, static files, pages, the submit helper and migrations ship in the wheel
+[tool.setuptools.package-data]
+flux_restful = [
+  "templates/**/*",
+  "static/**/*",
+  "pages/*.md",
+  "scripts/*.py",
+  "migrations/*",
+  "migrations/versions/.keep",
+]
+
 [tool.black]
 exclude = "^env/"
+target-version = ["py310", "py311"]
 
 [tool.isort]
 profile = "black" # needed for black/isort compatibility

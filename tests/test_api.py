@@ -12,7 +12,7 @@ sys.path.insert(0, root)
 
 from jose import jwt  # noqa
 
-from app.main import app  # noqa
+from flux_restful.main import app  # noqa
 
 client = TestClient(app)
 
@@ -102,7 +102,7 @@ def test_token_endpoint_rejects_malformed_header():
     """
     A garbage bearer token on the token endpoint is denied, not a 500.
     """
-    import app.auth as auth
+    import flux_restful.auth as auth
 
     response = client.post("/v1/token", headers={"Authorization": "Bearer not-a-jwt"})
     if auth.handshake_enabled():

@@ -29,4 +29,6 @@ RUN pip install -r /requirements.txt && \
 
 WORKDIR /code
 COPY . /code
+# Install the package (its dependencies are the pins installed above)
+RUN pip install --no-deps /code
 ENTRYPOINT ["/code/entrypoint.sh"]

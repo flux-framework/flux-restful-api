@@ -16,6 +16,9 @@ With Flux RESTful we can:
 3. option to kill or stop the server (intended for Flux Operator)
 4. allow for start with a user name and token (for basic auth)
 
+Install the server with `pip install flux-restful` (the Flux Python bindings come with
+Flux itself) and start it under a Flux instance with `flux start flux-restful serve`.
+
 This project is new and we look forward to [hearing your feedback](https://github.com/flux-framework/flux-restful-api).
 See our ⭐️ [Documentation](https://flux-framework.github.io/flux-restful-api) ⭐️ to get started,
 and take a look at the [clients](clients) we provide to interact with the server.

@@ -31,6 +31,8 @@ jobs:
     - name: Install Dependencies (in case changes)
       run: |
         pip install -r requirements.txt -r .github/dev-requirements.txt
+        # The server package from this checkout (provides the flux-restful command)
+        pip install --no-deps -e .
         # tests/test_client.py runs the Python client from this checkout
         pip install ./clients/python
 
@@ -44,9 +46,7 @@ jobs:
         export FLUX_USER=fluxuser
         export FLUX_TOKEN=12345
 
-        alembic revision --autogenerate -m "Create intital tables"
-        alembic upgrade head
-        python3 app/db/init_db.py init
+        flux-restful init
 
         # Require auth and shared secret key
         export FLUX_SECRET_KEY=notsosecrethoo

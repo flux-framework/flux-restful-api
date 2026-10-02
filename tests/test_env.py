@@ -4,7 +4,7 @@ Unit tests for the job environment allowlist (no Flux needed).
 
 import re
 
-from app.library import env
+from flux_restful.library import env
 
 SERVER_ENV = {
     "PATH": "/usr/bin",
@@ -67,10 +67,10 @@ def test_helper_environment_adds_flux_uri(monkeypatch):
 
 def test_no_server_setting_is_allowlisted():
     """
-    Every FLUX_* variable read by app/core/config.py is server configuration
+    Every FLUX_* variable read by flux_restful/core/config.py is server configuration
     and must never reach a job by default.
     """
-    from app.core import config
+    from flux_restful.core import config
 
     with open(config.__file__) as fd:
         names = set(re.findall(r'"(FLUX_[A-Z_]+)"', fd.read()))

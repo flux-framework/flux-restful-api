@@ -10,8 +10,8 @@ import pytest
 from conftest import oidc_token, unprivileged_user
 from jose import jwt
 
-import app.auth as auth
-from app.auth import tokens
+import flux_restful.auth as auth
+from flux_restful.auth import tokens
 
 SECRET = "shared-with-clients"
 

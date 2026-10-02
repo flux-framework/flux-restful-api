@@ -8,9 +8,9 @@ import time
 
 import pytest
 
-import app.auth as auth
-import app.library.flux as flux_cli
-from app.core.config import settings
+import flux_restful.auth as auth
+import flux_restful.library.flux as flux_cli
+from flux_restful.core.config import settings
 
 ME = pwd.getpwuid(os.getuid()).pw_name
 

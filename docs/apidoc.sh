@@ -4,4 +4,4 @@
 #
 #
 rm source/*.rst
-sphinx-apidoc -o source/ ../app
+sphinx-apidoc -o source/ ../flux_restful

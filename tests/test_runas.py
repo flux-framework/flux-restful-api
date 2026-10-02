@@ -12,8 +12,8 @@ import subprocess
 
 import pytest
 
-from app.core.config import settings
-from app.library import runas
+from flux_restful.core.config import settings
+from flux_restful.library import runas
 
 ME = pwd.getpwuid(os.getuid())
 
