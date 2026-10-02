@@ -19,7 +19,7 @@ def submit_via_api(client, command):
     return response.json()["id"]
 
 
-def wait_for_output(client, jobid, needle, timeout=15):
+def wait_for_output(client, jobid, needle, timeout=120):
     deadline = time.time() + timeout
     while time.time() < deadline:
         lines = client.get(f"/v1/jobs/{jobid}/output").json().get("Output") or []

@@ -12,6 +12,7 @@ import flux.job.kvslookup
 from app.auth.base import is_system_user
 from app.core.config import settings
 from app.library.env import build_job_environment
+from app.library.handle import get_handle
 from app.library.runas import run_as_user
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +31,22 @@ class JobAccessDenied(Exception):
     """
     The authenticated user does not own the job (and is not a superuser).
     """
+
+
+class InvalidJobId(ValueError):
+    """
+    The job id is not a Flux job id (routes answer 400).
+    """
+
+
+def parse_jobid(jobid):
+    """
+    Parse a job id in any Flux form (integer, F58, ...). Raises InvalidJobId.
+    """
+    try:
+        return flux.job.JobID(jobid)
+    except Exception:
+        raise InvalidJobId(f"{jobid!r} is not a valid job id")
 
 
 def user_name(user):
@@ -83,17 +100,15 @@ def job_owner(jobid):
     user who submitted it, which is what distinguishes users in single-user
     mode where every job runs as the server user.
     """
-    from app.main import app
-
-    jobid = flux.job.JobID(jobid)
+    jobid = parse_jobid(jobid)
     try:
-        info = flux.job.job_list_id(app.handle, jobid, attrs=["userid"]).get_jobinfo()
+        info = flux.job.job_list_id(get_handle(), jobid, attrs=["userid"]).get_jobinfo()
     except FileNotFoundError:
         return None
     if multi_user():
         # Only the uid decides ownership; skip the jobspec RPC
         return info.userid, None
-    spec = flux.job.kvslookup.job_kvs_lookup(app.handle, jobid, keys=["jobspec"])
+    spec = flux.job.kvslookup.job_kvs_lookup(get_handle(), jobid, keys=["jobspec"])
     attribute = None
     if spec and spec.get("jobspec"):
         attribute = spec["jobspec"].get("attributes", {}).get("system", {}).get("user")
@@ -259,21 +274,64 @@ def query_jobs(contenders, query):
     return jobs
 
 
-def stream_job_output(jobid, user=None):
+def stream_job_output(jobid, user=None, poll=1.0):
     """
-    Given a jobid, stream the output.
+    Given a jobid, stream the output until the job ends.
+
+    The generator is advanced in the thread pool, so it must not sit in a
+    blocking wait: a job that prints nothing would then pin one pool thread
+    per open stream, and enough streams would starve every other request.
+    Instead it waits at most `poll` seconds per step and yields an empty
+    chunk when nothing arrived, which hands the thread back and lets the
+    server notice a client that has gone away. The stream owns its handle,
+    since steps may run on different pool threads.
 
     Callers must check ensure_job_access() before the response starts.
     """
-    from app.main import app
-
     ensure_job_access(jobid, user)
+    jobid = parse_jobid(jobid)
+    handle = flux.Flux()
+
+    def watch():
+        return flux.job.event_watch_async(handle, jobid, "guest.output")
+
+    def finished():
+        try:
+            info = flux.job.job_list_id(handle, jobid, attrs=["state"]).get_jobinfo()
+        except Exception:
+            return True
+        return info.state == "INACTIVE"
+
+    future = watch()
     try:
-        for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
-            if "data" in line.context:
-                yield line.context["data"]
-    except Exception:
-        pass
+        while True:
+            try:
+                future.wait_for(poll)
+                event = future.get_event()
+            except TimeoutError:
+                yield ""
+                continue
+            except FileNotFoundError:
+                # The output log does not exist until the job starts. A watch
+                # opened earlier reports this from get_event() once the job
+                # does start, so both calls sit in this try.
+                if finished():
+                    return
+                yield ""
+                time.sleep(poll)
+                future = watch()
+                continue
+            except OSError:
+                return
+            if event is None:
+                return
+            if "data" in event.context:
+                yield event.context["data"]
+    finally:
+        try:
+            future.cancel()
+        except Exception:
+            pass
 
 
 def cancel_job(jobid, user):
@@ -282,41 +340,44 @@ def cancel_job(jobid, user):
 
     Returns a message to the user and a return code.
     """
-    from app.main import app
-
     ensure_job_access(jobid, user)
+    jobid = parse_jobid(jobid)
     try:
-        flux.job.cancel(app.handle, jobid)
+        flux.job.cancel(get_handle(), jobid)
     # This is usually FileNotFoundError
     except Exception as e:
         return "Job cannot be cancelled: %s." % e, 400
     return "Job is requested to cancel.", 200
 
 
-def get_job_output(jobid, user=None, delay=None):
+def get_job_output(jobid, user=None):
     """
-    Given a jobid, get the output.
+    The output a job has produced so far, as a list of chunks.
 
-    If there is a delay, we are requesting on demand, so we want to return early.
+    This is a snapshot of the job's output eventlog from the KVS, which
+    returns immediately for running jobs. (Watching the eventlog instead
+    would block until the job ends.) Empty if the job has not started, has
+    produced nothing, or does not exist.
     """
-    lines = []
-    start = time.time()
-    from app.main import app
-
     ensure_job_access(jobid, user)
-    jobid = flux.job.JobID(jobid)
-
-    # If the submit is too close to the log request, it cannot find the file handle
-    # It could be also the jobid cannot be found.
+    jobid = parse_jobid(jobid)
     try:
-        for line in flux.job.event_watch(app.handle, jobid, "guest.output"):
-            if "data" in line.context:
-                lines.append(line.context["data"])
-            now = time.time()
-            if delay is not None and (now - start) > delay:
-                return lines
+        result = flux.job.kvslookup.job_kvs_lookup(
+            get_handle(), jobid, keys=["guest.output"]
+        )
     except Exception:
-        pass
+        return []
+    eventlog = (result or {}).get("guest.output") or ""
+    lines = []
+    for entry in eventlog.splitlines():
+        if not entry.strip():
+            continue
+        try:
+            event = flux.job.EventLogEvent(entry)
+        except Exception:
+            continue
+        if "data" in event.context:
+            lines.append(event.context["data"])
     return lines
 
 
@@ -359,21 +420,17 @@ def list_jobs(user=None):
     In single-user mode every job runs as the server user, so the listing is
     shared; access to a job's details and output is still per user.
     """
-    from app.main import app
-
     name = user_name(user)
     if multi_user() and name and not getattr(user, "is_superuser", False):
-        return flux.job.job_list(app.handle, userid=pwd.getpwnam(name).pw_uid)
-    return flux.job.job_list(app.handle)
+        return flux.job.job_list(get_handle(), userid=pwd.getpwnam(name).pw_uid)
+    return flux.job.job_list(get_handle())
 
 
 def get_simple_job(jobid):
     """
     Not used - an original (simpler) implementation.
     """
-    from app.main import app
-
-    info = flux.job.job_list_id(app.handle, jobid, attrs=["all"])
+    info = flux.job.job_list_id(get_handle(), jobid, attrs=["all"])
     return json.loads(info.get_str())["job"]
 
 
@@ -381,13 +438,11 @@ def get_job(jobid, user=None):
     """
     Get details for a job
     """
-    from app.main import app
-
     ensure_job_access(jobid, user)
-    jobid = flux.job.JobID(jobid)
+    jobid = parse_jobid(jobid)
 
     payload = {"id": jobid, "attrs": ["all"]}
-    rpc = flux.job.list.JobListIdRPC(app.handle, "job-list.list-id", payload)
+    rpc = flux.job.list.JobListIdRPC(get_handle(), "job-list.list-id", payload)
     try:
         jobinfo = rpc.get()
 

@@ -14,6 +14,7 @@ from app.core.logging import init_loggers
 from app.db.base import Base
 from app.db.session import engine
 from app.library import csrf
+from app.library import handle as flux_handle
 from app.routers import api, views
 
 init_loggers()
@@ -45,6 +46,16 @@ async def job_access_denied(request: Request, exc: flux_cli.JobAccessDenied):
     return JSONResponse(status_code=403, content={"detail": str(exc)})
 
 
+@app.exception_handler(flux_cli.InvalidJobId)
+async def invalid_job_id(request: Request, exc: flux_cli.InvalidJobId):
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
+
+
+@app.exception_handler(flux_handle.FluxUnavailable)
+async def flux_unavailable(request: Request, exc: flux_handle.FluxUnavailable):
+    return JSONResponse(status_code=503, content={"detail": str(exc)})
+
+
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.dirname(here)
 static_root = os.path.join(root, "static")
@@ -63,26 +74,13 @@ app.include_router(views.router)
 app.include_router(views.auth_views_router)
 app.include_router(api.router)
 
+# Fail at startup if there is no Flux instance to talk to. Requests use a
+# per-thread handle (see app.library.handle); nothing is created per request.
 try:
-    import flux
-except ImportError:
-    sys.exit("Cannot import flux. Make sure flux Python bindings are available.")
+    log.info("Flux instance size: %s", flux_handle.check_connection())
+except flux_handle.FluxUnavailable as e:
+    sys.exit(str(e))
 
-
-@app.middleware("http")
-async def load_app_data(request: Request, call_next):
-    """
-    Middleware to ensure that data is always loaded (do we need?)
-    """
-    # Save the app root and app directory root (here)
-    app.here = here
-    app.root = root
-
-    # Use a common flux executor
-    try:
-        app.handle = flux.Flux()
-    except Exception:
-        sys.exit(
-            "Cannot find flux instance! Ensure you have run flux start or similar."
-        )
-    return await call_next(request)
+# Paths used by templates and helpers
+app.here = here
+app.root = root

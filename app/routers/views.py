@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 
 import flux.job
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from markupsafe import Markup
@@ -14,6 +15,7 @@ import app.routers.depends as deps
 from app.core.config import settings
 from app.forms import SubmitForm
 from app.library import csrf
+from app.library.handle import get_handle
 
 # These views never have auth!
 router = APIRouter(tags=["views"])
@@ -45,7 +47,8 @@ async def home(request: Request):
 # List jobs
 @auth_views_router.get("/jobs", response_class=HTMLResponse)
 async def jobs_table(request: Request, user=user_auth):
-    jobs = list(flux_cli.list_jobs_detailed(user=user).values())
+    jobs = await run_in_threadpool(flux_cli.list_jobs_detailed, user=user)
+    jobs = list(jobs.values())
     return templates.TemplateResponse(request, "jobs/jobs.html", {"jobs": jobs})
 
 
@@ -72,20 +75,15 @@ async def logout(request: Request, response: Response):
     operation_id="job_info",
 )
 async def job_info(request: Request, jobid, msg=None, user=user_auth):
-    job = flux_cli.get_job(jobid, user=user)
+    job = await run_in_threadpool(flux_cli.get_job, jobid, user=user)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
 
     # If we have a message, add to messages (the template escapes it)
     messages = [msg] if msg else []
 
-    # If not completed, ask info to return after a second of waiting
-    if job["state"] == "INACTIVE":
-        info = flux_cli.get_job_output(jobid, user=user)
-
-    # Otherwise ensure we get all the logs!
-    else:
-        info = flux_cli.get_job_output(jobid, user=user, delay=1)
+    # The output produced so far (a snapshot, so this never waits on the job)
+    info = await run_in_threadpool(flux_cli.get_job_output, jobid, user=user)
     return templates.TemplateResponse(
         request,
         "jobs/job.html",
@@ -112,11 +110,14 @@ async def submit_job(request: Request, user=user_auth):
 # Button to cancel a job: a POST form with a CSRF token, never a GET link
 @auth_views_router.post("/job/{jobid}/cancel", response_class=HTMLResponse)
 async def cancel_job(request: Request, jobid, user=user_auth):
-    from app.main import app
-
     await csrf.verify_form(request)
-    message, _ = flux_cli.cancel_job(jobid, user=user)
-    url = app.url_path_for("job_info", jobid=jobid) + "?" + urlencode({"msg": message})
+    message, _ = await run_in_threadpool(flux_cli.cancel_job, jobid, user=user)
+    # A relative redirect, so it also works behind a proxy
+    url = (
+        request.url_for("job_info", jobid=jobid).path
+        + "?"
+        + urlencode({"msg": message})
+    )
     return RedirectResponse(url=url, status_code=303)
 
 
@@ -135,7 +136,7 @@ async def submit_job_post(request: Request, user=user_auth):
                 launcher.launch(form.kwargs, workdir=form.workdir, user=user)
             )
         else:
-            return submit_job_helper(request, form, user=user)
+            return await run_in_threadpool(submit_job_helper, request, form, user)
     return templates.TemplateResponse(
         request,
         "jobs/submit.html",
@@ -152,15 +153,13 @@ def submit_job_helper(request, form, user):
     """
     A helper to submit a flux job (not a launcher)
     """
-    from app.main import app
-
     # Submit the job and return the ID, but allow for error
     # Prepare the flux job! We don't support envars here yet
     try:
         fluxjob = flux_cli.prepare_job(
             user, form.kwargs, runtime=form.runtime, workdir=form.workdir
         )
-        flux_future = flux_cli.submit_job(app.handle, fluxjob, user=user)
+        flux_future = flux_cli.submit_job(get_handle(), fluxjob, user=user)
         jobid = flux_future.get_id()
         intid = flux.job.JobID(jobid)
         # Markup.format escapes the values; the template escapes everything else

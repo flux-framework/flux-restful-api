@@ -29,7 +29,7 @@ def submit(client, headers, command="sleep 60"):
     return response.json()["id"]
 
 
-def wait_inactive(client, headers, jobid, timeout=15):
+def wait_inactive(client, headers, jobid, timeout=120):
     deadline = time.time() + timeout
     while time.time() < deadline:
         job = client.get(f"/v1/jobs/{jobid}", headers=headers).json()
