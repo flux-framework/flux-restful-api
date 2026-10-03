@@ -5,7 +5,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![DOI](https://zenodo.org/badge/561527661.svg)](https://zenodo.org/badge/latestdoi/561527661)
 
-![img/flux-restful-eyes-small.png](img/flux-restful-eyes-small.png)
+![https://github.com/flux-framework/flux-restful-api/raw/main/img/flux-restful-eyes-small.png](https://github.com/flux-framework/flux-restful-api/raw/main/img/flux-restful-eyes-small.png)
 
 This is a small Flux Python API (using FastAPI) that can be containerized
 alongside Flux, and provide an easy means to interact with Flux via the API.
