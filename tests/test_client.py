@@ -4,16 +4,9 @@ Run the real Python client against the app (through the test client session).
 These need a running Flux instance (run under `flux start`).
 """
 
-import os
-import sys
-
 import pytest
 
-# Test the client in this checkout, not a copy that happens to be installed
-here = os.path.abspath(os.path.dirname(__file__))
-sys.path.insert(0, os.path.join(os.path.dirname(here), "clients", "python"))
-
-from flux_restful_client.main import get_client  # noqa: E402
+from flux_restful.client.main import get_client
 
 SECRET = "shared-with-clients"
 

@@ -65,11 +65,10 @@ you have the allocation. E.g.,:
 $ ssh corona194
 ```
 
-And return to that directory. We can cd into the python client and install:
+And return to that directory. The package (server and client) installs from the checkout:
 
 ```bash
 $ source env/bin/activate
-$ cd clients/python
 $ pip install -e .
 ```
 
@@ -81,7 +80,7 @@ could use python or just a script. First, submit the job:
 
 
 ```python
-from flux_restful_client.main import get_client
+from flux_restful.client.main import get_client
 
 # You can also again export these in the environment.
 cli = get_client(host="http://127.0.0.1:16798", user="dinosaur", token="dinosaur")

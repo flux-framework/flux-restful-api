@@ -29,10 +29,8 @@ jobs:
     - name: Install Dependencies (in case changes)
       run: |
         pip install -r requirements.txt -r .github/dev-requirements.txt
-        # The server package from this checkout (provides the flux-restful command)
+        # This checkout as a package (server and client)
         pip install --no-deps -e .
-        # tests/test_client.py runs the Python client from this checkout
-        pip install ./clients/python
 
     - name: Run tests
       run: |

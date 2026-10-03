@@ -2,7 +2,7 @@
 
 import json
 
-from flux_restful_client.main import get_client
+from flux_restful.client.main import get_client
 
 
 def main():

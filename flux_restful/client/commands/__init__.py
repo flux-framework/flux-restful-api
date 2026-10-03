@@ -4,9 +4,9 @@ import argparse
 import os
 import sys
 
-import flux_restful_client
-import flux_restful_client.main.schemas as schemas
-from flux_restful_client.logger import setup_logger
+import flux_restful.client.main.schemas as schemas
+from flux_restful.client.logger import setup_logger
+from flux_restful.version import __version__
 
 
 def add_submit_arguments(command):
@@ -214,7 +214,7 @@ def run_flux_restful_client():
         """print help, including the software version and active client
         and exit with return code.
         """
-        version = flux_restful_client.__version__
+        version = __version__
 
         print("\nFlux RESTFul Python Client v%s" % version)
         parser.print_help()
@@ -232,7 +232,7 @@ def run_flux_restful_client():
 
     # Show the version and exit
     if args.command == "version" or args.version:
-        print(flux_restful_client.__version__)
+        print(__version__)
         sys.exit(0)
 
     setup_logger(

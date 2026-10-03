@@ -2,7 +2,7 @@
 
 import json
 
-from flux_restful_client.main import get_client
+from flux_restful.client.main import get_client
 
 # This is the same example as the submit_job.py, but with authentication
 # added. You should start the server with the following environment

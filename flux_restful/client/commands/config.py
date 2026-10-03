@@ -1,8 +1,8 @@
 import sys
 
-import flux_restful_client.defaults as defaults
-from flux_restful_client.logger import logger
-from flux_restful_client.main import get_client
+import flux_restful.client.defaults as defaults
+from flux_restful.client.logger import logger
+from flux_restful.client.main import get_client
 
 
 def main(args, parser, extra, subparser):

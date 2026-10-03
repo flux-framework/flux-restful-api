@@ -102,7 +102,7 @@ $ export FLUX_SECRET_KEY=notsecrethoo
 ```
 
 From here, continue reading the user guide for different language clients,
-or see our Python [examples](https://github.com/flux-framework/flux-restful-api/tree/main/clients/python/examples) folder
+or see our Python [examples](https://github.com/flux-framework/flux-restful-api/tree/main/example/client) folder
 for snippet examples, or the [tutorials](../tutorials/index.md) for more complex setups.
 
 ## Python
@@ -116,23 +116,22 @@ $ python -m venv env
 $ source env/bin/activate
 ```
 
-You can install the client from pip:
+The client ships in the same package as the server, so one install gives you both,
+at the same version:
 
 ```bash
-$ pip install flux-restful-client
+$ pip install flux-restful
 ```
 
 Or from the repository directly:
 
 ```bash
 $ git clone https://github.com/flux-framework/flux-restful-api
-$ cd flux-restful-api/clients/python
-# Install to your Python install
-$ pip install .
-
-# Development version using the code here
+$ cd flux-restful-api
 $ pip install -e .
 ```
+
+The client is `flux_restful.client` and the command line tool is `flux-restful-cli`.
 
 ### Command Line Client
 
@@ -365,8 +364,7 @@ See our [tutorial](https://flux-framework.org/flux-restful-api/auto_examples/api
 example!
 
 ```python
-# Make sure the directory with the client is in sys.path
-from flux_restful_client import get_client
+from flux_restful.client.main import get_client
 
 # create with username and token
 cli = get_client(user="fluxuser", token="12345")

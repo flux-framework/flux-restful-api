@@ -21,7 +21,7 @@ def main(args, parser, extra, subparser):
 
 
 def create_client(args):
-    from flux_restful_client.main import get_client
+    from flux_restful.client.main import get_client
 
     cli = get_client(quiet=args.quiet, settings_file=args.settings_file)
 

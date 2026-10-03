@@ -1,7 +1,7 @@
-import flux_restful_client.defaults as defaults
-import flux_restful_client.main.schemas as schemas
-import flux_restful_client.utils as utils
-from flux_restful_client.logger import logger
+import flux_restful.client.defaults as defaults
+import flux_restful.client.main.schemas as schemas
+import flux_restful.client.utils as utils
+from flux_restful.client.logger import logger
 
 try:
     from ruamel_yaml.comments import CommentedSeq

@@ -17,4 +17,3 @@ readthedocs-sphinx-search
 myst-parser
 pymdown-extensions
 sphinx-gallery
-flux-restful-client

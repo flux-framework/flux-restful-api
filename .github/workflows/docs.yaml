@@ -42,10 +42,8 @@ jobs:
         cd flux-restful-api
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r .github/dev-requirements.txt
-        # Install flux-restful-client for tutorial rendering
-        cd clients/python/
-        python3 -m pip install .[all]
-        cd -
+        # The package (the tutorial uses the client)
+        python3 -m pip install --no-deps -e .
         cd docs
         python3 -m pip install -r requirements.txt
         make html
