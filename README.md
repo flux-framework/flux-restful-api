@@ -4,6 +4,7 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![DOI](https://zenodo.org/badge/561527661.svg)](https://zenodo.org/badge/latestdoi/561527661)
+![PyPI Version](https://img.shields.io/pypi/v/flux-restful)
 
 ![https://github.com/flux-framework/flux-restful-api/raw/main/img/flux-restful-eyes-small.png](https://github.com/flux-framework/flux-restful-api/raw/main/img/flux-restful-eyes-small.png)
 
@@ -23,7 +24,7 @@ This project is new and we look forward to [hearing your feedback](https://githu
 See our ⭐️ [Documentation](https://flux-framework.github.io/flux-restful-api) ⭐️ to get started,
 and take a look at the [clients](clients) we provide to interact with the server.
 
-![img/flux-restful.png](img/flux-restful.png)
+![https://github.com/flux-framework/flux-restful-api/raw/main/img/flux-restful.png](https://github.com/flux-framework/flux-restful-api/raw/main/img/flux-restful.png)
 
 
 ## 😁️ Contributors 😁️

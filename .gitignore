@@ -4,3 +4,5 @@ flux_restful/migrations/versions/*.py
 .env
 __pycache__
 *.tar.gz
+flux_restful.egg-info
+dist

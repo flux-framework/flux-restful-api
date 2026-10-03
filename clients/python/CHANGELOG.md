@@ -14,6 +14,7 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+ - Keep query parameters when retrying a request after authenticating; a job submit after a 401 lost its command (0.2.3)
  - Do not re-authenticate when the token endpoint itself fails; previously a wrong password looped forever (0.2.2)
  - Fix bug with submit and POST needing params (0.2.1)
  - New release with updated client (0.2.0)
