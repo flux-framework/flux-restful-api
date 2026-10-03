@@ -19,16 +19,16 @@ The versions coincide with releases on pip. Only major versions will be released
   - `flux-restful serve|init|add-user|list-users` replaces `uvicorn app.main:app` and `app/db/init_db.py`
   - the container entrypoint and `make init` no longer run alembic autogenerate at every start
 - Requests no longer block on running jobs: output is read as a snapshot, Flux calls run off the event loop with per-thread handles; bad job ids are 400, missing jobs 404 (1.0.0)
-- Multi-user mode becomes the user directly (no sudo); jobs are owned by their user, others get 403 (1.0.0)
-- Jobs and launchers get an allowlist of the server environment instead of all of it (1.0.0)
+- Multi-user mode becomes the user directly (no sudo); jobs are owned by their user, others get 403
+- Jobs and launchers get an allowlist of the server environment instead of all of it
   - server settings and secrets no longer reach jobs; add variables with FLUX_JOB_ENV_PASSTHROUGH (names or patterns)
   - web UI: messages and job table cells are escaped, forms carry a CSRF token, cancel is a POST
-- Pluggable authentication backends via FLUX_AUTH_BACKEND: none, database, shared-secret, pam, oidc (1.0.0)
+- Pluggable authentication backends via FLUX_AUTH_BACKEND: none, database, shared-secret, pam, oidc
   - access tokens are signed with a server-only FLUX_TOKEN_SIGNING_KEY (required; entrypoint generates one), never the client shared secret
   - a failed login at a token endpoint is 400, not 401, so clients do not loop re-requesting a token
   - FLUX_ADMIN_USERS grants superuser with any backend; GET /v1/auth describes how to log in
   - FLUX_REQUIRE_AUTH=false now disables auth (previously any value enabled it)
-- Pin dependencies; hash passwords with bcrypt directly; fix views and job listing on current FastAPI/Flux (1.0.0)
+- Pin dependencies; hash passwords with bcrypt directly; fix views and job listing on current FastAPI/Flux
 - Ensure we update flux environment for user (0.1.13)
 - Add better multi-user mode - running jobs on behalf of user (0.1.12)
 - Restore original rpc to get job info (has more information) (0.1.11)
