@@ -13,11 +13,10 @@ EXPOSE 5000
 ENV PYTHONPATH=/usr/lib/flux/python3.10
 
 # For easier Python development.
-RUN python3 -m pip install IPython --break-system-packages && \
-    python3 -m pip install -r /requirements.txt --break-system-packages && \
-    python3 -m pip install -r /dev-requirements.txt --break-system-packages && \
-    python3 -m pip install -r /docs-requirements.txt --break-system-packages
-
+RUN python3 -m pip install IPython && \
+    python3 -m pip install -r /requirements.txt && \
+    python3 -m pip install -r /dev-requirements.txt && \
+    python3 -m pip install -r /docs-requirements.txt
 
 RUN mkdir -p /run/flux /var/lib/flux mkdir /etc/flux/system/cron.d /mnt/curve && \
     flux keygen /mnt/curve/curve.cert && \

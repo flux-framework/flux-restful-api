@@ -21,8 +21,6 @@ jobs:
       ports:
        - 5000
       env:
-        INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
-        INSTALL_REPO: ${{ github.repository }}
         FLUX_SECRET_KEY: notsosecrethoo
         FLUX_USER: fluxuser
         FLUX_TOKEN: "12345"
@@ -42,11 +40,12 @@ jobs:
         # Tests for the API with auth disabled
         flux start pytest -xs tests/
 
-        # Create main user in database
+        # Create main user in database (via the module: pip may put the
+        # flux-restful console script outside PATH in this container)
         export FLUX_USER=fluxuser
         export FLUX_TOKEN=12345
 
-        flux-restful init
+        python3 -m flux_restful.cli init
 
         # Require auth and shared secret key
         export FLUX_SECRET_KEY=notsosecrethoo

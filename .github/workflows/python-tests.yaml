@@ -6,55 +6,55 @@ on:
     - main
     - gh-pages
 
-
 jobs:
-  prepare-container:
+  # Run the Python client's tests against a server built from this checkout
+  client:
     runs-on: ubuntu-latest
-    outputs:
-      branch: ${{ steps.extract_branch.outputs.branch }}
     steps:
-    - name: Extract branch name
-      run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
-      id: extract_branch
+    - uses: actions/checkout@v7
 
-  test-noauth:
-    runs-on: ubuntu-latest
-    needs: [prepare-container]
-    services:
-      api:
-        image: ghcr.io/flux-framework/flux-restful-api:latest
-        ports:
-          - 5000:5000
-        env:
-          INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
-          INSTALL_REPO: ${{ github.repository }}
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run tests without auth
+    - name: Build the server image from this checkout
+      run: docker build -t flux-restful-api:test .
+
+    - name: Install the client
       run: |
         cd clients/python
         pip install -e .[all]
-        pytest -xs flux_restful_client/tests/test_api.py
 
-  test-auth:
-    needs: [prepare-container]
-    runs-on: ubuntu-latest
-    services:
-      api:
-        env:
-          INSTALL_BRANCH: ${{ needs.prepare-container.outputs.branch }}
-          INSTALL_REPO: ${{ github.repository }}
-        image: ghcr.io/flux-framework/flux-restful-api:latest
-        ports:
-          - 5000:5000
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run tests with auth
+    - name: Test without auth
       run: |
+        docker run -d --name api -p 5000:5000 flux-restful-api:test
+        # Wait for the server; fail fast with its logs if the container dies
+        for i in $(seq 1 60); do
+          curl -sf http://localhost:5000/v1/auth && break
+          if [ "$(docker inspect -f '{{.State.Running}}' api)" != "true" ]; then
+            echo "server container exited"; docker logs api; exit 1
+          fi
+          sleep 2
+        done
+        curl -sf http://localhost:5000/v1/auth || { echo "server did not come up"; docker logs api; exit 1; }
+        cd clients/python
+        pytest -xs flux_restful_client/tests/test_api.py || { docker logs api; exit 1; }
+        docker rm -f api
+
+    - name: Test with auth
+      run: |
+        docker run -d --name api -p 5000:5000 \
+          -e FLUX_REQUIRE_AUTH=true -e FLUX_USER=fluxuser -e FLUX_TOKEN=12345 \
+          -e FLUX_SECRET_KEY=notsecrethoo \
+          flux-restful-api:test
+        # Wait for the server; fail fast with its logs if the container dies
+        for i in $(seq 1 60); do
+          curl -sf http://localhost:5000/v1/auth && break
+          if [ "$(docker inspect -f '{{.State.Running}}' api)" != "true" ]; then
+            echo "server container exited"; docker logs api; exit 1
+          fi
+          sleep 2
+        done
+        curl -sf http://localhost:5000/v1/auth || { echo "server did not come up"; docker logs api; exit 1; }
         export FLUX_USER=fluxuser
         export FLUX_TOKEN=12345
-        export FLUX_REQUIRE_AUTH=true
         export FLUX_SECRET_KEY=notsecrethoo
         cd clients/python
-        pip install -e .[all]
-        pytest -xs flux_restful_client/tests/test_api.py
+        pytest -xs flux_restful_client/tests/test_api.py || { docker logs api; exit 1; }
+        docker rm -f api
