@@ -30,6 +30,12 @@ html_title = "Flux RESTful API"
 copyright = "2022, Flux RESTful API Developers"
 author = "@vsoch"
 
+# The documented release, from the VERSION file at the repository root
+with open(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "VERSION")
+) as fd:
+    release = version = fd.read().strip()
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -158,21 +164,15 @@ html_theme_options = {
             },
         },
     ],
-    # BEGIN: version_dropdown
-    "version_dropdown": False,
+    # Show the documented release in the header (one entry: these docs track main)
+    "version_dropdown": True,
     "version_info": [
         {
-            "version": "https://sphinx-immaterial.rtfd.io",
-            "title": "ReadTheDocs",
-            "aliases": [],
-        },
-        {
-            "version": "https://jbms.github.io/sphinx-immaterial",
-            "title": "Github Pages",
-            "aliases": [],
+            "version": "https://flux-framework.org/flux-restful-api",
+            "title": release,
+            "aliases": ["latest"],
         },
     ],
-    # END: version_dropdown
     "toc_title_is_page_title": True,
     # BEGIN: social icons
     "social": [
@@ -224,6 +224,9 @@ extlinks = {
 
 # Enable eval_rst in markdown
 def setup(app):
+    # Make the documented release available to version-card.js (see _static)
+    app.add_js_file(None, body=f'var fluxRestfulRelease = "{release}";')
+    app.add_js_file("version-card.js")
     app.add_config_value(
         "recommonmark_config",
         {"enable_math": True, "enable_inline_math": True, "enable_eval_rst": True},
