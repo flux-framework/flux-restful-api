@@ -63,13 +63,12 @@ $ docker run --name flux-restful -d --rm -it -p 5000:5000 ghcr.io/flux-framework
 $ docker stop flux-restful
 ```
 
-Finally, if you want to install a custom branch (and/or repository) of the RESTFul API, we provide
-an environment variable to do this. E.g., this makes it easy to test a custom branch in CI without
-needing to push a container to a registry. Here is how to specify a branch (and default to flux-framework/flux-restful-api)
-or your own repository base:
+To try a branch of the RESTful API, build the image from your checkout and run that instead
+(this is also what CI does for the client tests):
 
 ```bash
-$ docker run --env INSTALL_BRANCH=add/feature --env INSTALL_REPO=user/flux-restful-api -d --rm -it -p 5000:5000 ghcr.io/flux-framework/flux-restful-api
+$ docker build -t flux-restful-api:dev .
+$ docker run --name flux-restful -d --rm -it -p 5000:5000 flux-restful-api:dev
 ```
 
 
@@ -80,33 +79,43 @@ in a VSCode environment.
 
 #### 1. Install
 
-After cloning the repository, install dependencies:
+The server is on PyPI as `flux-restful`. You also need the Flux Python bindings (`import flux`),
+which come with Flux itself and are not on PyPI, so use a virtual environment that can see them:
 
 ```bash
-$ python -m venv env
+$ python -m venv --system-site-packages env
 $ source env/bin/activate
+$ pip install flux-restful
 ```
 
-Install requirements (note that you also need Flux Python available, which isn't in these requirements as you cannot install from pip).
+To work on the code, install the checkout instead (the pins in `requirements.txt` are the
+versions the container image is tested with):
 
 ```bash
-pip install -r requirements.txt
+$ pip install -r requirements.txt -r .github/dev-requirements.txt
+$ pip install --no-deps -e .
 ```
+
+Either way you get the `flux-restful` command, with `serve`, `init`, `add-user`, and `list-users`.
 
 #### 2. Start Service
 
 There are two ways to start the app! You can either have it be the entry for flux start:
 
 ```console
-$ flux start uvicorn app.main:app --host=0.0.0.0 --port=5000
+$ flux start flux-restful serve --host=0.0.0.0 --port=5000
 ```
 
 Or do it separately (two commands):
 
 ```bash
 flux start --test-size=4
-uvicorn app.main:app --host=0.0.0.0 --port=5000
+flux-restful serve --host=0.0.0.0 --port=5000
 ```
+
+`flux-restful serve` runs uvicorn; `--workers` adds workers, which all need the same
+`FLUX_TOKEN_SIGNING_KEY`. For auto-reload during development run uvicorn directly:
+`uvicorn flux_restful.main:app --reload`.
 
 For the latter, you can also use the Makefile:
 
@@ -319,57 +328,32 @@ $ pre-commit install
 
 ## Database
 
-The database config was created with:
-
-```bash
-$ alembic init --template generic ./migrations
-```
-
-At this point we need to edit `migrations/env.py` so it could see our database models. This part:
-
-```python
-# This line was added so we import our database
-from app.db.base import Base  # noqa
-
-target_metadata = Base.metadata
-```
-
-At this point we can do a migration to create the initial (empty) tables.
-
-```bash
-$ alembic revision --autogenerate -m "Create intital tables"
-```
-
-And then to run the first set of migrations:
-
-```bash
-$ alembic upgrade head
-```
-
-At this point we can create our initial super flux user:
+The server keeps its users in a SQLite database, `flux-restful.db` in the working directory.
+`flux-restful init` creates the tables (if missing) and the superuser from `FLUX_USER` and
+`FLUX_TOKEN`:
 
 ```bash
 export FLUX_USER=fluxuser
 export FLUX_TOKEN=12345
 ```
-```bash
-$ python app/db/init_db.py init
-```
 ```console
-# python app/db/init_db.py init
-
-INFO:__main__:Creating initial data
-INFO:__main__:User fluxuser has been created.
-INFO:__main__:Initial data created
+$ flux-restful init
+INFO:flux-restful:Creating initial data
+INFO:flux-restful:User fluxuser has been created.
+INFO:flux-restful:Initial data created
 ```
+
+The container entrypoint does the same at every start, since its database is ephemeral.
+Alembic is configured (`alembic.ini`, `flux_restful/migrations`) for schema migrations if the
+models change in a release; it is not needed to run the server.
 
 or add a user:
 
 ```bash
-$ python app/db/init_db.py add-user peenut peenut
+$ flux-restful add-user peenut peenut
 ```
 ```console
-INFO:__main__:User peenut has been created.
+INFO:flux-restful:User peenut has been created.
 ```
 
 You can see how we run these commands in the `entrypoint.sh` for the container.
@@ -393,7 +377,7 @@ and this will require having Flux.
 running. E.g., in another terminal:
 
 ```bash
-$ flux start uvicorn app.main:app --host=0.0.0.0 --port=5000
+$ flux start uvicorn flux_restful.main:app --host=0.0.0.0 --port=5000
 ```
 
 ### Install Dependencies and Build
@@ -431,7 +415,7 @@ of Flux alongside the app) you can use flux start. You will need to run them as 
 flux instance owner. E.g., if it's flux:
 
 ```bash
-$ sudo -u flux flux start pytest -xs tests/test_api.py
+$ sudo -u flux flux start pytest -xs tests/
 ```
 
 or if it's just root / a single user:

@@ -814,7 +814,7 @@
   
   
   <span class="md-ellipsis">
-    <span title="/source/modules.rst (reference label)"><span>app</span></span>
+    <span title="/source/modules.rst (reference label)"><span>flux_<wbr>restful</span></span>
     
   </span>
   
@@ -878,12 +878,8 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 </code></pre></div>
 </div>
 <h2 id="database">Database<a class="headerlink" href="#database" title="Permalink to this heading">¶</a></h2>
-<p>Prepare the database. Note that this can also be done with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>alembic<span class="w"> </span>revision<span class="w"> </span>--autogenerate<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Create intital tables&quot;</span>
-alembic<span class="w"> </span>upgrade<span class="w"> </span>head
-</code></pre></div>
-</div>
-<p>Export your desired flux token and user, and create the database.</p>
+<p>Export your desired flux token and user, and create the database (tables and the
+superuser; <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code> does the same):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_USER</span><span class="o">=</span>dinosaur
 <span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_TOKEN</span><span class="o">=</span>dinosaur
 
@@ -893,7 +889,7 @@ alembic<span class="w"> </span>upgrade<span class="w"> </span>head
 <h2 id="start">Start<a class="headerlink" href="#start" title="Permalink to this heading">¶</a></h2>
 <p>And run! This can also be done by running <code class="docutils literal notranslate"><span class="pre">make</span></code> (and inspect the Makefile first
 for port variables, etc):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">16798</span><span class="w"> </span>--workers<span class="o">=</span><span class="m">2</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>uvicorn<span class="w"> </span>flux_restful.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">16798</span><span class="w"> </span>--workers<span class="o">=</span><span class="m">2</span>
 </code></pre></div>
 </div>
 <p>Note that we are using a very large port number.</p>
@@ -904,9 +900,8 @@ you have the allocation. E.g.,:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>ssh<span class="w"> </span>corona194
 </code></pre></div>
 </div>
-<p>And return to that directory. We can cd into the python client and install:</p>
+<p>And return to that directory. The package (server and client) installs from the checkout:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>env/bin/activate
-$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>clients/python
 $<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </code></pre></div>
 </div>
@@ -914,7 +909,7 @@ $<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </sp
 <p>We can now derive an interaction via example in the examples directory.
 I like to use ipython when I’m developing or testing like this, but you
 could use python or just a script. First, submit the job:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">flux_restful_client.main</span> <span class="kn">import</span> <span class="n">get_client</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">flux_restful.client.main</span> <span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="c1"># You can also again export these in the environment.</span>
 <span class="n">cli</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;http://127.0.0.1:16798&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s2">&quot;dinosaur&quot;</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;dinosaur&quot;</span><span class="p">)</span>

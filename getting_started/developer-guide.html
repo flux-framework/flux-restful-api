@@ -901,7 +901,7 @@
   
   
   <span class="md-ellipsis">
-    <span title="/source/modules.rst (reference label)"><span>app</span></span>
+    <span title="/source/modules.rst (reference label)"><span>flux_<wbr>restful</span></span>
     
   </span>
   
@@ -1022,36 +1022,43 @@ correctly provided auth (or not):</p>
 $<span class="w"> </span>docker<span class="w"> </span>stop<span class="w"> </span>flux-restful
 </code></pre></div>
 </div>
-<p>Finally, if you want to install a custom branch (and/or repository) of the RESTFul API, we provide
-an environment variable to do this. E.g., this makes it easy to test a custom branch in CI without
-needing to push a container to a registry. Here is how to specify a branch (and default to flux-framework/flux-restful-api)
-or your own repository base:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>--env<span class="w"> </span><span class="nv">INSTALL_BRANCH</span><span class="o">=</span>add/feature<span class="w"> </span>--env<span class="w"> </span><span class="nv">INSTALL_REPO</span><span class="o">=</span>user/flux-restful-api<span class="w"> </span>-d<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>ghcr.io/flux-framework/flux-restful-api
+<p>To try a branch of the RESTful API, build the image from your checkout and run that instead
+(this is also what CI does for the client tests):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>flux-restful-api:dev<span class="w"> </span>.
+$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>flux-restful<span class="w"> </span>-d<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>flux-restful-api:dev
 </code></pre></div>
 </div>
 <h2 id="local">Local<a class="headerlink" href="#local" title="Permalink to this heading">¶</a></h2>
 <p>You can use this setup locally (if you have flux and Python available) or within the Dev Container
 in a VSCode environment.</p>
 <h3 id="install">1. Install<a class="headerlink" href="#install" title="Permalink to this heading">¶</a></h3>
-<p>After cloning the repository, install dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>env
+<p>The server is on PyPI as <code class="docutils literal notranslate"><span class="pre">flux-restful</span></code>. You also need the Flux Python bindings (<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">flux</span></code>),
+which come with Flux itself and are not on PyPI, so use a virtual environment that can see them:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>--system-site-packages<span class="w"> </span>env
 $<span class="w"> </span><span class="nb">source</span><span class="w"> </span>env/bin/activate
+$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>flux-restful
 </code></pre></div>
 </div>
-<p>Install requirements (note that you also need Flux Python available, which isn’t in these requirements as you cannot install from pip).</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<p>To work on the code, install the checkout instead (the pins in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> are the
+versions the container image is tested with):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt<span class="w"> </span>-r<span class="w"> </span>.github/dev-requirements.txt
+$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-deps<span class="w"> </span>-e<span class="w"> </span>.
 </code></pre></div>
 </div>
+<p>Either way you get the <code class="docutils literal notranslate"><span class="pre">flux-restful</span></code> command, with <code class="docutils literal notranslate"><span class="pre">serve</span></code>, <code class="docutils literal notranslate"><span class="pre">init</span></code>, <code class="docutils literal notranslate"><span class="pre">add-user</span></code>, and <code class="docutils literal notranslate"><span class="pre">list-users</span></code>.</p>
 <h3 id="start-service">2. Start Service<a class="headerlink" href="#start-service" title="Permalink to this heading">¶</a></h3>
 <p>There are two ways to start the app! You can either have it be the entry for flux start:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>flux<span class="w"> </span>start<span class="w"> </span>uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>flux<span class="w"> </span>start<span class="w"> </span>flux-restful<span class="w"> </span>serve<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
 </code></pre></div>
 </div>
 <p>Or do it separately (two commands):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>flux<span class="w"> </span>start<span class="w"> </span>--test-size<span class="o">=</span><span class="m">4</span>
-uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
+flux-restful<span class="w"> </span>serve<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
 </code></pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">flux-restful</span> <span class="pre">serve</span></code> runs uvicorn; <code class="docutils literal notranslate"><span class="pre">--workers</span></code> adds workers, which all need the same
+<code class="docutils literal notranslate"><span class="pre">FLUX_TOKEN_SIGNING_KEY</span></code>. For auto-reload during development run uvicorn directly:
+<code class="docutils literal notranslate"><span class="pre">uvicorn</span> <span class="pre">flux_restful.main:app</span> <span class="pre">--reload</span></code>.</p>
 <p>For the latter, you can also use the Makefile:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>make
 </code></pre></div>
@@ -1302,45 +1309,27 @@ you can use pre-commit as follows. Here is a manual run:</p>
 </code></pre></div>
 </div>
 <h2 id="database">Database<a class="headerlink" href="#database" title="Permalink to this heading">¶</a></h2>
-<p>The database config was created with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>alembic<span class="w"> </span>init<span class="w"> </span>--template<span class="w"> </span>generic<span class="w"> </span>./migrations
-</code></pre></div>
-</div>
-<p>At this point we need to edit <code class="docutils literal notranslate"><span class="pre">migrations/env.py</span></code> so it could see our database models. This part:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># This line was added so we import our database</span>
-<span class="kn">from</span> <span class="nn">app.db.base</span> <span class="kn">import</span> <span class="n">Base</span>  <span class="c1"># noqa</span>
-
-<span class="n">target_metadata</span> <span class="o">=</span> <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span>
-</code></pre></div>
-</div>
-<p>At this point we can do a migration to create the initial (empty) tables.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>alembic<span class="w"> </span>revision<span class="w"> </span>--autogenerate<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Create intital tables&quot;</span>
-</code></pre></div>
-</div>
-<p>And then to run the first set of migrations:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>alembic<span class="w"> </span>upgrade<span class="w"> </span>head
-</code></pre></div>
-</div>
-<p>At this point we can create our initial super flux user:</p>
+<p>The server keeps its users in a SQLite database, <code class="docutils literal notranslate"><span class="pre">flux-restful.db</span></code> in the working directory.
+<code class="docutils literal notranslate"><span class="pre">flux-restful</span> <span class="pre">init</span></code> creates the tables (if missing) and the superuser from <code class="docutils literal notranslate"><span class="pre">FLUX_USER</span></code> and
+<code class="docutils literal notranslate"><span class="pre">FLUX_TOKEN</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_USER</span><span class="o">=</span>fluxuser
 <span class="nb">export</span><span class="w"> </span><span class="nv">FLUX_TOKEN</span><span class="o">=</span><span class="m">12345</span>
 </code></pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>python<span class="w"> </span>app/db/init_db.py<span class="w"> </span>init
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp">$ </span>flux-restful<span class="w"> </span>init
+<span class="go">INFO:flux-restful:Creating initial data</span>
+<span class="go">INFO:flux-restful:User fluxuser has been created.</span>
+<span class="go">INFO:flux-restful:Initial data created</span>
 </code></pre></div>
 </div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="gp"># </span>python<span class="w"> </span>app/db/init_db.py<span class="w"> </span>init
-
-<span class="go">INFO:__main__:Creating initial data</span>
-<span class="go">INFO:__main__:User fluxuser has been created.</span>
-<span class="go">INFO:__main__:Initial data created</span>
-</code></pre></div>
-</div>
+<p>The container entrypoint does the same at every start, since its database is ephemeral.
+Alembic is configured (<code class="docutils literal notranslate"><span class="pre">alembic.ini</span></code>, <code class="docutils literal notranslate"><span class="pre">flux_restful/migrations</span></code>) for schema migrations if the
+models change in a release; it is not needed to run the server.</p>
 <p>or add a user:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>python<span class="w"> </span>app/db/init_db.py<span class="w"> </span>add-user<span class="w"> </span>peenut<span class="w"> </span>peenut
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux-restful<span class="w"> </span>add-user<span class="w"> </span>peenut<span class="w"> </span>peenut
 </code></pre></div>
 </div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">INFO:__main__:User peenut has been created.</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span class="go">INFO:flux-restful:User peenut has been created.</span>
 </code></pre></div>
 </div>
 <p>You can see how we run these commands in the <code class="docutils literal notranslate"><span class="pre">entrypoint.sh</span></code> for the container.
@@ -1358,7 +1347,7 @@ documentation. The reason is because we import the app to derive docstrings,
 and this will require having Flux.</p>
 <p><strong>NOTE</strong> to build the documentation you will need an unauthenticated flux endpoint
 running. E.g., in another terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>uvicorn<span class="w"> </span>app.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>uvicorn<span class="w"> </span>flux_restful.main:app<span class="w"> </span>--host<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="o">=</span><span class="m">5000</span>
 </code></pre></div>
 </div>
 <h3 id="install-dependencies-and-build">Install Dependencies and Build<a class="headerlink" href="#install-dependencies-and-build" title="Permalink to this heading">¶</a></h3>
@@ -1385,7 +1374,7 @@ server to preview:</p>
 <p>To run tests, from within the devcontainers environment (or with a local install)
 of Flux alongside the app) you can use flux start. You will need to run them as the
 flux instance owner. E.g., if it’s flux:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>-u<span class="w"> </span>flux<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>pytest<span class="w"> </span>-xs<span class="w"> </span>tests/test_api.py
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>-u<span class="w"> </span>flux<span class="w"> </span>flux<span class="w"> </span>start<span class="w"> </span>pytest<span class="w"> </span>-xs<span class="w"> </span>tests/
 </code></pre></div>
 </div>
 <p>or if it’s just root / a single user:</p>

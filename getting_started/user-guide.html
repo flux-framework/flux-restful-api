@@ -937,7 +937,7 @@
   
   
   <span class="md-ellipsis">
-    <span title="/source/modules.rst (reference label)"><span>app</span></span>
+    <span title="/source/modules.rst (reference label)"><span>flux_<wbr>restful</span></span>
     
   </span>
   
@@ -1019,7 +1019,7 @@ with <code class="docutils literal notranslate"><span class="pre">FLUX_AUTH_BACK
 </tr>
 <tr>
 <td><code>database</code></td>
-<td>Users created with <code>python3 app/db/init_db.py</code></td>
+<td>Users created with <code>flux-restful</code></td>
 <td>Post username and password to <code>/v1/login/access-token</code> to get a token.</td>
 </tr>
 <tr>
@@ -1086,7 +1086,7 @@ $<span class="w"> </span><span class="nb">export</span><span class="w"> </span><
 </code></pre></div>
 </div>
 <p>From here, continue reading the user guide for different language clients,
-or see our Python <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/tree/main/clients/python/examples">examples</a> folder
+or see our Python <a class="reference external" href="https://github.com/flux-framework/flux-restful-api/tree/main/example/client">examples</a> folder
 for snippet examples, or the <a class="reference internal" href="../tutorials/index.html"><span class="std std-doc">tutorials</span></a> for more complex setups.</p>
 <h2 id="python">Python<a class="headerlink" href="#python" title="Permalink to this heading">¶</a></h2>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h3>
@@ -1095,20 +1095,18 @@ for snippet examples, or the <a class="reference internal" href="../tutorials/in
 $<span class="w"> </span><span class="nb">source</span><span class="w"> </span>env/bin/activate
 </code></pre></div>
 </div>
-<p>You can install the client from pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>flux-restful-client
+<p>The client ships in the same package as the server, so one install gives you both,
+at the same version:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>flux-restful
 </code></pre></div>
 </div>
 <p>Or from the repository directly:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/flux-framework/flux-restful-api
-$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>flux-restful-api/clients/python
-<span class="c1"># Install to your Python install</span>
-$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
-
-<span class="c1"># Development version using the code here</span>
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>flux-restful-api
 $<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </code></pre></div>
 </div>
+<p>The client is <code class="docutils literal notranslate"><span class="pre">flux_restful.client</span></code> and the command line tool is <code class="docutils literal notranslate"><span class="pre">flux-restful-cli</span></code>.</p>
 <h3 id="command-line-client">Command Line Client<a class="headerlink" href="#command-line-client" title="Permalink to this heading">¶</a></h3>
 <p>Although most of you will want to interact with the client in Python, we also install
 a simple command line client to let you “one off” a quick command without needing to write
@@ -1300,8 +1298,7 @@ or the job was not found.</p>
 <h3 id="within-python">Within Python<a class="headerlink" href="#within-python" title="Permalink to this heading">¶</a></h3>
 <p>See our <a class="reference external" href="https://flux-framework.org/flux-restful-api/auto_examples/api_tutorial.html#sphx-glr-auto-examples-api-tutorial-py">tutorial</a> for this complete
 example!</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Make sure the directory with the client is in sys.path</span>
-<span class="kn">from</span> <span class="nn">flux_restful_client</span> <span class="kn">import</span> <span class="n">get_client</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">flux_restful.client.main</span> <span class="kn">import</span> <span class="n">get_client</span>
 
 <span class="c1"># create with username and token</span>
 <span class="n">cli</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;fluxuser&quot;</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;12345&quot;</span><span class="p">)</span>
