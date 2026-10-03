@@ -7,7 +7,7 @@ import shutil
 import stat
 import tempfile
 
-from flux_restful_client.logger import logger
+from flux_restful.client.logger import logger
 
 try:
     from ruamel_yaml import YAML

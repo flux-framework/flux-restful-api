@@ -16,10 +16,10 @@ jobs:
     - name: Build the server image from this checkout
       run: docker build -t flux-restful-api:test .
 
-    - name: Install the client
+    - name: Install the package (server and client) and test tools
       run: |
-        cd clients/python
-        pip install -e .[all]
+        pip install -r requirements.txt -r .github/dev-requirements.txt
+        pip install --no-deps -e .
 
     - name: Test without auth
       run: |
@@ -33,8 +33,7 @@ jobs:
           sleep 2
         done
         curl -sf http://localhost:5000/v1/auth || { echo "server did not come up"; docker logs api; exit 1; }
-        cd clients/python
-        pytest -xs flux_restful_client/tests/test_api.py || { docker logs api; exit 1; }
+        FLUX_RESTFUL_HOST=http://localhost:5000 pytest -xs tests/e2e || { docker logs api; exit 1; }
         docker rm -f api
 
     - name: Test with auth
@@ -55,6 +54,5 @@ jobs:
         export FLUX_USER=fluxuser
         export FLUX_TOKEN=12345
         export FLUX_SECRET_KEY=notsecrethoo
-        cd clients/python
-        pytest -xs flux_restful_client/tests/test_api.py || { docker logs api; exit 1; }
+        FLUX_RESTFUL_HOST=http://localhost:5000 pytest -xs tests/e2e || { docker logs api; exit 1; }
         docker rm -f api

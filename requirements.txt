@@ -17,3 +17,7 @@ pydantic-settings==2.15.0
 # python-jose >= 3.4.0 contains the fixes for CVE-2024-33663 and CVE-2024-33664
 python-jose[cryptography]==3.5.0
 bcrypt==5.0.0
+# The Python client
+httpx==0.28.1
+jsonschema==4.25.1
+ruamel.yaml==0.18.15

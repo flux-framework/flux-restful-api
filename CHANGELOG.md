@@ -14,8 +14,10 @@ and **Merged pull requests**. Critical items to know are:
 The versions coincide with releases on pip. Only major versions will be released as tags on Github.
 
 ## [0.0.x](https://github.com/flux-framework/flux-restful-api/tree/main) (0.0.x)
+- Add flux restful client packaged alongside (1.1.0)
 - Published on PyPI as `flux-restful` (1.0.0)
   - the package is `flux_restful` (was `app`); templates and static files ship inside it
+  - the Python client is part of it as `flux_restful.client` with the same version (was the separate `flux-restful-client` package); `flux-restful-cli` is unchanged
   - `flux-restful serve|init|add-user|list-users` replaces `uvicorn app.main:app` and `app/db/init_db.py`
   - the container entrypoint and `make init` no longer run alembic autogenerate at every start
 - Requests no longer block on running jobs: output is read as a snapshot, Flux calls run off the event loop with per-thread handles; bad job ids are 400, missing jobs 404 (1.0.0)
@@ -38,3 +40,11 @@ The versions coincide with releases on pip. Only major versions will be released
   - catching any errors on creation of fluxjob
   - Add support uvicorn workers (>1 needed to run >1 process with Flux)
 - Project (faux) skeleton release (0.0.0)
+
+## Python client (formerly the separate flux-restful-client package)
+- Keep query parameters when retrying a request after authenticating; a job submit after a 401 lost its command (0.2.3)
+- Do not re-authenticate when the token endpoint itself fails; previously a wrong password looped forever (0.2.2)
+- Fix bug with submit and POST needing params (0.2.1)
+- New release with updated client (0.2.0)
+- Update to use newer versions of fastapi, etc (0.1.15)
+  - option_flags is a flat string list of values

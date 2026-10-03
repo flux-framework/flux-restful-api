@@ -1,6 +1,21 @@
+"""
+End-to-end tests of the Python client against a running server.
+
+They run only when FLUX_RESTFUL_HOST names a server (CI starts the container
+image and sets it); otherwise they are skipped.
+"""
+
+import os
 import time
 
-from flux_restful_client.main import get_client
+import pytest
+
+from flux_restful.client.main import get_client
+
+pytestmark = pytest.mark.skipif(
+    not os.environ.get("FLUX_RESTFUL_HOST"),
+    reason="set FLUX_RESTFUL_HOST to a running server to run the client e2e tests",
+)
 
 
 def test_list_nodes():

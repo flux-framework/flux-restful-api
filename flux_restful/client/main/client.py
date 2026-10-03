@@ -2,12 +2,13 @@ import os
 import sys
 import time
 
-import flux_restful_client.main.schemas as schemas
-import flux_restful_client.utils as utils
 import httpx
 import jsonschema
-from flux_restful_client.logger import logger
 from jose import jwt
+
+import flux_restful.client.main.schemas as schemas
+import flux_restful.client.utils as utils
+from flux_restful.client.logger import logger
 
 from .settings import Settings
 

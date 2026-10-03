@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "flux-restful"
 dynamic = ["version"]
-description = "A RESTful API and web interface for submitting and monitoring jobs on a Flux Framework instance"
+description = "A RESTful API, web interface, and Python client for submitting and monitoring jobs on a Flux Framework instance"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
@@ -42,6 +42,10 @@ dependencies = [
   "pydantic-settings>=2.2",
   "python-jose[cryptography]>=3.4",
   "bcrypt>=4.0",
+  # The Python client (flux_restful.client)
+  "httpx>=0.24",
+  "jsonschema>=4.0",
+  "ruamel.yaml>=0.17",
 ]
 
 [project.optional-dependencies]
@@ -56,6 +60,7 @@ Changelog = "https://github.com/flux-framework/flux-restful-api/blob/main/CHANGE
 
 [project.scripts]
 flux-restful = "flux_restful.cli:main"
+flux-restful-cli = "flux_restful.client.commands:run_flux_restful_client"
 
 [tool.setuptools.dynamic]
 version = { file = "VERSION" }
@@ -70,6 +75,7 @@ flux_restful = [
   "static/**/*",
   "pages/*.md",
   "scripts/*.py",
+  "client/settings.yml",
   "migrations/*",
   "migrations/versions/.keep",
 ]

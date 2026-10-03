@@ -1,6 +1,6 @@
 import os
 
-import flux_restful_client.utils as utils
+import flux_restful.client.utils as utils
 
 install_dir = utils.get_installdir()
 reps = {"$install_dir": install_dir, "$root_dir": os.path.dirname(install_dir)}

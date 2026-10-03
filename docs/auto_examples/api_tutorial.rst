@@ -36,7 +36,7 @@ list, get statuses, cancel. We can use our example client for this.
     import time
 
     import matplotlib.pyplot as plt
-    from flux_restful_client.main import get_client
+    from flux_restful.client.main import get_client
 
     # This is expected to be rendered from docs root
     here = os.path.dirname(os.path.abspath(os.getcwd()))
