@@ -106,20 +106,20 @@ class FluxRestfulClient:
         url = f"{self.host}/{self.prefix}/{endpoint}"
         method = method.upper()
 
-        # Make the request and return to calling function, unless requires auth
-        try:
+        def send(headers):
             if method == "POST" and stream:
-                response = self.session.stream(
+                return self.session.stream(
                     method, url, json=data, params=params, headers=headers
                 )
-            elif method == "POST":
-                response = self.session.post(url, params=data, headers=headers)
-            elif method == "GET" and stream:
-                response = self.session.stream(
-                    method, url, params=params, headers=headers
-                )
-            elif method == "GET":
-                response = self.session.get(url, params=params, headers=headers)
+            if method == "POST":
+                return self.session.post(url, params=data, headers=headers)
+            if method == "GET" and stream:
+                return self.session.stream(method, url, params=params, headers=headers)
+            return self.session.get(url, params=params, headers=headers)
+
+        # Make the request and return to calling function, unless requires auth
+        try:
+            response = send(headers)
 
         except Exception as e:
             if attempts > 0:
@@ -141,9 +141,11 @@ class FluxRestfulClient:
         if response.status_code != 401 or endpoint == "token":
             return response
 
-        # Otherwise, authenticate the request and retry once
+        # Otherwise, authenticate and retry once, as the same request: the
+        # retry used to drop the query parameters, so an authenticated POST
+        # of a job arrived without its command.
         if self.authenticate_request(response):
-            return self.session.request(method, url, json=data, headers=self.headers)
+            return send(self.headers)
         return response
 
     def authenticate_request(self, originalResponse):

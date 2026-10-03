@@ -49,6 +49,18 @@ def test_client_authenticates_with_correct_password(make_client):
     response = cli.jobs()
     assert "jobs" in response
     assert cli.calls.count("token") == 1
+
+
+def test_client_retry_after_401_keeps_the_request(make_client):
+    """
+    The first request gets a 401, the client fetches a token and retries. The
+    retry must be the same request: a POST with query parameters (submit)
+    used to be resent without them.
+    """
+    cli = make_client("alice", "wonderland")
+    response = cli.submit("sleep 1")
+    assert "id" in response, response
+    assert cli.calls.count("token") == 1
     # The token is reused for later requests
     cli.jobs()
     assert cli.calls.count("token") == 1
